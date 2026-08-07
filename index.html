@@ -149,18 +149,18 @@
 <body>
 
 <header class="top">
-  <div class="eyebrow"><span>Solution Development — Requirements Package Review, Part B</span><span class="config-status" id="configStatus">Using default weights (not connected)</span></div>
-  <h1>Concept complexity scorer</h1>
+  <div class="eyebrow"><span>Solution Development Engineering - Concept Phase</span><span class="config-status" id="configStatus">Using default weights (not connected)</span></div>
+  <h1>Concept package scoring</h1>
   <p class="sub">Break the cell into process steps when they differ significantly (e.g. bin picking, sorting, palletizing) and score each one separately. Customer automation readiness applies once, to the whole project. Concept effort adds up across steps.</p>
 
   <div class="setup-row">
     <div class="field">
       <label for="senderName">Your name</label>
-      <input type="text" id="senderName" placeholder="e.g. Lukas Guggeis">
+      <input type="text" id="senderName" placeholder="e.g. Jane Doe">
     </div>
     <div class="field">
       <label for="projectName">Project / package name</label>
-      <input type="text" id="projectName" placeholder="e.g. Tesa embedded gluing cell">
+      <input type="text" id="projectName" placeholder="e.g. Project #1">
     </div>
     <div class="field">
       <label>Who's scoring</label>
@@ -207,7 +207,6 @@
       </div>
     </div>
 
-    <p class="footnote">Framework: concept complexity scoring (Part B) for the Requirements Package Review. Weights and bands are pulled live from the shared config (Google Sheet) when connected — otherwise the tool falls back to the last-agreed defaults shown here. Recalibrate the config once the actuals log holds data. This tool covers Part B (complexity) only; Part A (package completeness) is a separate manual check.</p>
   </div>
 
   <aside class="summary" id="summaryPanel">
@@ -351,9 +350,9 @@ const elementDefs = [
 ];
 
 const readinessOptionsDef = [
-  {score:1, label:'Already automates this', text:"Customer already runs automated cells like this — fits their existing standards and processes."},
-  {score:2, label:'Some experience, open gaps', text:"Some automation experience, but this process/interface still has open gaps or one unresolved clarification from the workshop."},
-  {score:3, label:'Fundamentally new to them', text:"Fundamentally new for how they run this process. No established automation practice here, workshop didn't resolve how they'd adapt."}
+  {score:1, label:'Experienced in automation', text:"Customer already runs automated cells like this — fits their existing standards and processes."},
+  {score:2, label:'Taking first steps', text:"Some automation experience, but this process/interface still has open gaps or one unresolved clarification from the workshop."},
+  {score:3, label:'New to automation', text:"Fundamentally new for how they run this process. No established automation practice here, workshop didn't resolve how they'd adapt."}
 ];
 
 let state = {
