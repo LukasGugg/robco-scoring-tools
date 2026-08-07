@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Concept Complexity Scorer — Admin</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Castoro&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#FCF9F7; --text:#0D2130; --line:#F3EAE3;
+    --low:#8ACED8; --mid:#6587A6; --high:#D96B67;
+    --muted:#B5B9BB; --dusk:#1C3C5A; --card:#ffffff;
+  }
+  *{box-sizing:border-box;}
+  body{ margin:0; background:var(--bg); color:var(--text); font-family:'Helvetica Neue', Arial, sans-serif; font-weight:300; line-height:1.5; }
+  h1,h2,h3{ font-family:'Castoro', Georgia, serif; font-weight:400; margin:0; }
+  .page{ max-width:1200px; margin:0 auto; padding:32px 24px 80px; }
+  .eyebrow{ text-transform:uppercase; letter-spacing:0.12em; font-size:11px; color:var(--dusk); margin-bottom:6px; }
+  h1{ font-size:28px; }
+  .sub{ color:#5c6b76; font-size:14px; margin-top:8px; max-width:700px; }
+  .status-banner{ margin-top:16px; padding:12px 16px; border-radius:10px; font-size:13px; display:none; }
+  .status-banner.err{ background:rgba(217,107,103,0.15); color:#8a2f2b; display:block; }
+  .status-banner.info{ background:rgba(138,206,216,0.15); color:var(--dusk); display:block; }
+
+  .tabs{ display:flex; gap:8px; margin-top:24px; border-bottom:1px solid var(--line); }
+  .tab-btn{ font-family:inherit; font-size:14px; padding:10px 18px; border:none; background:none; cursor:pointer; color:#5c6b76; border-bottom:2px solid transparent; }
+  .tab-btn.active{ color:var(--dusk); border-bottom-color:var(--dusk); font-weight:700; }
+  .tab-panel{ display:none; margin-top:24px; }
+  .tab-panel.active{ display:block; }
+
+  .card{ background:var(--card); border:1px solid var(--line); border-radius:14px; padding:22px; margin-bottom:18px; }
+  .card h2{ font-size:17px; margin-bottom:4px; }
+  .card .desc{ font-size:12.5px; color:#5c6b76; margin-bottom:16px; }
+
+  table.data-table{ width:100%; border-collapse:collapse; font-size:12.5px; }
+  table.data-table th{ text-align:left; padding:8px; border-bottom:1px solid var(--line); color:#8a97a1; font-weight:400; text-transform:uppercase; font-size:10.5px; letter-spacing:.04em; }
+  table.data-table td{ padding:8px; border-bottom:1px solid var(--line); vertical-align:top; }
+  table.data-table tr:hover{ background:rgba(138,206,216,0.06); }
+  .band-pill{ padding:2px 8px; border-radius:10px; font-size:11px; font-weight:700; }
+  .band-Standard{ background:rgba(138,206,216,0.25); color:var(--dusk); }
+  .band-Elevated{ background:rgba(232,192,138,0.35); color:#7a5a1f; }
+  .band-Complex{ background:rgba(217,107,103,0.25); color:#8a2f2b; }
+  .expand-btn{ font-family:inherit; font-size:11.5px; background:none; border:1px solid var(--muted); border-radius:6px; padding:4px 8px; cursor:pointer; }
+  .steps-detail{ display:none; background:var(--bg); border-radius:8px; padding:10px; margin-top:6px; font-size:11.5px; }
+  .steps-detail.show{ display:block; }
+  .steps-detail table{ width:100%; border-collapse:collapse; }
+  .steps-detail th, .steps-detail td{ padding:4px 6px; text-align:left; }
+
+  .config-form{ display:grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap:14px; }
+  .config-field{ display:flex; flex-direction:column; gap:5px; }
+  .config-field label{ font-size:11px; color:#5c6b76; }
+  .config-field input{ font-family:inherit; font-size:13px; padding:8px 10px; border:1px solid var(--muted); border-radius:7px; }
+  .config-group-title{ grid-column:1/-1; font-size:12px; text-transform:uppercase; letter-spacing:.05em; color:var(--dusk); margin-top:10px; margin-bottom:-4px; }
+
+  .btn{ font-family:inherit; font-size:13px; padding:10px 20px; border-radius:8px; border:none; cursor:pointer; background:var(--dusk); color:#fff; }
+  .btn-row{ margin-top:18px; display:flex; gap:10px; align-items:center; }
+  .save-status{ font-size:12.5px; }
+  .save-status.ok{ color:#3f8f6b; }
+  .save-status.err{ color:var(--high); }
+
+  .refresh-btn{ font-family:inherit; font-size:12.5px; padding:7px 14px; border-radius:7px; border:1px solid var(--muted); background:#fff; cursor:pointer; }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <div class="eyebrow">Solution Development — Multi-Phase Complexity Scorer</div>
+  <h1>Admin panel</h1>
+  <p class="sub">Read-only view of submitted scores across all phases, pulled from each phase's own Responses tab. Weights, bands, and effort ranges are edited directly in the <strong>Config</strong> tab of the Sheet (phase-prefixed keys, e.g. <code>concept.weight_task</code>) — no UI for that here, on purpose.</p>
+  <div class="setup-row" style="margin-top:16px; display:flex; gap:10px; align-items:flex-end;">
+    <div class="config-field" style="max-width:200px;">
+      <label>Phase</label>
+      <select id="phaseSelect" style="font-family:inherit; font-size:13px; padding:8px 10px; border:1px solid var(--muted); border-radius:7px; width:100%;">
+        <option value="Concept">Concept</option>
+        <option value="Design">Design</option>
+        <option value="Execution">Execution</option>
+      </select>
+    </div>
+    <div class="config-field" style="max-width:260px;">
+      <label>Admin passcode</label>
+      <input type="password" id="passcodeInput" placeholder="Enter passcode">
+    </div>
+    <button class="refresh-btn" id="unlockBtn">Unlock</button>
+  </div>
+  <div class="status-banner" id="statusBanner"></div>
+
+  <div class="card" style="margin-top:24px;">
+    <div style="display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <h2>Submissions — <span id="phaseHeading">Concept</span></h2>
+        <div class="desc">Newest first. Click a row to see the per-item dimension scores and examples.</div>
+      </div>
+      <button class="refresh-btn" id="refreshSubmissionsBtn">Refresh</button>
+    </div>
+    <table class="data-table" id="submissionsTable">
+      <thead>
+        <tr><th></th><th>Date</th><th>Sender</th><th>Project</th><th>Estimate type</th><th>Total effort</th><th>Reference estimate</th></tr>
+      </thead>
+      <tbody id="submissionsBody"><tr><td colspan="7">Enter the admin passcode above and click Unlock.</td></tr></tbody>
+    </table>
+  </div>
+</div>
+
+<script>
+// Paste your deployed Apps Script Web App URL here (see SETUP.md). Read-only —
+// used only for GET ?type=submissions. Config is edited directly in the Sheet.
+const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzmQIh55Ii-v9cn06ethadDeaC47HHlCpkVGcl-IkgvP4zL8uDKWV95IczYElA0ylcg/exec';
+
+function showStatus(msg, type){
+  const el = document.getElementById('statusBanner');
+  el.className = 'status-banner ' + type;
+  el.textContent = msg;
+}
+
+let passcode = '';
+document.getElementById('unlockBtn').addEventListener('click', ()=>{
+  passcode = document.getElementById('passcodeInput').value;
+  loadSubmissions();
+});
+document.getElementById('refreshSubmissionsBtn').addEventListener('click', loadSubmissions);
+document.getElementById('phaseSelect').addEventListener('change', ()=>{
+  document.getElementById('phaseHeading').textContent = document.getElementById('phaseSelect').value;
+  if(passcode) loadSubmissions();
+});
+
+async function loadSubmissions(){
+  const phase = document.getElementById('phaseSelect').value;
+  const body = document.getElementById('submissionsBody');
+  body.innerHTML = '<tr><td colspan="7">Loading…</td></tr>';
+  if(!WEBAPP_URL || WEBAPP_URL.indexOf('PASTE_YOUR') === 0){
+    body.innerHTML = '<tr><td colspan="7">Not connected — set WEBAPP_URL in this file.</td></tr>';
+    return;
+  }
+  try{
+    const res = await fetch(WEBAPP_URL + '?type=submissions&phase=' + encodeURIComponent(phase) + '&passcode=' + encodeURIComponent(passcode));
+    const data = await res.json();
+    if(data.error){
+      body.innerHTML = `<tr><td colspan="7">${data.error}</td></tr>`;
+      showStatus('Could not load submissions: ' + data.error + ' — check the passcode, and that a Responses_' + phase + ' tab exists.', 'err');
+      return;
+    }
+    showStatus('', '');
+    document.getElementById('statusBanner').className = 'status-banner';
+    if(!data.length){
+      body.innerHTML = '<tr><td colspan="7">No submissions yet for ' + phase + '.</td></tr>';
+      return;
+    }
+    body.innerHTML = '';
+    data.forEach((sub, idx)=>{
+      const tr = document.createElement('tr');
+      const date = sub['Timestamp'] ? new Date(sub['Timestamp']).toLocaleString() : '';
+      tr.innerHTML = `
+        <td><button class="expand-btn" data-idx="${idx}">Details</button></td>
+        <td>${date}</td>
+        <td>${sub['Sender name'] || sub['Email Address'] || ''}</td>
+        <td>${sub['Project / package name'] || sub['Project name'] || ''}</td>
+        <td>${sub['Estimate type'] || ''}</td>
+        <td>${sub['Total effort low'] || ''}–${sub['Total effort high'] || ''}</td>
+        <td>${sub['Reference estimate'] || ''}</td>`;
+      body.appendChild(tr);
+
+      const detailTr = document.createElement('tr');
+      const detailTd = document.createElement('td');
+      detailTd.colSpan = 7;
+      const detailDiv = document.createElement('div');
+      detailDiv.className = 'steps-detail';
+      detailDiv.id = `detail-${idx}`;
+
+      const itemsArr = Array.isArray(sub.itemsParsed) ? sub.itemsParsed : [];
+      let itemsHtml = '';
+      if(!Array.isArray(sub.itemsParsed)){
+        itemsHtml += `<p>Couldn't read item data for this submission — "Items JSON" contained: <code>${JSON.stringify(sub['Items JSON'])}</code>. Usually means a Form entry ID mapping is off.</p>`;
+      } else if(itemsArr.length){
+        // Discover dimension keys dynamically from the first item, so this works for any phase.
+        const dimKeys = Object.keys(itemsArr[0].scores || {});
+        itemsHtml += `<table><thead><tr><th>Item</th>${dimKeys.map(k=>`<th>${k}</th>`).join('')}<th>Score</th><th>Band</th><th>Effort</th></tr></thead><tbody>`;
+        itemsArr.forEach(item=>{
+          const scores = item.scores || {};
+          itemsHtml += `<tr>
+            <td>${item.name || ''}</td>
+            ${dimKeys.map(k=>`<td>${scores[k] ?? ''}</td>`).join('')}
+            <td>${item.weightedScore != null ? Number(item.weightedScore).toFixed(2) : ''}</td>
+            <td><span class="band-pill band-${item.band}">${item.band || ''}</span></td>
+            <td>${item.effortLow ?? ''}–${item.effortHigh ?? ''}</td>
+          </tr>`;
+        });
+        itemsHtml += `</tbody></table>`;
+      } else {
+        itemsHtml += `<p>No items recorded on this submission.</p>`;
+      }
+
+      const pl = sub.projectLevelParsed || {};
+      if(Object.keys(pl).length){
+        itemsHtml += `<p style="margin-top:8px;"><strong>Project-level:</strong> ${Object.entries(pl).map(([k,v])=>`${k}=${v}`).join(', ')}</p>`;
+      }
+      if(sub['Adjustment notes']){ itemsHtml += `<p style="margin-top:4px;"><strong>Adjustment notes:</strong> ${sub['Adjustment notes']}</p>`; }
+
+      detailDiv.innerHTML = itemsHtml;
+      detailTd.appendChild(detailDiv);
+      detailTr.appendChild(detailTd);
+      body.appendChild(detailTr);
+    });
+
+    document.querySelectorAll('.expand-btn').forEach(btn=>{
+      btn.addEventListener('click', ()=>{
+        document.getElementById(`detail-${btn.dataset.idx}`).classList.toggle('show');
+      });
+    });
+  } catch(err){
+    body.innerHTML = `<tr><td colspan="7">Error: ${err}</td></tr>`;
+  }
+}
+</script>
+</body>
+</html>
