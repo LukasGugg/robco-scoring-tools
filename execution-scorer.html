@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Phase Scorer — Template</title>
+<title>Execution Phase Scorer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Castoro&display=swap" rel="stylesheet">
 <style>
@@ -15,7 +15,6 @@
   *{box-sizing:border-box;}
   body{ margin:0; background:var(--bg); color:var(--text); font-family:'Helvetica Neue', Arial, sans-serif; font-weight:300; line-height:1.5; }
   h1,h2,h3{ font-family:'Castoro', Georgia, serif; font-weight:400; margin:0; }
-  .demo-banner{ background:var(--dusk); color:#fff; text-align:center; padding:10px 16px; font-size:13px; }
   .wrap{ display:grid; grid-template-columns: 1fr 380px; gap:28px; max-width:1360px; margin:0 auto; padding:32px 24px 120px; align-items:start; }
   @media (max-width: 1000px){
     .wrap{ grid-template-columns: 1fr; padding-bottom:280px; }
@@ -28,21 +27,9 @@
   .setup-row{ display:flex; gap:16px; flex-wrap:wrap; margin-top:20px; align-items:flex-end; }
   .field{ display:flex; flex-direction:column; gap:6px; }
   .field label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dusk); }
-  .field input[type=text], .field select{ font-family:inherit; font-size:14px; padding:9px 11px; border:1.5px solid var(--muted); border-radius:8px; background:#fff; color:var(--text); min-width:220px; }
+  .field input[type=text]{ font-family:inherit; font-size:14px; padding:9px 11px; border:1.5px solid var(--muted); border-radius:8px; background:#fff; color:var(--text); min-width:220px; }
   .config-status{ font-size:11px; color:#5c6b76; font-weight:700; }
   .config-status.live{ color:#1e6b47; }
-
-  .readiness-card{ background:#fff; border:1.5px solid var(--dusk); border-radius:14px; padding:22px; margin-top:24px; }
-  .readiness-card h2{ font-size:18px; }
-  .readiness-card .desc{ font-size:13px; color:#3d4d57; margin-top:4px; margin-bottom:14px; }
-  .readiness-options{ display:flex; flex-direction:column; gap:10px; }
-  .readiness-option{ display:flex; gap:12px; align-items:flex-start; border:1.75px solid var(--muted); border-radius:10px; padding:13px 16px; cursor:pointer; }
-  .readiness-option:hover{ border-color:var(--dusk); }
-  .readiness-option.sel-1{ border-color:var(--dusk); background:rgba(138,206,216,0.28); }
-  .readiness-option.sel-2{ border-color:var(--dusk); background:rgba(101,135,166,0.28); }
-  .readiness-option.sel-3{ border-color:var(--dusk); background:rgba(217,107,103,0.22); }
-  .readiness-option .r-label{ font-weight:700; font-size:14px; display:block; }
-  .readiness-option .r-desc{ font-size:12.5px; color:#3d4d57; margin-top:3px; }
 
   .steps-toolbar{ display:flex; justify-content:space-between; align-items:center; margin-top:26px; }
   .steps-toolbar h2{ font-size:19px; }
@@ -78,7 +65,6 @@
   .step-score-row .step-cell{ background:transparent; text-align:center; padding:6px; border:none; }
   .step-score-badge{ font-family:'Castoro', Georgia, serif; font-size:20px; }
   .step-score-band{ font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; margin-top:2px; }
-  .footnote{ font-size:11px; color:#5c6b76; margin-top:20px; max-width:900px; }
 
   .summary{ position:sticky; top:24px; background:var(--dusk); color:#fff; border-radius:16px; padding:22px; }
   .summary h3{ font-size:15px; text-transform:uppercase; letter-spacing:.06em; }
@@ -107,25 +93,19 @@
 </head>
 <body>
 
-<div class="demo-banner">TEMPLATE — edit the <code>PHASE_DEFS</code> object at the top of the script to define your own phase(s), dimensions, and weights. Everything else is generic plumbing.</div>
-
 <header class="top">
-  <div class="eyebrow"><span id="phaseEyebrow">Phase Scorer</span> — <span class="config-status" id="configStatus">Using local defaults (not connected)</span></div>
-  <h1 id="phaseTitle">Phase Scorer Template</h1>
-  <p class="sub" id="phaseSub"></p>
+  <div class="eyebrow"><span>Solution Development Engineering - Execution Phase</span> — <span class="config-status" id="configStatus">Using local defaults (not connected)</span></div>
+  <h1>Execution phase scoring</h1>
+  <p class="sub">Score each unit on deployment-time complexity drivers.</p>
 
   <div class="setup-row">
     <div class="field">
-      <label for="phaseSelect">Phase</label>
-      <select id="phaseSelect"></select>
+      <label for="senderName">Your name</label>
+      <input type="text" id="senderName" placeholder="e.g. Jane Doe">
     </div>
     <div class="field">
       <label for="projectName">Project / package name</label>
-      <input type="text" id="projectName" placeholder="e.g. CWS Healthcare palletizing cell">
-    </div>
-    <div class="field">
-      <label for="senderName">Your name</label>
-      <input type="text" id="senderName" placeholder="e.g. Paul Meyer">
+      <input type="text" id="projectName" placeholder="e.g. Project #1">
     </div>
   </div>
 </header>
@@ -133,25 +113,17 @@
 <div class="wrap">
   <div class="left">
 
-    <section class="readiness-card" id="projectLevelCard" style="display:none;">
-      <h2 id="projectLevelTitle"></h2>
-      <div class="desc" id="projectLevelDesc"></div>
-      <div class="readiness-options" id="readinessOptions"></div>
-    </section>
-
     <div class="steps-toolbar">
-      <h2 id="unitsTitle">Units</h2>
-      <button class="add-step-btn" id="addStepBtn">+ Add</button>
+      <h2>Units</h2>
+      <button class="add-step-btn" id="addStepBtn">+ Add unit</button>
     </div>
-    <p class="steps-hint" id="unitsHint"></p>
+    <p class="steps-hint">Add one column per unit of execution work you want to score separately.</p>
 
     <div class="grid-card">
       <div class="steps-scroll">
         <table class="steps-grid" id="stepsTable"></table>
       </div>
     </div>
-
-    <p class="footnote">Weights and effort bands are pulled live from the shared Config tab when connected (per phase, via <code>?phase=</code>), otherwise this falls back to even-split placeholder weights defined per phase below.</p>
   </div>
 
   <aside class="summary" id="summaryPanel">
@@ -159,11 +131,10 @@
     <div class="step-summary-list" id="stepSummaryList"></div>
     <div class="total-hero">
       <div class="num" id="totalEffortNum">—</div>
-      <div class="lbl" id="totalEffortLabel">Total effort</div>
+      <div class="lbl">Total effort (hours)</div>
     </div>
     <div class="meta-grid">
       <div><div class="k">Units scored</div><div class="v" id="stepsScoredDisplay">0 / 0</div></div>
-      <div><div class="k" id="projectLevelKeyLabel">Project-level</div><div class="v" id="readinessDisplay">—</div></div>
     </div>
     <div class="decision-box" id="decisionBox">Score at least one unit to see a live total.</div>
     <div class="btn-row">
@@ -179,118 +150,53 @@
 </div>
 
 <script>
-/* =========================================================================
-   EDIT THIS SECTION to define your own phase(s). Nothing below this object
-   needs to change to add a phase, add a dimension, or change wording.
-   ========================================================================= */
+const PHASE_NAME = 'Execution';
 
-const PHASE_DEFS = {
-  Design: {
-    title: 'Design Phase Package Scorer',
-    subtitle: 'Score each work package on design-specific dimensions.',
-    unitLabel: 'work package',
-    unitLabelPlural: 'Work packages',
-    unitHint: 'Add one column per work package — e.g. "Gripper development," "Conveyor technology."',
-    effortUnit: 'hours',
-    elements: [
-      { key:'maturity', name:'Design maturity', sub:'Has this sub-system been designed before?',
-        options:[
-          {score:1, tooltip:'Reused from an existing design, minimal rework.'},
-          {score:2, tooltip:'Adapted from a reference design, meaningful changes needed.'},
-          {score:3, tooltip:'New design, no internal reference.'}
-        ], example:'e.g. Adapted from Project X gripper' },
-      { key:'testing', name:'Prototype / test need', sub:'How will this be validated?',
-        options:[
-          {score:1, tooltip:'Calculation/simulation is sufficient.'},
-          {score:2, tooltip:'Bench test of a sub-component needed.'},
-          {score:3, tooltip:'Full physical prototype needed.'}
-        ], example:'e.g. Bench test of gripper jaws' },
-      { key:'procurement', name:'Supplier & procurement risk', sub:'Sourcing risk for this package',
-        options:[
-          {score:1, tooltip:'Known supplier, standard lead time.'},
-          {score:2, tooltip:'New supplier or non-standard part.'},
-          {score:3, tooltip:'Custom part, long/uncertain lead time.'}
-        ], example:'e.g. Custom actuator, 12-week lead' },
-      { key:'interface', name:'Interface complexity', sub:'Coupling with other packages',
-        options:[
-          {score:1, tooltip:'Standalone, minimal interface.'},
-          {score:2, tooltip:'Simple interface to 1-2 packages.'},
-          {score:3, tooltip:'Complex interface across multiple systems.'}
-        ], example:'e.g. Interfaces with conveyor timing' }
-    ],
-    projectLevel: {
-      key: 'reqStability', title: 'Requirements stability', label: 'Requirements stability',
-      desc: 'Scored once for the whole project, not per package.',
-      options: [
-        {score:1, label:'Locked', text:'Requirements package signed off, minimal expected change.'},
-        {score:2, label:'Some open points', text:'A few requirements still being clarified.'},
-        {score:3, label:'Actively in flux', text:'Requirements still changing significantly during design.'}
-      ]
-    }
-  },
-
-  Execution: {
-    title: 'Execution Phase Scorer',
-    subtitle: 'Score each unit on deployment-time complexity drivers.',
-    unitLabel: 'unit',
-    unitLabelPlural: 'Units',
-    unitHint: 'Add one column per unit of execution work you want to score separately.',
-    effortUnit: 'hours',
-    elements: [
-      { key:'robots', name:'Number of robots', sub:'How many robots in this unit?',
-        options:[
-          {score:1, tooltip:'1 robot.'},
-          {score:2, tooltip:'2-3 robots.'},
-          {score:3, tooltip:'4+ robots.'}
-        ], example:'e.g. 2 robots' },
-      { key:'variants', name:'Number of variants', sub:'How many part/product variants?',
-        options:[
-          {score:1, tooltip:'1-5 variants.'},
-          {score:2, tooltip:'5-10 variants.'},
-          {score:3, tooltip:'10+ variants.'}
-        ], example:'e.g. 7 SKUs' },
-      { key:'usecase', name:'Use case complexity', sub:'e.g. palletizing vs. pick-and-place',
-        options:[
-          {score:1, tooltip:'Simple pick-and-place.'},
-          {score:2, tooltip:'Moderate — e.g. sorting, basic assembly.'},
-          {score:3, tooltip:'Complex — e.g. palletizing with mixed patterns.'}
-        ], example:'e.g. Mixed-pattern palletizing' },
-      { key:'integration', name:'Integration complexity', sub:'e.g. PLC / line integration present?',
-        options:[
-          {score:1, tooltip:'Standalone, no PLC/line integration.'},
-          {score:2, tooltip:'Simple PLC handshake.'},
-          {score:3, tooltip:'Deep integration into existing line/PLC.'}
-        ], example:'e.g. Full line PLC handshake' },
-      { key:'travel', name:'Travel', sub:'Travel burden for this unit',
-        options:[
-          {score:1, tooltip:'Local / no significant travel.'},
-          {score:2, tooltip:'Domestic travel required.'},
-          {score:3, tooltip:'International / extended travel required.'}
-        ], example:'e.g. 2-week on-site in Mexico' },
-      { key:'gripper', name:'Gripper complexity', sub:'(you noted this matters less at Execution — reconsider weight/inclusion)',
-        options:[
-          {score:1, tooltip:'Standard gripper, no changes needed on-site.'},
-          {score:2, tooltip:'Gripper needs on-site tuning/adjustment.'},
-          {score:3, tooltip:'Gripper is a known problem area needing rework on-site.'}
-        ], example:'e.g. Known soft-gripper reliability issue' }
-    ],
-    projectLevel: null  // set to null to skip a project-level factor entirely for this phase
-  }
+const DEF = {
+  effortUnit: 'hours',
+  elements: [
+    { key:'robots', name:'Number of robots', sub:'How many robots in this unit?',
+      options:[
+        {score:1, tooltip:'1 robot.'},
+        {score:2, tooltip:'2-3 robots.'},
+        {score:3, tooltip:'4+ robots.'}
+      ], example:'e.g. 2 robots' },
+    { key:'variants', name:'Number of variants', sub:'How many part/product variants?',
+      options:[
+        {score:1, tooltip:'1-5 variants.'},
+        {score:2, tooltip:'5-10 variants.'},
+        {score:3, tooltip:'10+ variants.'}
+      ], example:'e.g. 7 SKUs' },
+    { key:'usecase', name:'Use case complexity', sub:'e.g. palletizing vs. pick-and-place',
+      options:[
+        {score:1, tooltip:'Simple pick-and-place.'},
+        {score:2, tooltip:'Moderate — e.g. sorting, basic assembly.'},
+        {score:3, tooltip:'Complex — e.g. palletizing with mixed patterns.'}
+      ], example:'e.g. Mixed-pattern palletizing' },
+    { key:'integration', name:'Integration complexity', sub:'e.g. PLC / line integration present?',
+      options:[
+        {score:1, tooltip:'Standalone, no PLC/line integration.'},
+        {score:2, tooltip:'Simple PLC handshake.'},
+        {score:3, tooltip:'Deep integration into existing line/PLC.'}
+      ], example:'e.g. Full line PLC handshake' },
+    { key:'travel', name:'Travel', sub:'Travel burden for this unit',
+      options:[
+        {score:1, tooltip:'Local / no significant travel.'},
+        {score:2, tooltip:'Domestic travel required.'},
+        {score:3, tooltip:'International / extended travel required.'}
+      ], example:'e.g. 2-week on-site in Mexico' },
+    { key:'gripper', name:'Gripper complexity', sub:'(reconsider weight/inclusion if this matters less at Execution)',
+      options:[
+        {score:1, tooltip:'Standard gripper, no changes needed on-site.'},
+        {score:2, tooltip:'Gripper needs on-site tuning/adjustment.'},
+        {score:3, tooltip:'Gripper is a known problem area needing rework on-site.'}
+      ], example:'e.g. Known soft-gripper reliability issue' }
+  ]
 };
-
-/* =========================================================================
-   Generic plumbing below — shouldn't need edits to add/change a phase.
-   ========================================================================= */
 
 // Fill these in once your Forms + Apps Script are deployed (see SETUP.md).
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzmQIh55Ii-v9cn06ethadDeaC47HHlCpkVGcl-IkgvP4zL8uDKWV95IczYElA0ylcg/exec';
-// Each phase has its own Form (same schema, different Form) -- one URL per phase.
-const FORM_ACTION_URLS = {
-  Design: 'https://docs.google.com/forms/d/e/1FAIpQLSeT2YrqDYtUk4BMCC37jDqoXuTX6nmCLDnDvNviC9UT8dFoWQ/formResponse',
-  Execution: 'https://docs.google.com/forms/d/e/1FAIpQLSfgKJHpdF7DjQu0vkq2WDCdJv4arWd2ODVne0Zvc6rMjHzFAw/formResponse'
-};
-// Entry IDs are identical across phases as long as every Form was duplicated
-// from the same structure -- one shared mapping.
+const FORM_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfgKJHpdF7DjQu0vkq2WDCdJv4arWd2ODVne0Zvc6rMjHzFAw/formResponse';
 const FORM_ENTRY_IDS = {
   phase: 'entry.913181026',
   senderName: 'entry.1612375149',
@@ -304,27 +210,19 @@ const FORM_ENTRY_IDS = {
   adjustmentNotes: 'entry.1781478160'
 };
 
-let currentPhase = Object.keys(PHASE_DEFS)[0];
 let CONFIG = { weights:{}, bands:{ standardMax:1.6, elevatedMax:2.3, standard:{low:2,high:5}, elevated:{low:5,high:12}, complex:{low:12,high:25} } };
-let state = { project:'', senderName:'', projectLevel:{score:null}, steps:[] };
+let state = { project:'', senderName:'', steps:[] };
 let stepCounter = 0;
-
-const phaseSelect = document.getElementById('phaseSelect');
-Object.keys(PHASE_DEFS).forEach(p=>{
-  const opt = document.createElement('option'); opt.value = p; opt.textContent = p;
-  phaseSelect.appendChild(opt);
-});
-phaseSelect.addEventListener('change', ()=>{ switchPhase(phaseSelect.value); });
 
 function evenWeights(elements){
   const w = {}; elements.forEach(e=> w[e.key] = 1/elements.length); return w;
 }
 
-function newStep(def){
+function newStep(){
   stepCounter++;
   const scores = {}; const examples = {};
-  def.elements.forEach(e=>{ scores[e.key]=null; examples[e.key]=''; });
-  return { id: stepCounter, name: `${def.unitLabel.charAt(0).toUpperCase()+def.unitLabel.slice(1)} ${stepCounter}`, scores, examples };
+  DEF.elements.forEach(e=>{ scores[e.key]=null; examples[e.key]=''; });
+  return { id: stepCounter, name: `Unit ${stepCounter}`, scores, examples };
 }
 
 function bandFromScore(w){
@@ -333,21 +231,20 @@ function bandFromScore(w){
   return {name:'Complex', effort:[CONFIG.bands.complex.low, CONFIG.bands.complex.high], class:'band-complex'};
 }
 
-function stepWeightedScore(step, def){
-  const allAnswered = def.elements.every(e=> step.scores[e.key]!==null) && (!def.projectLevel || state.projectLevel.score!==null);
+function stepWeightedScore(step){
+  const allAnswered = DEF.elements.every(e=> step.scores[e.key]!==null);
   if(!allAnswered) return null;
   let sum = 0;
-  def.elements.forEach(e=>{ sum += step.scores[e.key] * (CONFIG.weights[e.key] ?? evenWeights(def.elements)[e.key]); });
-  if(def.projectLevel){ sum += state.projectLevel.score * (CONFIG.weights[def.projectLevel.key] ?? 0); }
+  DEF.elements.forEach(e=>{ sum += step.scores[e.key] * (CONFIG.weights[e.key] ?? evenWeights(DEF.elements)[e.key]); });
   return sum;
 }
 
-async function loadRemoteConfig(phaseName){
+async function loadRemoteConfig(){
   document.getElementById('configStatus').textContent = 'Using local defaults (not connected)';
   document.getElementById('configStatus').classList.remove('live');
   if(!WEBAPP_URL || WEBAPP_URL.indexOf('PASTE_YOUR') === 0) return;
   try{
-    const res = await fetch(WEBAPP_URL + '?type=config&phase=' + encodeURIComponent(phaseName));
+    const res = await fetch(WEBAPP_URL + '?type=config&phase=' + encodeURIComponent(PHASE_NAME));
     const data = await res.json();
     if(data.error) throw new Error(data.error);
     const weights = {};
@@ -368,53 +265,7 @@ async function loadRemoteConfig(phaseName){
   }
 }
 
-function switchPhase(phaseName){
-  currentPhase = phaseName;
-  const def = PHASE_DEFS[phaseName];
-  CONFIG.weights = evenWeights(def.elements);
-  state = { project: state.project, senderName: state.senderName, projectLevel:{score:null}, steps: [] };
-  stepCounter = 0;
-  state.steps.push(newStep(def));
-
-  document.getElementById('phaseEyebrow').textContent = phaseName + ' Phase — TEMPLATE';
-  document.getElementById('phaseTitle').textContent = def.title;
-  document.getElementById('phaseSub').textContent = def.subtitle;
-  document.getElementById('unitsTitle').textContent = def.unitLabelPlural;
-  document.getElementById('unitsHint').textContent = def.unitHint;
-  document.getElementById('addStepBtn').textContent = '+ Add ' + def.unitLabel;
-  document.getElementById('totalEffortLabel').textContent = 'Total effort (' + def.effortUnit + ')';
-
-  const plCard = document.getElementById('projectLevelCard');
-  if(def.projectLevel){
-    plCard.style.display = 'block';
-    document.getElementById('projectLevelTitle').textContent = def.projectLevel.title;
-    document.getElementById('projectLevelDesc').textContent = def.projectLevel.desc;
-    document.getElementById('projectLevelKeyLabel').textContent = def.projectLevel.label;
-    const optEl = document.getElementById('readinessOptions');
-    optEl.innerHTML = '';
-    def.projectLevel.options.forEach(opt=>{
-      const div = document.createElement('div');
-      div.className = 'readiness-option';
-      div.innerHTML = `<div><span class="r-label">${opt.label}</span><span class="r-desc">${opt.text}</span></div>`;
-      div.addEventListener('click', ()=>{
-        state.projectLevel.score = opt.score;
-        [...optEl.children].forEach(c=>c.classList.remove('sel-1','sel-2','sel-3'));
-        div.classList.add(`sel-${opt.score}`);
-        renderSummary();
-      });
-      optEl.appendChild(div);
-    });
-  } else {
-    plCard.style.display = 'none';
-  }
-
-  renderGrid();
-  renderSummary();
-  loadRemoteConfig(phaseName);
-}
-
 function renderGrid(){
-  const def = PHASE_DEFS[currentPhase];
   const table = document.getElementById('stepsTable');
   table.innerHTML = '';
   const headRow = document.createElement('tr');
@@ -435,7 +286,7 @@ function renderGrid(){
   });
   table.appendChild(headRow);
 
-  def.elements.forEach(elDef=>{
+  DEF.elements.forEach(elDef=>{
     const tr = document.createElement('tr');
     const labelTd = document.createElement('td'); labelTd.className='element-label';
     labelTd.innerHTML = `<strong>${elDef.name}</strong><span>${elDef.sub}</span>`;
@@ -479,7 +330,7 @@ function renderGrid(){
 }
 
 document.getElementById('addStepBtn').addEventListener('click', ()=>{
-  state.steps.push(newStep(PHASE_DEFS[currentPhase]));
+  state.steps.push(newStep());
   renderGrid(); renderSummary();
 });
 document.getElementById('projectName').addEventListener('input', e=>{ state.project = e.target.value; });
@@ -487,11 +338,10 @@ document.getElementById('senderName').addEventListener('input', e=>{ state.sende
 document.getElementById('resetBtn').addEventListener('click', ()=>{ location.reload(); });
 
 function renderSummary(){
-  const def = PHASE_DEFS[currentPhase];
   let totalLow=0, totalHigh=0, scoredCount=0;
   const listEl = document.getElementById('stepSummaryList'); listEl.innerHTML='';
   state.steps.forEach(step=>{
-    const w = stepWeightedScore(step, def);
+    const w = stepWeightedScore(step);
     const numEl = document.getElementById(`score-num-${step.id}`);
     const bandEl = document.getElementById(`score-band-${step.id}`);
     if(w!==null){
@@ -501,7 +351,7 @@ function renderSummary(){
       if(numEl) numEl.textContent = w.toFixed(2);
       if(bandEl){ bandEl.textContent = band.name; bandEl.className = 'step-score-band '+band.class; }
       const item = document.createElement('div'); item.className='step-summary-item';
-      item.innerHTML = `<div class="name">${step.name}</div><div class="details"><span>${w.toFixed(2)} — ${band.name}</span><span>${band.effort[0]}–${band.effort[1]}${def.effortUnit[0]}</span></div>`;
+      item.innerHTML = `<div class="name">${step.name}</div><div class="details"><span>${w.toFixed(2)} — ${band.name}</span><span>${band.effort[0]}–${band.effort[1]}${DEF.effortUnit[0]}</span></div>`;
       listEl.appendChild(item);
     } else {
       if(numEl) numEl.textContent = '—';
@@ -511,21 +361,18 @@ function renderSummary(){
     }
   });
   document.getElementById('stepsScoredDisplay').textContent = `${scoredCount} / ${state.steps.length}`;
-  document.getElementById('readinessDisplay').textContent = (def.projectLevel && state.projectLevel.score)
-    ? def.projectLevel.options.find(o=>o.score===state.projectLevel.score).label : '—';
   document.getElementById('totalEffortNum').textContent = scoredCount>0 ? `${totalLow}–${totalHigh}` : '—';
   const decisionBox = document.getElementById('decisionBox');
   decisionBox.textContent = scoredCount===0
     ? 'Score at least one unit to see a live total.'
-    : `${scoredCount} of ${state.steps.length} scored. Wire your own decision logic here per phase if useful.`;
+    : `${scoredCount} of ${state.steps.length} scored.`;
 }
 
 document.getElementById('copyBtn').addEventListener('click', ()=>{
-  const def = PHASE_DEFS[currentPhase];
-  let out = `[${currentPhase}] ${state.project || '(unnamed)'} — scored by ${state.senderName || '(not entered)'}\n\n`;
+  let out = `[Execution] ${state.project || '(unnamed)'} — scored by ${state.senderName || '(not entered)'}\n\n`;
   state.steps.forEach(step=>{
     out += `--- ${step.name} ---\n`;
-    def.elements.forEach(e=>{
+    DEF.elements.forEach(e=>{
       out += `  ${e.name} = ${step.scores[e.key] ?? '–'}`;
       if(step.examples[e.key]) out += ` — ${step.examples[e.key]}`;
       out += `\n`;
@@ -539,33 +386,30 @@ document.getElementById('copyBtn').addEventListener('click', ()=>{
 
 document.getElementById('sendBtn').addEventListener('click', ()=>{
   const statusEl = document.getElementById('sendStatus');
-  const formActionUrl = FORM_ACTION_URLS[currentPhase];
-  if(!formActionUrl || formActionUrl.indexOf('PASTE_YOUR') === 0){
-    statusEl.className='send-status err'; statusEl.textContent='No form connected yet for ' + currentPhase + ' — see SETUP.md.'; return;
+  if(!FORM_ACTION_URL || FORM_ACTION_URL.indexOf('PASTE_YOUR') === 0){
+    statusEl.className='send-status err'; statusEl.textContent='No form connected yet — see SETUP.md.'; return;
   }
-  const def = PHASE_DEFS[currentPhase];
   const rows = state.steps.map(step=>{
-    const w = stepWeightedScore(step, def);
+    const w = stepWeightedScore(step);
     const band = w!==null ? bandFromScore(w) : null;
     return { name:step.name, scores:step.scores, examples:step.examples, weightedScore:w,
       band: band?band.name:'', effortLow: band?band.effort[0]:null, effortHigh: band?band.effort[1]:null };
   });
   const totalLow = rows.reduce((s,r)=> s + (r.effortLow||0), 0);
   const totalHigh = rows.reduce((s,r)=> s + (r.effortHigh||0), 0);
-  const projectLevelObj = def.projectLevel ? { [def.projectLevel.key]: state.projectLevel.score } : {};
 
   const form = document.createElement('form');
-  form.action = formActionUrl; form.method='POST'; form.target='hidden_form_target'; form.style.display='none';
+  form.action = FORM_ACTION_URL; form.method='POST'; form.target='hidden_form_target'; form.style.display='none';
   function addField(entryId, value){
     if(!entryId || entryId.indexOf('PASTE_ENTRY_ID')===0) return;
     const input = document.createElement('input'); input.name = entryId; input.value = value==null?'':String(value);
     form.appendChild(input);
   }
-  addField(FORM_ENTRY_IDS.phase, currentPhase);
+  addField(FORM_ENTRY_IDS.phase, PHASE_NAME);
   addField(FORM_ENTRY_IDS.senderName, state.senderName);
   addField(FORM_ENTRY_IDS.project, state.project);
   addField(FORM_ENTRY_IDS.estimateType, '');
-  addField(FORM_ENTRY_IDS.projectLevelJson, JSON.stringify(projectLevelObj));
+  addField(FORM_ENTRY_IDS.projectLevelJson, JSON.stringify({}));
   addField(FORM_ENTRY_IDS.itemsJson, JSON.stringify(rows));
   addField(FORM_ENTRY_IDS.totalEffortLow, totalLow);
   addField(FORM_ENTRY_IDS.totalEffortHigh, totalHigh);
@@ -581,7 +425,11 @@ const hiddenIframe = document.createElement('iframe');
 hiddenIframe.name = 'hidden_form_target'; hiddenIframe.style.display='none';
 document.body.appendChild(hiddenIframe);
 
-switchPhase(currentPhase);
+state.steps.push(newStep());
+CONFIG.weights = evenWeights(DEF.elements);
+renderGrid();
+renderSummary();
+loadRemoteConfig();
 </script>
 </body>
 </html>
