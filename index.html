@@ -36,32 +36,6 @@
   .config-status{ font-size:11px; color:#5c6b76; font-weight:700; }
   .config-status.live{ color:#1e6b47; }
 
-  .readiness-card{ background:#fff; border:1.5px solid var(--dusk); border-radius:14px; padding:22px; margin-top:24px; }
-  .readiness-card h2{ font-size:18px; }
-  .readiness-card .desc{ font-size:13px; color:#3d4d57; margin-top:4px; margin-bottom:14px; }
-  .readiness-options{ display:flex; flex-direction:column; gap:10px; }
-  .readiness-option{
-    display:flex; gap:12px; align-items:flex-start; border:1.75px solid var(--muted);
-    border-radius:10px; padding:13px 16px; cursor:pointer; transition:border-color .15s, background .15s;
-  }
-  .readiness-option:hover{ border-color:var(--dusk); }
-  .readiness-option.sel-1{ border-color:var(--dusk); background:rgba(138,206,216,0.28); }
-  .readiness-option.sel-2{ border-color:var(--dusk); background:rgba(101,135,166,0.28); }
-  .readiness-option.sel-3{ border-color:var(--dusk); background:rgba(217,107,103,0.22); }
-  .readiness-option .r-label{ font-weight:700; font-size:14px; color:var(--text); display:block; }
-  .readiness-option .r-desc{ font-size:12.5px; color:#3d4d57; margin-top:3px; line-height:1.4; }
-  .readiness-row{ margin-top:16px; }
-  .readiness-example{ margin-top:14px; }
-  .readiness-example label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dusk); display:block; margin-bottom:6px; }
-  .readiness-example input{ width:100%; font-family:inherit; font-size:13px; padding:9px; border:1.5px solid var(--muted); border-radius:7px; }
-  .followup{ margin-top:14px; padding:14px; background:var(--bg); border-radius:10px; border:1.5px dashed var(--high); display:none; }
-  .followup.show{ display:block; }
-  .followup .yn{ display:flex; gap:10px; margin:10px 0; }
-  .followup .yn button{ font-family:inherit; font-size:13px; padding:8px 16px; border-radius:7px; border:1.75px solid var(--muted); background:#fff; cursor:pointer; }
-  .followup .yn button.active-yes{ background:var(--low); border-color:var(--dusk); }
-  .followup .yn button.active-no{ background:var(--high); border-color:var(--high); color:#fff; }
-  .followup textarea{ width:100%; font-family:inherit; font-size:13px; padding:9px; border:1.5px solid var(--muted); border-radius:8px; min-height:52px; resize:vertical; }
-
   .steps-toolbar{ display:flex; justify-content:space-between; align-items:center; margin-top:26px; }
   .steps-toolbar h2{ font-size:19px; }
   .add-step-btn{ font-family:inherit; font-size:13px; padding:9px 16px; border-radius:8px; border:none; background:var(--dusk); color:#fff; cursor:pointer; }
@@ -109,7 +83,7 @@
   .total-hero.accent .num{ color:var(--low); }
   .hero-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
-  .meta-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; font-size:12.5px; }
+  .meta-grid{ display:grid; grid-template-columns:1fr; gap:10px; margin-top:14px; font-size:12.5px; }
   .meta-grid div{ background:rgba(255,255,255,0.06); border-radius:8px; padding:10px; }
   .meta-grid .k{ color:#B7C4CE; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px;}
   .meta-grid .v{ font-size:14px; }
@@ -144,7 +118,7 @@
 <header class="top">
   <div class="eyebrow"><span>Solution Development Engineering - Concept Phase</span><span class="config-status" id="configStatus">Using default contingency/correlation (not connected)</span></div>
   <h1>Concept package scoring</h1>
-  <p class="sub">Break the cell into work packages when they differ significantly (e.g. bin picking, sorting, palletizing) and give each one a three-point time estimate (optimistic / most likely / pessimistic) plus a complexity multiplier. Customer automation readiness applies once, to the whole project. Contingency % and risk correlation are centrally managed — see the config status above.</p>
+  <p class="sub">Break the concept into work packages and give each one a three-point time estimate (optimistic / most likely / pessimistic) plus a complexity multiplier. Contingency % and risk correlation are centrally managed — see the config status above.</p>
 
   <div class="setup-row">
     <div class="field">
@@ -168,25 +142,6 @@
 
 <div class="wrap">
   <div class="left">
-
-    <section class="readiness-card">
-      <h2>Customer automation readiness</h2>
-      <div class="desc">Scored once for the whole project, not per work package — this is about the customer's overall readiness, based on the requirements workshop.</div>
-      <div class="readiness-options" id="readinessOptions"></div>
-      <div class="readiness-example">
-        <label>One-line example</label>
-        <input type="text" id="readinessExample" placeholder="e.g. Customer already runs 2 similar automated lines">
-      </div>
-      <div class="followup" id="readinessFollowup">
-        <strong style="font-size:13px;">Scored High — one more question</strong>
-        <p style="font-size:13px; margin:8px 0 0;">Is there a credible customer-readiness argument — documented leadership commitment, a funded plan, new hires, or a new facility — that this customer will close the gap?</p>
-        <div class="yn">
-          <button id="readyYes">Yes, there's a credible argument</button>
-          <button id="readyNo">No, or it's not documented</button>
-        </div>
-        <textarea id="readinessText" placeholder="If yes: what's the argument?"></textarea>
-      </div>
-    </section>
 
     <div class="steps-toolbar">
       <h2>Work packages</h2>
@@ -219,10 +174,9 @@
 
     <div class="meta-grid">
       <div><div class="k">Packages scored</div><div class="v" id="stepsScoredDisplay">0 / 0</div></div>
-      <div><div class="k">Readiness</div><div class="v" id="readinessDisplay">—</div></div>
     </div>
 
-    <div class="decision-box decision-pending" id="decisionBox">Score readiness and at least one work package to get a decision recommendation.</div>
+    <div class="decision-box decision-pending" id="decisionBox">Score at least one work package to get a decision recommendation.</div>
 
     <div class="rse-compare" id="rseCompare" style="display:none;">
       <label>RSE's initial estimated total effort (hrs, for comparison)</label>
@@ -298,12 +252,6 @@ async function loadRemoteConfig(){
   }
 }
 
-const readinessOptionsDef = [
-  {score:1, label:'Experienced in automation', text:"Customer already runs automated cells like this — fits their existing standards and processes."},
-  {score:2, label:'Taking first steps', text:"Some automation experience, but this process/interface still has open gaps or one unresolved clarification from the workshop."},
-  {score:3, label:'New to automation', text:"Fundamentally new for how they run this process. No established automation practice here, workshop didn't resolve how they'd adapt."}
-];
-
 const num = v => (v===''||v===null||v===undefined) ? 0 : (Number(v)||0);
 const hasVal = v => v!==''&&v!==null&&v!==undefined&&!Number.isNaN(Number(v));
 
@@ -321,18 +269,36 @@ function tierClass(m){
 
 let state = {
   project:'', mode:'rse', senderName:'',
-  readiness:{ score:null, example:'' },
-  readinessArg:{ answer:null, text:'' },
   steps: [],
   rseScore:null, adjustmentNotes:''
 };
 let stepCounter = 0;
 
-function newStep(){
+function newStep(name){
   stepCounter++;
-  return { id: stepCounter, name: `Work package ${stepCounter}`, optimistic:'', mostLikely:'', pessimistic:'', multiplier:1.0, notes:'' };
+  return { id: stepCounter, name: name || `Work package ${stepCounter}`, optimistic:'', mostLikely:'', pessimistic:'', multiplier:1.0, notes:'' };
 }
-state.steps.push(newStep());
+
+// Starting checklist — a suggestion, not a rule. Delete what doesn't apply, rename what's
+// close, add what's missing. Matches the Concept-phase work breakdown from the reference tool.
+const DEFAULT_WORK_PACKAGES = [
+  'Requirements & Feasibility Study',
+  'Use Case / Application Definition',
+  'Concept Layout – Mechanical (kinematics, envelope)',
+  'Concept Layout – Electrical/Controls Architecture',
+  'End-Effector / Tooling Concept',
+  'Safety Concept (preliminary risk assessment)',
+  'Make/Buy Analysis & Vendor Research',
+  'ROM Cost & Schedule Estimate',
+  'Concept Review & Stakeholder Sign-off (internal)',
+  'Concept Documentation',
+  'Statement of Work (SOW) Drafting & Customer Negotiation — binding',
+  'Regulatory & Standards Scoping (CE, UL, ISO 10218/15066)',
+  'Site & Integration Constraints Survey',
+  'Human Factors / Ergonomics Concept',
+  'Preliminary Risk Register (cost/schedule/technical)'
+];
+DEFAULT_WORK_PACKAGES.forEach(name=> state.steps.push(newStep(name)));
 
 function computeStep(step){
   const hasAny = hasVal(step.optimistic) || hasVal(step.mostLikely) || hasVal(step.pessimistic);
@@ -370,38 +336,7 @@ function computeAll(){
   return { perStep, central, sigmaTotal, totalLow, totalHigh, totalP80, scoredCount, incompleteSteps, anyNovel };
 }
 
-// ---------- Readiness card ----------
-const readinessOptEl = document.getElementById('readinessOptions');
-readinessOptionsDef.forEach(opt=>{
-  const div = document.createElement('div');
-  div.className = 'readiness-option';
-  div.dataset.score = opt.score;
-  div.innerHTML = `<div><span class="r-label">${opt.label}</span><span class="r-desc">${opt.text}</span></div>`;
-  div.addEventListener('click', ()=>{
-    state.readiness.score = opt.score;
-    [...readinessOptEl.children].forEach(c=>c.classList.remove('sel-1','sel-2','sel-3'));
-    div.classList.add(`sel-${opt.score}`);
-    document.getElementById('readinessFollowup').classList.toggle('show', opt.score===3);
-    if(opt.score!==3){ state.readinessArg.answer=null; state.readinessArg.text=''; }
-    renderSummary();
-  });
-  readinessOptEl.appendChild(div);
-});
 document.getElementById('senderName').addEventListener('input', e=>{ state.senderName = e.target.value; });
-document.getElementById('readinessExample').addEventListener('input', e=>{ state.readiness.example = e.target.value; });
-document.getElementById('readinessText').addEventListener('input', e=>{ state.readinessArg.text = e.target.value; renderSummary(); });
-document.getElementById('readyYes').addEventListener('click', ()=>{
-  state.readinessArg.answer='yes';
-  document.getElementById('readyYes').classList.add('active-yes');
-  document.getElementById('readyNo').classList.remove('active-no');
-  renderSummary();
-});
-document.getElementById('readyNo').addEventListener('click', ()=>{
-  state.readinessArg.answer='no';
-  document.getElementById('readyNo').classList.add('active-no');
-  document.getElementById('readyYes').classList.remove('active-yes');
-  renderSummary();
-});
 
 // ---------- Work package grid ----------
 function renderGrid(){
@@ -573,29 +508,17 @@ function renderSummary(){
   });
 
   document.getElementById('stepsScoredDisplay').textContent = `${scoredCount} / ${total}`;
-  document.getElementById('readinessDisplay').textContent = state.readiness.score ? readinessOptionsDef.find(o=>o.score===state.readiness.score).label : '—';
   document.getElementById('totalEffortNum').textContent = (scoredCount>0) ? central.toFixed(1) : '—';
   document.getElementById('p80EffortNum').textContent = (scoredCount>0) ? totalP80.toFixed(1) : '—';
 
   const decisionBox = document.getElementById('decisionBox');
-  if(state.readiness.score === null || scoredCount === 0){
+  if(scoredCount === 0){
     decisionBox.className = 'decision-box decision-pending';
-    decisionBox.textContent = 'Score readiness and at least one work package to get a decision recommendation.';
+    decisionBox.textContent = 'Score at least one work package to get a decision recommendation.';
   } else {
     let text = '';
     let cls = 'decision-ok';
-    if(state.readiness.score === 3){
-      if(state.readinessArg.answer === 'yes'){
-        cls = 'decision-accept-flag';
-        text = 'Accept — flag customer-readiness as risk. Carry the readiness argument into the risk register.';
-      } else if(state.readinessArg.answer === 'no'){
-        cls = 'decision-return';
-        text = 'Return — this is a customer-readiness gap, not a documentation gap. Don\'t accept without a credible argument.';
-      } else {
-        cls = 'decision-pending';
-        text = 'Customer automation readiness scored High — answer the follow-up above to get a decision.';
-      }
-    } else if(anyNovel){
+    if(anyNovel){
       cls = 'decision-flag';
       text = 'One or more work packages carries a 2.5x+ complexity multiplier (genuinely novel work, no internal precedent). Confirm the requirements for that package are complete (Part A) — if not, this should be a Return; if complete, proceed with the P80 commitment figure.';
     } else {
@@ -620,8 +543,8 @@ function renderSummary(){
     }
   }
 
-  const progressAnswered = (state.readiness.score?1:0) + scoredCount;
-  const progressTotal = 1 + state.steps.length;
+  const progressAnswered = scoredCount;
+  const progressTotal = state.steps.length;
   document.getElementById('progressFill').style.width = (progressAnswered/progressTotal*100)+'%';
 }
 
@@ -633,10 +556,6 @@ function buildPayload(){
     project: state.project,
     mode: state.mode,
     senderName: state.senderName,
-    readinessScore: state.readiness.score,
-    readinessExample: state.readiness.example,
-    readinessArgAnswer: state.readinessArg.answer,
-    readinessArgText: state.readinessArg.text,
     steps: perStep.map(({step, calc})=>({
       name: step.name,
       optimistic: step.optimistic,
@@ -664,15 +583,6 @@ document.getElementById('copyBtn').addEventListener('click', ()=>{
   let out = `Concept complexity score — ${payload.project || '(unnamed project)'}\n`;
   out += `Scored by: ${payload.senderName || '(not entered)'}\n`;
   out += `Mode: ${payload.mode==='rse' ? 'RSE initial estimate' : 'SDE confirmed (during review)'}\n\n`;
-  out += `Customer automation readiness = ${payload.readinessScore ?? '–'}`;
-  if(payload.readinessExample) out += ` — ${payload.readinessExample}`;
-  out += `\n`;
-  if(payload.readinessScore===3){
-    out += `  Readiness argument: ${payload.readinessArgAnswer ?? 'not answered'}`;
-    if(payload.readinessArgText) out += ` — ${payload.readinessArgText}`;
-    out += `\n`;
-  }
-  out += `\n`;
   payload.steps.forEach(step=>{
     out += `--- ${step.name} ---\n`;
     out += `  O/M/P = ${step.optimistic || '–'} / ${step.mostLikely || '–'} / ${step.pessimistic || '–'} hrs, multiplier ${Number(step.multiplier).toFixed(1)}x\n`;
@@ -731,10 +641,6 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   addField(FORM_ENTRY_IDS.project, payload.project);
   addField(FORM_ENTRY_IDS.estimateType, payload.mode);
   addField(FORM_ENTRY_IDS.projectLevelJson, JSON.stringify({
-    readinessScore: payload.readinessScore,
-    readinessExample: payload.readinessExample,
-    readinessArgAnswer: payload.readinessArgAnswer,
-    readinessArgText: payload.readinessArgText,
     totalP80Hours: payload.totalP80Hours,
     contingencyPctUsed: payload.contingencyPctUsed,
     correlationUsed: payload.correlationUsed
