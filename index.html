@@ -83,24 +83,18 @@
   .remove-step-btn:disabled{ opacity:.3; cursor:not-allowed; }
 
   .step-cell{ min-width:190px; background:var(--bg); border-radius:10px; padding:8px; border:1px solid var(--muted); }
-  .mini-options{ display:flex; gap:5px; }
-  .mini-opt{ position:relative; flex:1; font-family:inherit; font-size:12px; font-weight:700; padding:7px 0; border-radius:6px; border:1.75px solid var(--muted); background:#fff; cursor:pointer; color:var(--text); }
-  .mini-opt:hover{ border-color:var(--dusk); }
-  .mini-opt.sel-1{ border-color:var(--dusk); background:rgba(138,206,216,0.32); }
-  .mini-opt.sel-2{ border-color:var(--dusk); background:rgba(101,135,166,0.32); }
-  .mini-opt.sel-3{ border-color:var(--dusk); background:rgba(217,107,103,0.26); }
-  .mini-opt[data-tooltip]:hover::after{
-    content:attr(data-tooltip); position:absolute; bottom:120%; left:50%; transform:translateX(-50%);
-    width:190px; background:var(--dusk); color:#fff; padding:8px 10px; border-radius:8px; font-size:11px;
-    line-height:1.4; z-index:40; box-shadow:0 6px 16px rgba(0,0,0,0.2); text-align:left; font-weight:300;
-  }
-  .mini-example{ width:100%; margin-top:6px; font-family:inherit; font-size:11.5px; padding:6px 7px; border:1.5px solid var(--muted); border-radius:6px; background:#fff; }
+  .mini-example{ width:100%; font-family:inherit; font-size:11.5px; padding:6px 7px; border:1.5px solid var(--muted); border-radius:6px; background:#fff; }
+  .mult-slider-row{ display:flex; align-items:center; gap:8px; }
+  .mult-slider-row input[type=range]{ flex:1; }
+  .mult-value{ font-size:12px; font-weight:700; min-width:34px; text-align:right; }
+  .mult-tier{ font-size:10.5px; color:#4a5a66; margin-top:5px; line-height:1.3; }
 
   .step-score-row .step-cell{ background:transparent; text-align:center; padding:6px; border:none; }
   .step-score-badge{ font-family:'Castoro', Georgia, serif; font-size:20px; }
   .step-score-band{ font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; margin-top:2px; }
-
-  .footnote{ font-size:11px; color:#5c6b76; margin-top:20px; max-width:900px; }
+  .band-standard{ color:var(--low); }
+  .band-elevated{ color:#e8c08a; }
+  .band-complex{ color:#ff9d97; }
 
   .summary{ position:sticky; top:24px; background:var(--dusk); color:#fff; border-radius:16px; padding:22px; }
   .summary h3{ font-size:15px; color:#fff; text-transform:uppercase; letter-spacing:.06em; }
@@ -108,13 +102,12 @@
   .step-summary-item{ background:rgba(255,255,255,0.06); border-radius:10px; padding:10px 12px; }
   .step-summary-item .name{ font-size:12.5px; color:#dfe7ec; font-weight:700; }
   .step-summary-item .details{ display:flex; justify-content:space-between; margin-top:4px; font-size:11.5px; color:#B7C4CE; }
-  .band-standard{ color:var(--low); }
-  .band-elevated{ color:#e8c08a; }
-  .band-complex{ color:#ff9d97; }
 
   .total-hero{ margin-top:18px; padding:18px; background:rgba(255,255,255,0.06); border-radius:12px; text-align:center; }
   .total-hero .num{ font-family:'Castoro', Georgia, serif; font-size:36px; line-height:1; }
   .total-hero .lbl{ margin-top:4px; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:#B7C4CE; }
+  .total-hero.accent .num{ color:var(--low); }
+  .hero-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
 
   .meta-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; font-size:12.5px; }
   .meta-grid div{ background:rgba(255,255,255,0.06); border-radius:8px; padding:10px; }
@@ -149,9 +142,9 @@
 <body>
 
 <header class="top">
-  <div class="eyebrow"><span>Solution Development Engineering - Concept Phase</span><span class="config-status" id="configStatus">Using default weights (not connected)</span></div>
+  <div class="eyebrow"><span>Solution Development Engineering - Concept Phase</span><span class="config-status" id="configStatus">Using default contingency/correlation (not connected)</span></div>
   <h1>Concept package scoring</h1>
-  <p class="sub">Break the cell into process steps when they differ significantly (e.g. bin picking, sorting, palletizing) and score each one separately. Customer automation readiness applies once, to the whole project. Concept effort adds up across steps.</p>
+  <p class="sub">Break the cell into work packages when they differ significantly (e.g. bin picking, sorting, palletizing) and give each one a three-point time estimate (optimistic / most likely / pessimistic) plus a complexity multiplier. Customer automation readiness applies once, to the whole project. Contingency % and risk correlation are centrally managed — see the config status above.</p>
 
   <div class="setup-row">
     <div class="field">
@@ -178,7 +171,7 @@
 
     <section class="readiness-card">
       <h2>Customer automation readiness</h2>
-      <div class="desc">Scored once for the whole project, not per step — this is about the customer's overall readiness, based on the requirements workshop.</div>
+      <div class="desc">Scored once for the whole project, not per work package — this is about the customer's overall readiness, based on the requirements workshop.</div>
       <div class="readiness-options" id="readinessOptions"></div>
       <div class="readiness-example">
         <label>One-line example</label>
@@ -196,10 +189,10 @@
     </section>
 
     <div class="steps-toolbar">
-      <h2>Process steps</h2>
-      <button class="add-step-btn" id="addStepBtn">+ Add process step</button>
+      <h2>Work packages</h2>
+      <button class="add-step-btn" id="addStepBtn">+ Add work package</button>
     </div>
-    <p class="steps-hint">Add one column per process step that differs significantly in how it's built (e.g. bin picking vs. sorting vs. palletizing). One step is fine if the cell is homogeneous.</p>
+    <p class="steps-hint">Add one column per work package that differs significantly in how it's built (e.g. bin picking vs. sorting vs. palletizing). One is fine if the cell is homogeneous. Give each an honest three-point estimate — the gap between optimistic and pessimistic is information, not padding.</p>
 
     <div class="grid-card">
       <div class="steps-scroll">
@@ -213,21 +206,27 @@
     <h3>Live score</h3>
     <div class="step-summary-list" id="stepSummaryList"></div>
 
-    <div class="total-hero">
-      <div class="num" id="totalEffortNum">—</div>
-      <div class="lbl">Total concept effort (days)</div>
+    <div class="hero-row">
+      <div class="total-hero">
+        <div class="num" id="totalEffortNum">—</div>
+        <div class="lbl">Expected effort (hrs)</div>
+      </div>
+      <div class="total-hero accent">
+        <div class="num" id="p80EffortNum">—</div>
+        <div class="lbl">P80 commitment (hrs)</div>
+      </div>
     </div>
 
     <div class="meta-grid">
-      <div><div class="k">Steps scored</div><div class="v" id="stepsScoredDisplay">0 / 0</div></div>
+      <div><div class="k">Packages scored</div><div class="v" id="stepsScoredDisplay">0 / 0</div></div>
       <div><div class="k">Readiness</div><div class="v" id="readinessDisplay">—</div></div>
     </div>
 
-    <div class="decision-box decision-pending" id="decisionBox">Score readiness and at least one process step to get a decision recommendation.</div>
+    <div class="decision-box decision-pending" id="decisionBox">Score readiness and at least one work package to get a decision recommendation.</div>
 
     <div class="rse-compare" id="rseCompare" style="display:none;">
-      <label>RSE's initial estimated total effort (days, for comparison)</label>
-      <input type="number" step="1" min="0" id="rseScoreInput" placeholder="e.g. 14">
+      <label>RSE's initial estimated total effort (hrs, for comparison)</label>
+      <input type="number" step="1" min="0" id="rseScoreInput" placeholder="e.g. 110">
       <div class="diff-warning" id="diffWarning" style="display:none;"></div>
       <div class="adj-notes">
         <label>Adjustment notes (why the SDE estimate differs)</label>
@@ -250,11 +249,11 @@
 
 <script>
 // ====== BACKEND CONNECTION ======
-// Config (weights/bands) is still read via the Apps Script Web App (see SETUP.md).
+// Config (contingency %, risk correlation) is read via the Apps Script Web App (see SETUP.md),
+// same endpoint as the other phases — just a different set of keys under the Concept prefix.
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzmQIh55Ii-v9cn06ethadDeaC47HHlCpkVGcl-IkgvP4zL8uDKWV95IczYElA0ylcg/exec';
 
-// Intake now goes through a Google Form instead of a POST to the Web App —
-// see SETUP.md for how to create the Form and get these values.
+// Intake goes through a Google Form — see SETUP.md for how to create the Form and get these values.
 const FORM_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSe63lA_LIwMZIDH2-7DNYcDLM5aMKrnk2CF9qSnWZs1w_Zc4g/formResponse';
 const FORM_ENTRY_IDS = {
   phase: 'entry.913181026',
@@ -270,38 +269,27 @@ const FORM_ENTRY_IDS = {
 };
 const PHASE_NAME = 'Concept';
 
+// Standard statistical constant for the 80th percentile of a normal distribution.
+const Z_P80 = 0.8416;
+
 // ====== DEFAULT CONFIG (used until/unless the Web App responds) ======
-let CONFIG = {
-  weights: { task:0.20, performance:0.15, mtbhHandling:0.10, mtbhVariety:0.10, periphery:0.15, integration:0.15, readiness:0.15 },
-  bands: {
-    standardMax: 1.6, elevatedMax: 2.3,
-    standard: { low:2, high:5, cont:'0–5%' },
-    elevated: { low:5, high:12, cont:'5–12%' },
-    complex:  { low:12, high:25, cont:'12–20%+' }
-  }
-};
+// contingencyPct and correlation are admin-managed — edited directly in the Config tab of the
+// Sheet as `concept.contingency_pct` and `concept.correlation`, same convention as the other phases.
+let CONFIG = { contingencyPct: 0.25, correlation: 0.35 };
 
 async function loadRemoteConfig(){
   if(!WEBAPP_URL || WEBAPP_URL.indexOf('PASTE_YOUR') === 0){
-    document.getElementById('configStatus').textContent = 'Using default weights (not connected)';
+    document.getElementById('configStatus').textContent = 'Using default contingency/correlation (not connected)';
     return;
   }
   try{
     const res = await fetch(WEBAPP_URL + '?type=config&phase=' + PHASE_NAME);
     const data = await res.json();
     if(data.error){ throw new Error(data.error); }
-    CONFIG.weights.task = parseFloat(data.weight_task) || CONFIG.weights.task;
-    CONFIG.weights.performance = parseFloat(data.weight_performance) || CONFIG.weights.performance;
-    CONFIG.weights.mtbhHandling = parseFloat(data.weight_mtbhHandling) || CONFIG.weights.mtbhHandling;
-    CONFIG.weights.mtbhVariety = parseFloat(data.weight_mtbhVariety) || CONFIG.weights.mtbhVariety;
-    CONFIG.weights.periphery = parseFloat(data.weight_periphery) || CONFIG.weights.periphery;
-    CONFIG.weights.integration = parseFloat(data.weight_integration) || CONFIG.weights.integration;
-    CONFIG.weights.readiness = parseFloat(data.weight_readiness) || CONFIG.weights.readiness;
-    CONFIG.bands.standardMax = parseFloat(data.band_standard_max) || CONFIG.bands.standardMax;
-    CONFIG.bands.elevatedMax = parseFloat(data.band_elevated_max) || CONFIG.bands.elevatedMax;
-    CONFIG.bands.standard = { low: parseFloat(data.band_standard_effort_low), high: parseFloat(data.band_standard_effort_high), cont: data.band_standard_contingency };
-    CONFIG.bands.elevated = { low: parseFloat(data.band_elevated_effort_low), high: parseFloat(data.band_elevated_effort_high), cont: data.band_elevated_contingency };
-    CONFIG.bands.complex  = { low: parseFloat(data.band_complex_effort_low),  high: parseFloat(data.band_complex_effort_high),  cont: data.band_complex_contingency };
+    const c = parseFloat(data.contingency_pct);
+    if(Number.isFinite(c)) CONFIG.contingencyPct = c;
+    const r = parseFloat(data.correlation);
+    if(Number.isFinite(r)) CONFIG.correlation = r;
     document.getElementById('configStatus').textContent = 'Live config connected';
     document.getElementById('configStatus').classList.add('live');
     renderSummary();
@@ -310,50 +298,26 @@ async function loadRemoteConfig(){
   }
 }
 
-const elementDefs = [
-  { key:'task', name:'Task', sub:"Done this kind of process before?",
-    options:[
-      {score:1, tooltip:"We've automated a similar process before, internally."},
-      {score:2, tooltip:"Haven't done it ourselves, but a supplier demo, video, or similar reference shows it's feasible."},
-      {score:3, tooltip:"No internal or external evidence this process is feasible."}
-    ], example:'e.g. Same as Project X' },
-  { key:'performance', name:'Performance', sub:"Throughput / cycle time for this step",
-    options:[
-      {score:1, tooltip:"We've hit this cycle time / throughput internally before."},
-      {score:2, tooltip:"Haven't hit it ourselves, but external data/benchmark/video shows it's achievable."},
-      {score:3, tooltip:"No reference showing this throughput/cycle time is achievable at all."}
-    ], example:'e.g. 8s cycle, hit before' },
-  { key:'mtbhHandling', name:'MTBH — Handling', sub:"Handled these parts before, at this step?",
-    options:[
-      {score:1, tooltip:"We've handled this kind of part (material, geometry, fragility) internally before."},
-      {score:2, tooltip:"Haven't handled it ourselves, but an external reference shows this kind of part handled this way."},
-      {score:3, tooltip:"No internal or external reference for handling this kind of part this way."}
-    ], example:'e.g. Deformable film, no ref' },
-  { key:'mtbhVariety', name:'MTBH — Variety', sub:"How many variants at this step?",
-    options:[
-      {score:1, tooltip:"1 to 5 part variants to handle."},
-      {score:2, tooltip:"5 to 10 variants, or a parametrizable program that covers the range."},
-      {score:3, tooltip:"More than 10 part variants."}
-    ], example:'e.g. 7 SKUs, parametrized' },
-  { key:'periphery', name:'Periphery', sub:"Special periphery needed at this step?",
-    options:[
-      {score:1, tooltip:"Known suppliers — RobCo already sources this kind of periphery from them."},
-      {score:2, tooltip:"Not known to RobCo, but a standard off-the-shelf product exists on the market."},
-      {score:3, tooltip:"A custom-built machine is required — nothing standard fits."}
-    ], example:'e.g. Off-the-shelf feeder, new vendor' },
-  { key:'integration', name:'Existing machinery integration', sub:"Interface depth with existing equipment at this step",
-    options:[
-      {score:1, tooltip:"Standalone — no interface with the customer's existing equipment."},
-      {score:2, tooltip:"Data/signal interface only (e.g. a PLC handshake), no physical modification."},
-      {score:3, tooltip:"Physical modification of, or deep integration into, the customer's live equipment."}
-    ], example:'e.g. Signal tap into existing PLC' }
-];
-
 const readinessOptionsDef = [
   {score:1, label:'Experienced in automation', text:"Customer already runs automated cells like this — fits their existing standards and processes."},
   {score:2, label:'Taking first steps', text:"Some automation experience, but this process/interface still has open gaps or one unresolved clarification from the workshop."},
   {score:3, label:'New to automation', text:"Fundamentally new for how they run this process. No established automation practice here, workshop didn't resolve how they'd adapt."}
 ];
+
+const num = v => (v===''||v===null||v===undefined) ? 0 : (Number(v)||0);
+const hasVal = v => v!==''&&v!==null&&v!==undefined&&!Number.isNaN(Number(v));
+
+function multiplierTier(m){
+  if(m < 1.2) return '1.0x — Done this exact kind of thing before.';
+  if(m < 1.5) return '1.2–1.4x — Familiar work with a new wrinkle.';
+  if(m < 2.5) return '1.5–2.0x — Meaningful customization, or an unfamiliar vendor ecosystem.';
+  return '2.5x+ — Genuinely novel. No internal precedent to estimate from.';
+}
+function tierClass(m){
+  if(m < 1.5) return 'band-standard';
+  if(m < 2.5) return 'band-elevated';
+  return 'band-complex';
+}
 
 let state = {
   project:'', mode:'rse', senderName:'',
@@ -366,25 +330,44 @@ let stepCounter = 0;
 
 function newStep(){
   stepCounter++;
-  const scores = {}; const examples = {};
-  elementDefs.forEach(e=>{ scores[e.key]=null; examples[e.key]=''; });
-  return { id: stepCounter, name: `Process step ${stepCounter}`, scores, examples };
+  return { id: stepCounter, name: `Work package ${stepCounter}`, optimistic:'', mostLikely:'', pessimistic:'', multiplier:1.0, notes:'' };
 }
 state.steps.push(newStep());
 
-function bandFromScore(w){
-  if(w<=CONFIG.bands.standardMax) return {name:'Standard', effort:[CONFIG.bands.standard.low, CONFIG.bands.standard.high], cont:CONFIG.bands.standard.cont, class:'band-standard'};
-  if(w<=CONFIG.bands.elevatedMax) return {name:'Elevated', effort:[CONFIG.bands.elevated.low, CONFIG.bands.elevated.high], cont:CONFIG.bands.elevated.cont, class:'band-elevated'};
-  return {name:'Complex', effort:[CONFIG.bands.complex.low, CONFIG.bands.complex.high], cont:CONFIG.bands.complex.cont, class:'band-complex'};
+function computeStep(step){
+  const hasAny = hasVal(step.optimistic) || hasVal(step.mostLikely) || hasVal(step.pessimistic);
+  if(!hasAny) return null;
+  const O = num(step.optimistic), M = num(step.mostLikely), P = num(step.pessimistic);
+  const pertHrs = (O + 4*M + P) / 6;
+  const sigma = (P - O) / 6;
+  const mult = Number(step.multiplier) || 1;
+  const adjusted = pertHrs * mult;
+  const central = adjusted * (1 + CONFIG.contingencyPct);
+  const sigmaEff = sigma * mult * (1 + CONFIG.contingencyPct);
+  const p80 = central + Z_P80 * sigmaEff;
+  return { pertHrs, sigma, adjusted, central, sigmaEff, p80 };
 }
 
-function stepWeightedScore(step){
-  const allAnswered = elementDefs.every(e=> step.scores[e.key]!==null) && state.readiness.score!==null;
-  if(!allAnswered) return null;
-  let sum = 0;
-  elementDefs.forEach(e=>{ sum += step.scores[e.key]*CONFIG.weights[e.key]; });
-  sum += state.readiness.score * CONFIG.weights.readiness;
-  return sum;
+function computeAll(){
+  let central = 0, sumSigma = 0, sumSigmaSq = 0, scoredCount = 0, incompleteSteps = 0, anyNovel = false;
+  const perStep = state.steps.map(step=>{
+    const calc = computeStep(step);
+    if(calc){
+      scoredCount++;
+      central += calc.central; sumSigma += calc.sigmaEff; sumSigmaSq += calc.sigmaEff*calc.sigmaEff;
+      if((Number(step.multiplier)||1) >= 2.5) anyNovel = true;
+      return { step, calc };
+    } else {
+      incompleteSteps++;
+      return { step, calc:null };
+    }
+  });
+  const rho = Math.min(Math.max(CONFIG.correlation, 0), 1);
+  const sigmaTotal = Math.sqrt(Math.max(sumSigmaSq + rho*(sumSigma*sumSigma - sumSigmaSq), 0));
+  const totalLow = central - sigmaTotal;
+  const totalHigh = central + sigmaTotal;
+  const totalP80 = central + Z_P80 * sigmaTotal;
+  return { perStep, central, sigmaTotal, totalLow, totalHigh, totalP80, scoredCount, incompleteSteps, anyNovel };
 }
 
 // ---------- Readiness card ----------
@@ -420,7 +403,7 @@ document.getElementById('readyNo').addEventListener('click', ()=>{
   renderSummary();
 });
 
-// ---------- Steps grid ----------
+// ---------- Work package grid ----------
 function renderGrid(){
   const table = document.getElementById('stepsTable');
   table.innerHTML = '';
@@ -452,53 +435,86 @@ function renderGrid(){
   });
   table.appendChild(headRow);
 
-  elementDefs.forEach(elDef=>{
+  const triadFields = [
+    { key:'optimistic', label:'Optimistic', sub:'Best case, no rework or waiting (hrs)' },
+    { key:'mostLikely', label:'Most Likely', sub:'Honest normal expectation (hrs)' },
+    { key:'pessimistic', label:'Pessimistic', sub:'Realistic bad run, not a catastrophe (hrs)' }
+  ];
+  triadFields.forEach(f=>{
     const tr = document.createElement('tr');
     const labelTd = document.createElement('td');
     labelTd.className = 'element-label';
-    labelTd.innerHTML = `<strong>${elDef.name}</strong><span>${elDef.sub}</span>`;
+    labelTd.innerHTML = `<strong>${f.label}</strong><span>${f.sub}</span>`;
     tr.appendChild(labelTd);
-
     state.steps.forEach(step=>{
       const td = document.createElement('td');
       const cellDiv = document.createElement('div');
       cellDiv.className = 'step-cell';
-      const miniOptions = document.createElement('div');
-      miniOptions.className = 'mini-options';
-      elDef.options.forEach(opt=>{
-        const btn = document.createElement('button');
-        btn.className = 'mini-opt';
-        if(step.scores[elDef.key] === opt.score) btn.classList.add(`sel-${opt.score}`);
-        btn.dataset.score = opt.score;
-        btn.setAttribute('data-tooltip', opt.tooltip);
-        btn.textContent = opt.score;
-        btn.addEventListener('click', ()=>{
-          step.scores[elDef.key] = opt.score;
-          [...miniOptions.children].forEach(c=>c.classList.remove('sel-1','sel-2','sel-3'));
-          btn.classList.add(`sel-${opt.score}`);
-          renderSummary();
-        });
-        miniOptions.appendChild(btn);
-      });
-      const exampleInput = document.createElement('input');
-      exampleInput.type = 'text'; exampleInput.className = 'mini-example';
-      exampleInput.placeholder = elDef.example;
-      exampleInput.value = step.examples[elDef.key];
-      exampleInput.addEventListener('input', e=>{ step.examples[elDef.key] = e.target.value; });
-
-      cellDiv.appendChild(miniOptions);
-      cellDiv.appendChild(exampleInput);
+      const input = document.createElement('input');
+      input.type = 'number'; input.min = '0'; input.className = 'mini-example';
+      input.placeholder = 'hrs'; input.value = step[f.key];
+      input.addEventListener('input', e=>{ step[f.key] = e.target.value; renderSummary(); });
+      cellDiv.appendChild(input);
       td.appendChild(cellDiv);
       tr.appendChild(td);
     });
     table.appendChild(tr);
   });
 
+  const multTr = document.createElement('tr');
+  const multLabelTd = document.createElement('td');
+  multLabelTd.className = 'element-label';
+  multLabelTd.innerHTML = `<strong>Complexity multiplier</strong><span>How unfamiliar is this work?</span>`;
+  multTr.appendChild(multLabelTd);
+  state.steps.forEach(step=>{
+    const td = document.createElement('td');
+    const cellDiv = document.createElement('div');
+    cellDiv.className = 'step-cell';
+    const row = document.createElement('div');
+    row.className = 'mult-slider-row';
+    const range = document.createElement('input');
+    range.type = 'range'; range.min = '1'; range.max = '3'; range.step = '0.1'; range.value = step.multiplier;
+    const valueSpan = document.createElement('span');
+    valueSpan.className = 'mult-value'; valueSpan.textContent = Number(step.multiplier).toFixed(1) + 'x';
+    const tierLabel = document.createElement('div');
+    tierLabel.className = 'mult-tier'; tierLabel.textContent = multiplierTier(Number(step.multiplier));
+    range.addEventListener('input', e=>{
+      step.multiplier = Number(e.target.value);
+      valueSpan.textContent = step.multiplier.toFixed(1) + 'x';
+      tierLabel.textContent = multiplierTier(step.multiplier);
+      renderSummary();
+    });
+    row.appendChild(range); row.appendChild(valueSpan);
+    cellDiv.appendChild(row); cellDiv.appendChild(tierLabel);
+    td.appendChild(cellDiv);
+    multTr.appendChild(td);
+  });
+  table.appendChild(multTr);
+
+  const notesTr = document.createElement('tr');
+  const notesLabelTd = document.createElement('td');
+  notesLabelTd.className = 'element-label';
+  notesLabelTd.innerHTML = `<strong>Notes</strong><span>Optional context</span>`;
+  notesTr.appendChild(notesLabelTd);
+  state.steps.forEach(step=>{
+    const td = document.createElement('td');
+    const cellDiv = document.createElement('div');
+    cellDiv.className = 'step-cell';
+    const input = document.createElement('input');
+    input.type = 'text'; input.className = 'mini-example';
+    input.placeholder = 'e.g. Adapted from Project X gripper'; input.value = step.notes;
+    input.addEventListener('input', e=>{ step.notes = e.target.value; });
+    cellDiv.appendChild(input);
+    td.appendChild(cellDiv);
+    notesTr.appendChild(td);
+  });
+  table.appendChild(notesTr);
+
   const scoreTr = document.createElement('tr');
   scoreTr.className = 'step-score-row';
   const scoreLabelTd = document.createElement('td');
   scoreLabelTd.className = 'element-label';
-  scoreLabelTd.innerHTML = `<strong>Step score</strong><span>Weighted, incl. readiness</span>`;
+  scoreLabelTd.innerHTML = `<strong>Score</strong><span>Expected · P80</span>`;
   scoreTr.appendChild(scoreLabelTd);
   state.steps.forEach(step=>{
     const td = document.createElement('td');
@@ -530,40 +546,21 @@ function setMode(m){
 document.getElementById('rseScoreInput').addEventListener('input', e=>{ state.rseScore = parseFloat(e.target.value)||null; renderSummary(); });
 document.getElementById('adjustmentNotes').addEventListener('input', e=>{ state.adjustmentNotes = e.target.value; });
 
-function computeAll(){
-  let totalLow = 0, totalHigh = 0, scoredCount = 0, anyHighFlag = false, anyIntegrationHigh = false, incompleteSteps = 0;
-  const perStep = state.steps.map(step=>{
-    const w = stepWeightedScore(step);
-    if(w!==null){
-      scoredCount++;
-      const band = bandFromScore(w);
-      totalLow += band.effort[0]; totalHigh += band.effort[1];
-      elementDefs.forEach(e=>{ if(step.scores[e.key]===3) anyHighFlag = true; });
-      if(step.scores.integration === 3) anyIntegrationHigh = true;
-      return { step, w, band };
-    } else {
-      incompleteSteps++;
-      return { step, w:null, band:null };
-    }
-  });
-  return { perStep, totalLow, totalHigh, scoredCount, anyHighFlag, anyIntegrationHigh, incompleteSteps };
-}
-
 function renderSummary(){
   const total = state.steps.length;
-  const { perStep, totalLow, totalHigh, scoredCount, anyHighFlag, anyIntegrationHigh, incompleteSteps } = computeAll();
+  const { perStep, central, totalLow, totalHigh, totalP80, scoredCount, incompleteSteps, anyNovel } = computeAll();
 
   const listEl = document.getElementById('stepSummaryList');
   listEl.innerHTML = '';
-  perStep.forEach(({step, w, band})=>{
+  perStep.forEach(({step, calc})=>{
     const scoreNumEl = document.getElementById(`score-num-${step.id}`);
     const scoreBandEl = document.getElementById(`score-band-${step.id}`);
-    if(w!==null){
-      if(scoreNumEl) scoreNumEl.textContent = w.toFixed(2);
-      if(scoreBandEl){ scoreBandEl.textContent = band.name; scoreBandEl.className = 'step-score-band '+band.class; }
+    if(calc){
+      if(scoreNumEl) scoreNumEl.textContent = calc.central.toFixed(1)+'h';
+      if(scoreBandEl){ scoreBandEl.textContent = 'P80 '+calc.p80.toFixed(1)+'h'; scoreBandEl.className = 'step-score-band '+tierClass(Number(step.multiplier)||1); }
       const item = document.createElement('div');
       item.className = 'step-summary-item';
-      item.innerHTML = `<div class="name">${step.name}</div><div class="details"><span>${w.toFixed(2)} — ${band.name}</span><span>${band.effort[0]}–${band.effort[1]}d</span></div>`;
+      item.innerHTML = `<div class="name">${step.name}</div><div class="details"><span>${calc.central.toFixed(1)}h expected</span><span>P80 ${calc.p80.toFixed(1)}h</span></div>`;
       listEl.appendChild(item);
     } else {
       if(scoreNumEl) scoreNumEl.textContent = '—';
@@ -577,12 +574,13 @@ function renderSummary(){
 
   document.getElementById('stepsScoredDisplay').textContent = `${scoredCount} / ${total}`;
   document.getElementById('readinessDisplay').textContent = state.readiness.score ? readinessOptionsDef.find(o=>o.score===state.readiness.score).label : '—';
-  document.getElementById('totalEffortNum').textContent = (scoredCount>0) ? `${totalLow}–${totalHigh}` : '—';
+  document.getElementById('totalEffortNum').textContent = (scoredCount>0) ? central.toFixed(1) : '—';
+  document.getElementById('p80EffortNum').textContent = (scoredCount>0) ? totalP80.toFixed(1) : '—';
 
   const decisionBox = document.getElementById('decisionBox');
   if(state.readiness.score === null || scoredCount === 0){
     decisionBox.className = 'decision-box decision-pending';
-    decisionBox.textContent = 'Score readiness and at least one process step to get a decision recommendation.';
+    decisionBox.textContent = 'Score readiness and at least one work package to get a decision recommendation.';
   } else {
     let text = '';
     let cls = 'decision-ok';
@@ -597,18 +595,15 @@ function renderSummary(){
         cls = 'decision-pending';
         text = 'Customer automation readiness scored High — answer the follow-up above to get a decision.';
       }
-    } else if(anyHighFlag){
+    } else if(anyNovel){
       cls = 'decision-flag';
-      text = 'One or more elements scored High on at least one step. Confirm the requirements for that item/step are complete (Part A) — if not, this should be a Return; if complete, proceed per each step\'s band.';
+      text = 'One or more work packages carries a 2.5x+ complexity multiplier (genuinely novel work, no internal precedent). Confirm the requirements for that package are complete (Part A) — if not, this should be a Return; if complete, proceed with the P80 commitment figure.';
     } else {
       cls = 'decision-ok';
-      text = 'No High-risk elements. Proceed per each step\'s band: Accept if requirements are complete (Part A); Conditional Accept if only minor gaps remain.';
-    }
-    if(anyIntegrationHigh){
-      text += ' At least one step involves physical modification of the customer\'s existing equipment — recommend routing to a team review regardless of band.';
+      text = 'No work package flagged as genuinely novel. Proceed with the Expected/P80 figures above once requirements are complete (Part A).';
     }
     if(incompleteSteps > 0){
-      text += ` (${incompleteSteps} step${incompleteSteps>1?'s':''} still incomplete.)`;
+      text += ` (${incompleteSteps} work package${incompleteSteps>1?'s':''} still incomplete.)`;
     }
     decisionBox.className = 'decision-box '+cls;
     decisionBox.textContent = text;
@@ -619,21 +614,21 @@ function renderSummary(){
     const w = document.getElementById('diffWarning');
     if(!inRange){
       w.style.display='block';
-      w.textContent = `RSE's estimate (${state.rseScore}d) falls outside the computed range (${totalLow}–${totalHigh}d) — fill in the adjustment notes below.`;
+      w.textContent = `RSE's estimate (${state.rseScore}h) falls outside the computed ±1σ range (${totalLow.toFixed(1)}–${totalHigh.toFixed(1)}h) — fill in the adjustment notes below.`;
     } else {
       w.style.display='none';
     }
   }
 
-  const progressAnswered = (state.readiness.score?1:0) + state.steps.reduce((n,s)=> n + elementDefs.filter(e=>s.scores[e.key]!==null).length, 0);
-  const progressTotal = 1 + state.steps.length*elementDefs.length;
+  const progressAnswered = (state.readiness.score?1:0) + scoredCount;
+  const progressTotal = 1 + state.steps.length;
   document.getElementById('progressFill').style.width = (progressAnswered/progressTotal*100)+'%';
 }
 
 document.getElementById('resetBtn').addEventListener('click', ()=>{ location.reload(); });
 
 function buildPayload(){
-  const { perStep, totalLow, totalHigh } = computeAll();
+  const { perStep, totalLow, totalHigh, totalP80 } = computeAll();
   return {
     project: state.project,
     mode: state.mode,
@@ -642,17 +637,23 @@ function buildPayload(){
     readinessExample: state.readiness.example,
     readinessArgAnswer: state.readinessArg.answer,
     readinessArgText: state.readinessArg.text,
-    steps: perStep.map(({step, w, band})=>({
+    steps: perStep.map(({step, calc})=>({
       name: step.name,
-      scores: step.scores,
-      examples: step.examples,
-      weightedScore: w,
-      band: band ? band.name : '',
-      effortLow: band ? band.effort[0] : null,
-      effortHigh: band ? band.effort[1] : null
+      optimistic: step.optimistic,
+      mostLikely: step.mostLikely,
+      pessimistic: step.pessimistic,
+      multiplier: step.multiplier,
+      notes: step.notes,
+      pertHrs: calc ? calc.pertHrs : null,
+      sigma: calc ? calc.sigma : null,
+      expectedHours: calc ? calc.central : null,
+      p80Hours: calc ? calc.p80 : null
     })),
     totalEffortLow: totalLow,
     totalEffortHigh: totalHigh,
+    totalP80Hours: totalP80,
+    contingencyPctUsed: CONFIG.contingencyPct,
+    correlationUsed: CONFIG.correlation,
     rseEstimate: state.rseScore,
     adjustmentNotes: state.adjustmentNotes
   };
@@ -674,21 +675,19 @@ document.getElementById('copyBtn').addEventListener('click', ()=>{
   out += `\n`;
   payload.steps.forEach(step=>{
     out += `--- ${step.name} ---\n`;
-    elementDefs.forEach(e=>{
-      out += `  ${e.name} = ${step.scores[e.key] ?? '–'}`;
-      if(step.examples[e.key]) out += ` — ${step.examples[e.key]}`;
-      out += `\n`;
-    });
-    if(step.weightedScore!==null){
-      out += `  Step weighted score = ${step.weightedScore.toFixed(2)} → ${step.band} (${step.effortLow}–${step.effortHigh}d)\n`;
+    out += `  O/M/P = ${step.optimistic || '–'} / ${step.mostLikely || '–'} / ${step.pessimistic || '–'} hrs, multiplier ${Number(step.multiplier).toFixed(1)}x\n`;
+    if(step.notes) out += `  Notes: ${step.notes}\n`;
+    if(step.expectedHours!==null){
+      out += `  Expected = ${step.expectedHours.toFixed(1)}h, P80 = ${step.p80Hours.toFixed(1)}h\n`;
     } else {
-      out += `  Step incomplete\n`;
+      out += `  Incomplete\n`;
     }
     out += `\n`;
   });
-  out += `Total concept effort = ${payload.totalEffortLow}–${payload.totalEffortHigh} days\n`;
+  out += `Total concept effort (±1σ) = ${payload.totalEffortLow.toFixed(1)}–${payload.totalEffortHigh.toFixed(1)} hrs\n`;
+  out += `P80 commitment = ${payload.totalP80Hours.toFixed(1)} hrs\n`;
   if(payload.mode==='sde' && payload.rseEstimate!==null){
-    out += `RSE initial estimate: ${payload.rseEstimate} days\n`;
+    out += `RSE initial estimate: ${payload.rseEstimate} hrs\n`;
     if(payload.adjustmentNotes) out += `Adjustment notes: ${payload.adjustmentNotes}\n`;
   }
 
@@ -735,7 +734,10 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
     readinessScore: payload.readinessScore,
     readinessExample: payload.readinessExample,
     readinessArgAnswer: payload.readinessArgAnswer,
-    readinessArgText: payload.readinessArgText
+    readinessArgText: payload.readinessArgText,
+    totalP80Hours: payload.totalP80Hours,
+    contingencyPctUsed: payload.contingencyPctUsed,
+    correlationUsed: payload.correlationUsed
   }));
   addField(FORM_ENTRY_IDS.itemsJson, JSON.stringify(payload.steps));
   addField(FORM_ENTRY_IDS.totalEffortLow, payload.totalEffortLow);
