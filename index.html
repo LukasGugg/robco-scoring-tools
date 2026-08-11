@@ -43,27 +43,28 @@
 
   .grid-card{ background:var(--card); border:1.5px solid var(--muted); border-radius:14px; padding:16px; margin-top:12px; }
   .steps-scroll{ overflow-x:auto; }
-  table.steps-grid{ border-collapse:separate; border-spacing:8px 8px; min-width:100%; }
-  table.steps-grid th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:#4a5a66; font-weight:700; padding:0 4px; }
-  .element-label{ position:sticky; left:0; background:var(--card); z-index:5; width:170px; min-width:170px; padding:8px !important; vertical-align:top; }
-  .element-label strong{ font-size:13.5px; display:block; }
-  .element-label span{ font-size:11px; color:#4a5a66; display:block; margin-top:3px; line-height:1.3; }
-  th.element-label{ background:transparent; }
+  table.steps-grid{ border-collapse:collapse; width:100%; min-width:820px; }
+  table.steps-grid th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:#4a5a66; font-weight:700; padding:0 8px 8px; }
+  table.steps-grid td{ padding:6px 8px; vertical-align:top; border-top:1px solid var(--line); }
+  table.steps-grid tr.wp-row:first-child td{ border-top:none; }
 
-  .step-header{ min-width:190px; }
+  .wp-name-cell{ min-width:220px; }
+  .wp-num-cell{ min-width:80px; }
+  .wp-mult-cell{ min-width:160px; }
+  .wp-notes-cell{ min-width:190px; }
+  .wp-score-cell{ min-width:100px; text-align:center; }
+
   .step-header-inner{ display:flex; gap:6px; align-items:center; }
   .step-name-input{ flex:1; font-family:inherit; font-size:13px; font-weight:700; padding:7px 9px; border:1.5px solid var(--muted); border-radius:7px; color:var(--text); }
   .remove-step-btn{ font-family:inherit; font-size:14px; width:26px; height:26px; border-radius:6px; border:1.5px solid var(--muted); background:#fff; cursor:pointer; color:var(--high); line-height:1; }
   .remove-step-btn:disabled{ opacity:.3; cursor:not-allowed; }
 
-  .step-cell{ min-width:190px; background:var(--bg); border-radius:10px; padding:8px; border:1px solid var(--muted); }
-  .mini-example{ width:100%; font-family:inherit; font-size:11.5px; padding:6px 7px; border:1.5px solid var(--muted); border-radius:6px; background:#fff; }
-  .mult-slider-row{ display:flex; align-items:center; gap:8px; }
-  .mult-slider-row input[type=range]{ flex:1; }
-  .mult-value{ font-size:12px; font-weight:700; min-width:34px; text-align:right; }
+  .mini-example{ width:100%; font-family:inherit; font-size:11.5px; padding:6px 7px; border:1.5px solid var(--muted); border-radius:6px; background:var(--bg); }
+  .mult-slider-row{ display:flex; align-items:center; gap:6px; }
+  .mult-slider-row input[type=range]{ width:90px; }
+  .mult-value{ font-size:12px; font-weight:700; min-width:32px; text-align:right; }
   .mult-tier{ font-size:10.5px; color:#4a5a66; margin-top:5px; line-height:1.3; }
 
-  .step-score-row .step-cell{ background:transparent; text-align:center; padding:6px; border:none; }
   .step-score-badge{ font-family:'Castoro', Georgia, serif; font-size:20px; }
   .step-score-band{ font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; margin-top:2px; }
   .band-standard{ color:var(--low); }
@@ -122,6 +123,10 @@
 
   <div class="setup-row">
     <div class="field">
+      <label for="hubspotDealId">HubSpot deal ID</label>
+      <input type="text" id="hubspotDealId" placeholder="e.g. 24681012">
+    </div>
+    <div class="field">
       <label for="senderName">Your name</label>
       <input type="text" id="senderName" placeholder="e.g. Jane Doe">
     </div>
@@ -147,7 +152,7 @@
       <h2>Work packages</h2>
       <button class="add-step-btn" id="addStepBtn">+ Add work package</button>
     </div>
-    <p class="steps-hint">Add one column per work package that differs significantly in how it's built (e.g. bin picking vs. sorting vs. palletizing). One is fine if the cell is homogeneous. Give each an honest three-point estimate — the gap between optimistic and pessimistic is information, not padding.</p>
+    <p class="steps-hint">Add one row per work package that differs significantly in how it's built (e.g. bin picking vs. sorting vs. palletizing). One is fine if the cell is homogeneous. Give each an honest three-point estimate — the gap between optimistic and pessimistic is information, not padding.</p>
 
     <div class="grid-card">
       <div class="steps-scroll">
@@ -268,7 +273,7 @@ function tierClass(m){
 }
 
 let state = {
-  project:'', mode:'rse', senderName:'',
+  project:'', mode:'rse', senderName:'', hubspotDealId:'',
   steps: [],
   rseScore:null, adjustmentNotes:''
 };
@@ -337,25 +342,32 @@ function computeAll(){
 }
 
 document.getElementById('senderName').addEventListener('input', e=>{ state.senderName = e.target.value; });
+document.getElementById('hubspotDealId').addEventListener('input', e=>{ state.hubspotDealId = e.target.value; });
 
-// ---------- Work package grid ----------
+// ---------- Work package grid (one row per work package) ----------
 function renderGrid(){
   const table = document.getElementById('stepsTable');
   table.innerHTML = '';
 
   const headRow = document.createElement('tr');
-  const cornerTh = document.createElement('th');
-  cornerTh.className = 'element-label';
-  cornerTh.textContent = '';
-  headRow.appendChild(cornerTh);
-  state.steps.forEach(step=>{
+  ['Work package', 'Optimistic (hrs)', 'Most Likely (hrs)', 'Pessimistic (hrs)', 'Complexity multiplier', 'Notes', 'Score'].forEach(label=>{
     const th = document.createElement('th');
-    th.className = 'step-header';
-    const inner = document.createElement('div');
-    inner.className = 'step-header-inner';
-    const input = document.createElement('input');
-    input.type = 'text'; input.className = 'step-name-input'; input.value = step.name;
-    input.addEventListener('input', e=>{ step.name = e.target.value; renderSummary(); });
+    th.textContent = label;
+    headRow.appendChild(th);
+  });
+  table.appendChild(headRow);
+
+  state.steps.forEach(step=>{
+    const tr = document.createElement('tr');
+    tr.className = 'wp-row';
+
+    const nameTd = document.createElement('td');
+    nameTd.className = 'wp-name-cell';
+    const nameInner = document.createElement('div');
+    nameInner.className = 'step-header-inner';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text'; nameInput.className = 'step-name-input'; nameInput.value = step.name;
+    nameInput.addEventListener('input', e=>{ step.name = e.target.value; renderSummary(); });
     const removeBtn = document.createElement('button');
     removeBtn.className = 'remove-step-btn'; removeBtn.textContent = '×';
     removeBtn.disabled = state.steps.length <= 1;
@@ -364,49 +376,25 @@ function renderGrid(){
       state.steps = state.steps.filter(s=>s.id !== step.id);
       renderGrid(); renderSummary();
     });
-    inner.appendChild(input); inner.appendChild(removeBtn);
-    th.appendChild(inner);
-    headRow.appendChild(th);
-  });
-  table.appendChild(headRow);
+    nameInner.appendChild(nameInput); nameInner.appendChild(removeBtn);
+    nameTd.appendChild(nameInner);
+    tr.appendChild(nameTd);
 
-  const triadFields = [
-    { key:'optimistic', label:'Optimistic', sub:'Best case, no rework or waiting (hrs)' },
-    { key:'mostLikely', label:'Most Likely', sub:'Honest normal expectation (hrs)' },
-    { key:'pessimistic', label:'Pessimistic', sub:'Realistic bad run, not a catastrophe (hrs)' }
-  ];
-  triadFields.forEach(f=>{
-    const tr = document.createElement('tr');
-    const labelTd = document.createElement('td');
-    labelTd.className = 'element-label';
-    labelTd.innerHTML = `<strong>${f.label}</strong><span>${f.sub}</span>`;
-    tr.appendChild(labelTd);
-    state.steps.forEach(step=>{
+    ['optimistic', 'mostLikely', 'pessimistic'].forEach(key=>{
       const td = document.createElement('td');
-      const cellDiv = document.createElement('div');
-      cellDiv.className = 'step-cell';
+      td.className = 'wp-num-cell';
       const input = document.createElement('input');
       input.type = 'number'; input.min = '0'; input.className = 'mini-example';
-      input.placeholder = 'hrs'; input.value = step[f.key];
-      input.addEventListener('input', e=>{ step[f.key] = e.target.value; renderSummary(); });
-      cellDiv.appendChild(input);
-      td.appendChild(cellDiv);
+      input.placeholder = 'hrs'; input.value = step[key];
+      input.addEventListener('input', e=>{ step[key] = e.target.value; renderSummary(); });
+      td.appendChild(input);
       tr.appendChild(td);
     });
-    table.appendChild(tr);
-  });
 
-  const multTr = document.createElement('tr');
-  const multLabelTd = document.createElement('td');
-  multLabelTd.className = 'element-label';
-  multLabelTd.innerHTML = `<strong>Complexity multiplier</strong><span>How unfamiliar is this work?</span>`;
-  multTr.appendChild(multLabelTd);
-  state.steps.forEach(step=>{
-    const td = document.createElement('td');
-    const cellDiv = document.createElement('div');
-    cellDiv.className = 'step-cell';
-    const row = document.createElement('div');
-    row.className = 'mult-slider-row';
+    const multTd = document.createElement('td');
+    multTd.className = 'wp-mult-cell';
+    const multRow = document.createElement('div');
+    multRow.className = 'mult-slider-row';
     const range = document.createElement('input');
     range.type = 'range'; range.min = '1'; range.max = '3'; range.step = '0.1'; range.value = step.multiplier;
     const valueSpan = document.createElement('span');
@@ -419,48 +407,26 @@ function renderGrid(){
       tierLabel.textContent = multiplierTier(step.multiplier);
       renderSummary();
     });
-    row.appendChild(range); row.appendChild(valueSpan);
-    cellDiv.appendChild(row); cellDiv.appendChild(tierLabel);
-    td.appendChild(cellDiv);
-    multTr.appendChild(td);
-  });
-  table.appendChild(multTr);
+    multRow.appendChild(range); multRow.appendChild(valueSpan);
+    multTd.appendChild(multRow); multTd.appendChild(tierLabel);
+    tr.appendChild(multTd);
 
-  const notesTr = document.createElement('tr');
-  const notesLabelTd = document.createElement('td');
-  notesLabelTd.className = 'element-label';
-  notesLabelTd.innerHTML = `<strong>Notes</strong><span>Optional context</span>`;
-  notesTr.appendChild(notesLabelTd);
-  state.steps.forEach(step=>{
-    const td = document.createElement('td');
-    const cellDiv = document.createElement('div');
-    cellDiv.className = 'step-cell';
-    const input = document.createElement('input');
-    input.type = 'text'; input.className = 'mini-example';
-    input.placeholder = 'e.g. Adapted from Project X gripper'; input.value = step.notes;
-    input.addEventListener('input', e=>{ step.notes = e.target.value; });
-    cellDiv.appendChild(input);
-    td.appendChild(cellDiv);
-    notesTr.appendChild(td);
-  });
-  table.appendChild(notesTr);
+    const notesTd = document.createElement('td');
+    notesTd.className = 'wp-notes-cell';
+    const notesInput = document.createElement('input');
+    notesInput.type = 'text'; notesInput.className = 'mini-example';
+    notesInput.placeholder = 'e.g. Adapted from Project X gripper'; notesInput.value = step.notes;
+    notesInput.addEventListener('input', e=>{ step.notes = e.target.value; });
+    notesTd.appendChild(notesInput);
+    tr.appendChild(notesTd);
 
-  const scoreTr = document.createElement('tr');
-  scoreTr.className = 'step-score-row';
-  const scoreLabelTd = document.createElement('td');
-  scoreLabelTd.className = 'element-label';
-  scoreLabelTd.innerHTML = `<strong>Score</strong><span>Expected · P80</span>`;
-  scoreTr.appendChild(scoreLabelTd);
-  state.steps.forEach(step=>{
-    const td = document.createElement('td');
-    td.id = `step-score-${step.id}`;
-    const div = document.createElement('div');
-    div.className = 'step-cell';
-    div.innerHTML = `<div class="step-score-badge" id="score-num-${step.id}">—</div><div class="step-score-band" id="score-band-${step.id}"></div>`;
-    td.appendChild(div);
-    scoreTr.appendChild(td);
+    const scoreTd = document.createElement('td');
+    scoreTd.className = 'wp-score-cell';
+    scoreTd.innerHTML = `<div class="step-score-badge" id="score-num-${step.id}">—</div><div class="step-score-band" id="score-band-${step.id}"></div>`;
+    tr.appendChild(scoreTd);
+
+    table.appendChild(tr);
   });
-  table.appendChild(scoreTr);
 }
 
 document.getElementById('addStepBtn').addEventListener('click', ()=>{
@@ -556,6 +522,7 @@ function buildPayload(){
     project: state.project,
     mode: state.mode,
     senderName: state.senderName,
+    hubspotDealId: state.hubspotDealId,
     steps: perStep.map(({step, calc})=>({
       name: step.name,
       optimistic: step.optimistic,
@@ -581,6 +548,7 @@ function buildPayload(){
 document.getElementById('copyBtn').addEventListener('click', ()=>{
   const payload = buildPayload();
   let out = `Concept complexity score — ${payload.project || '(unnamed project)'}\n`;
+  out += `HubSpot deal ID: ${payload.hubspotDealId || '(not entered)'}\n`;
   out += `Scored by: ${payload.senderName || '(not entered)'}\n`;
   out += `Mode: ${payload.mode==='rse' ? 'RSE initial estimate' : 'SDE confirmed (during review)'}\n\n`;
   payload.steps.forEach(step=>{
@@ -641,6 +609,7 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   addField(FORM_ENTRY_IDS.project, payload.project);
   addField(FORM_ENTRY_IDS.estimateType, payload.mode);
   addField(FORM_ENTRY_IDS.projectLevelJson, JSON.stringify({
+    hubspotDealId: payload.hubspotDealId,
     totalP80Hours: payload.totalP80Hours,
     contingencyPctUsed: payload.contingencyPctUsed,
     correlationUsed: payload.correlationUsed
