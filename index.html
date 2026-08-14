@@ -39,10 +39,14 @@
   .page-panel{ display:none; }
   .page-panel.active{ display:block; }
 
+  .learn-pointer{ max-width:1360px; margin:14px auto 0; padding:0 24px; font-size:12.5px; color:#3d4d57; }
+  .learn-pointer button{ font-family:inherit; font-size:12.5px; color:var(--dusk); background:none; border:none; padding:0; cursor:pointer; text-decoration:underline; font-weight:700; }
+
   .steps-toolbar{ display:flex; justify-content:space-between; align-items:center; margin-top:26px; }
   .steps-toolbar h2{ font-size:19px; }
   .add-step-btn{ font-family:inherit; font-size:13px; padding:9px 16px; border-radius:8px; border:none; background:var(--dusk); color:#fff; cursor:pointer; }
-  .steps-hint{ font-size:12.5px; color:#3d4d57; margin-top:4px; margin-bottom:12px; max-width:700px; }
+  ul.steps-hint{ font-size:12.5px; color:#3d4d57; margin:4px 0 12px; padding-left:18px; max-width:700px; }
+  ul.steps-hint li{ margin-bottom:2px; }
 
   .grid-card{ background:var(--card); border:1.5px solid var(--muted); border-radius:14px; padding:16px; margin-top:12px; }
   .steps-scroll{ overflow-x:auto; }
@@ -55,7 +59,6 @@
   .wp-num-cell{ min-width:80px; }
   .wp-num-cell-wide{ min-width:118px; }
   .wp-mult-cell{ min-width:160px; }
-  .wp-notes-cell{ min-width:190px; }
   .wp-score-cell{ min-width:100px; text-align:center; }
 
   .step-header-inner{ display:flex; gap:6px; align-items:center; }
@@ -75,6 +78,10 @@
   .band-standard{ color:var(--low); }
   .band-elevated{ color:#e8c08a; }
   .band-complex{ color:#ff9d97; }
+
+  .notes-field{ margin-top:16px; }
+  .notes-field label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dusk); display:block; margin-bottom:6px; }
+  .notes-field textarea.mini-example{ min-height:70px; font-size:13px; }
 
   .summary{ position:sticky; top:24px; background:var(--dusk); color:#fff; border-radius:16px; padding:22px; }
   .summary h3{ font-size:15px; color:#fff; text-transform:uppercase; letter-spacing:.06em; }
@@ -155,6 +162,8 @@
   <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 </header>
 
+<div class="learn-pointer">Questions about how to use this scoring, or how to interpret it and the math behind it? See the <button id="learnPointerLink">Learn tab</button>.</div>
+
 <div class="page-tabs">
   <button class="page-tab active" id="tabScorerBtn">Scorer</button>
   <button class="page-tab" id="tabLearnBtn">Learn</button>
@@ -168,12 +177,21 @@
       <h2>Work packages</h2>
       <button class="add-step-btn" id="addStepBtn">+ Add work package</button>
     </div>
-    <p class="steps-hint">Add one row per work package that differs significantly in how it's built (e.g. bin picking vs. sorting vs. palletizing). One is fine if the cell is homogeneous. Give each an honest three-point estimate — the gap between optimistic and pessimistic is information, not padding.</p>
+    <ul class="steps-hint">
+      <li>Add or remove work packages to fit your concept.</li>
+      <li>Give each one a three-point estimate — see the Learn tab if you have questions.</li>
+      <li>Add a complexity multiplier where it's warranted.</li>
+    </ul>
 
     <div class="grid-card">
       <div class="steps-scroll">
         <table class="steps-grid" id="stepsTable"></table>
       </div>
+    </div>
+
+    <div class="notes-field">
+      <label for="generalNotes">Notes</label>
+      <textarea id="generalNotes" class="mini-example" rows="3" placeholder="e.g. Customer wants delivery by Q3, mixed-pattern palletizing not yet validated"></textarea>
     </div>
 
   </div>
@@ -405,14 +423,14 @@ function tierClass(m){
 }
 
 let state = {
-  project:'', senderName:'', hubspotDealId:'',
+  project:'', senderName:'', hubspotDealId:'', generalNotes:'',
   steps: []
 };
 let stepCounter = 0;
 
 function newStep(name){
   stepCounter++;
-  return { id: stepCounter, name: name || `Work package ${stepCounter}`, optimistic:'', mostLikely:'', pessimistic:'', multiplier:1.0, notes:'' };
+  return { id: stepCounter, name: name || `Work package ${stepCounter}`, optimistic:'', mostLikely:'', pessimistic:'', multiplier:1.0 };
 }
 
 // Starting checklist — a suggestion, not a rule. Delete what doesn't apply, rename what's
@@ -468,6 +486,14 @@ function computeAll(){
 
 document.getElementById('senderName').addEventListener('input', e=>{ state.senderName = e.target.value; });
 document.getElementById('hubspotDealId').addEventListener('input', e=>{ state.hubspotDealId = e.target.value; });
+document.getElementById('generalNotes').addEventListener('input', e=>{ state.generalNotes = e.target.value; });
+document.getElementById('learnPointerLink').addEventListener('click', ()=>{
+  switchPageTab('learn');
+  requestAnimationFrame(()=>{
+    const el = document.getElementById('lrn-start');
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
 
 // ---------- Work package grid (one row per work package) ----------
 function renderGrid(){
@@ -481,7 +507,6 @@ function renderGrid(){
     { label:'Most Likely (hrs)', cls:'wp-num-cell-wide' },
     { label:'Pessimistic (hrs)', cls:'wp-num-cell' },
     { label:'Complexity multiplier', cls:'wp-mult-cell' },
-    { label:'Notes', cls:'wp-notes-cell' },
     { label:'Score', cls:'wp-score-cell' }
   ].forEach(col=>{
     const th = document.createElement('th');
@@ -544,16 +569,6 @@ function renderGrid(){
     multRow.appendChild(range); multRow.appendChild(valueSpan);
     multTd.appendChild(multRow); multTd.appendChild(tierLabel);
     tr.appendChild(multTd);
-
-    const notesTd = document.createElement('td');
-    notesTd.className = 'wp-notes-cell';
-    const notesInput = document.createElement('textarea');
-    notesInput.className = 'mini-example';
-    notesInput.rows = 2;
-    notesInput.placeholder = 'e.g. Adapted from Project X gripper'; notesInput.value = step.notes;
-    notesInput.addEventListener('input', e=>{ step.notes = e.target.value; });
-    notesTd.appendChild(notesInput);
-    tr.appendChild(notesTd);
 
     const scoreTd = document.createElement('td');
     scoreTd.className = 'wp-score-cell';
@@ -652,13 +667,13 @@ function buildPayload(){
     project: state.project,
     senderName: state.senderName,
     hubspotDealId: state.hubspotDealId,
+    generalNotes: state.generalNotes,
     steps: perStep.map(({step, calc})=>({
       name: step.name,
       optimistic: step.optimistic,
       mostLikely: step.mostLikely,
       pessimistic: step.pessimistic,
       multiplier: step.multiplier,
-      notes: step.notes,
       pertHrs: calc ? calc.pertHrs : null,
       sigma: calc ? calc.sigma : null,
       expectedHours: calc ? calc.central : null,
@@ -680,7 +695,6 @@ document.getElementById('copyBtn').addEventListener('click', ()=>{
   payload.steps.forEach(step=>{
     out += `--- ${step.name} ---\n`;
     out += `  O/M/P = ${step.optimistic || '–'} / ${step.mostLikely || '–'} / ${step.pessimistic || '–'} hrs, multiplier ${Number(step.multiplier).toFixed(1)}x\n`;
-    if(step.notes) out += `  Notes: ${step.notes}\n`;
     if(step.expectedHours!==null){
       out += `  Expected = ${step.expectedHours.toFixed(1)}h, P80 = ${step.p80Hours.toFixed(1)}h\n`;
     } else {
@@ -690,6 +704,7 @@ document.getElementById('copyBtn').addEventListener('click', ()=>{
   });
   out += `Total concept effort (±1σ) = ${payload.totalEffortLow.toFixed(1)}–${payload.totalEffortHigh.toFixed(1)} hrs\n`;
   out += `P80 commitment = ${payload.totalP80Hours.toFixed(1)} hrs\n`;
+  if(payload.generalNotes) out += `\nNotes: ${payload.generalNotes}\n`;
 
   navigator.clipboard.writeText(out).then(()=>{
     const toast = document.getElementById('copiedToast');
@@ -732,6 +747,7 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   addField(FORM_ENTRY_IDS.estimateType, '');
   addField(FORM_ENTRY_IDS.projectLevelJson, JSON.stringify({
     hubspotDealId: payload.hubspotDealId,
+    generalNotes: payload.generalNotes,
     totalP80Hours: payload.totalP80Hours,
     contingencyPctUsed: payload.contingencyPctUsed,
     correlationUsed: payload.correlationUsed
