@@ -6,9 +6,9 @@ config endpoint (some browsers block that from a `file://` URL).
 
 ## Workflow
 
-1. Branch off `main`: `git checkout -b feature/your-change` — never commit straight to `main`.
-2. Make your change, test it in a browser.
-3. Push the branch and open a PR. `main` is protected — it needs a PR to merge.
+No enforced process — merge to `main` yourself when you're confident in a change. For anything
+bigger than a tweak, branching (`git checkout -b feature/your-change`) and opening a PR is still a
+good idea so someone else gets a chance to look, but it's a judgment call, not a gate.
 
 ## Following the existing pattern
 
