@@ -5,7 +5,8 @@ opening the file (or its hosted URL) in a browser — no build step, no server
 required, and no shared code between them, so each can evolve (or be owned
 by a different contributor) independently:
 
-- **`index.html`** — Concept phase scorer
+- **`index.html`** — Landing page, links to each scorer below
+- **`concept-scorer.html`** — Concept phase scorer
 - **`design-scorer.html`** — Design phase scorer
 - **`execution-scorer.html`** — Execution phase scorer
 - **`admin.html`** — Admin panel

@@ -12,7 +12,7 @@ good idea so someone else gets a chance to look, but it's a judgment call, not a
 
 ## Following the existing pattern
 
-`index.html` (Concept) and `design-scorer.html` (Design) are structurally identical: header with
+`concept-scorer.html` (Concept) and `design-scorer.html` (Design) are structurally identical: header with
 sender/HubSpot-deal-ID/project fields → Scorer/Learn tabs → a row-per-work-package grid (three-point
 estimate + complexity multiplier) → Learn tab explaining the math → a `<script>` with `CONFIG`,
 `state`, `computeStep`/`computeAll`, and render functions. If you're adding a new phase or reworking
