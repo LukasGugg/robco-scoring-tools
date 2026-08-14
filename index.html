@@ -53,12 +53,13 @@
 
   .wp-name-cell{ min-width:220px; }
   .wp-num-cell{ min-width:80px; }
+  .wp-num-cell-wide{ min-width:118px; }
   .wp-mult-cell{ min-width:160px; }
   .wp-notes-cell{ min-width:190px; }
   .wp-score-cell{ min-width:100px; text-align:center; }
 
-  .step-header-inner{ display:flex; gap:6px; align-items:center; }
-  .step-name-input{ flex:1; font-family:inherit; font-size:13px; font-weight:700; padding:7px 9px; border:1.5px solid var(--muted); border-radius:7px; color:var(--text); }
+  .step-header-inner{ display:flex; gap:6px; align-items:flex-start; }
+  .step-name-input{ flex:1; font-family:inherit; font-size:13px; font-weight:700; padding:7px 9px; border:1.5px solid var(--muted); border-radius:7px; color:var(--text); resize:vertical; min-height:34px; line-height:1.3; white-space:pre-wrap; word-wrap:break-word; }
   .remove-step-btn{ font-family:inherit; font-size:14px; width:26px; height:26px; border-radius:6px; border:1.5px solid var(--muted); background:#fff; cursor:pointer; color:var(--high); line-height:1; }
   .remove-step-btn:disabled{ opacity:.3; cursor:not-allowed; }
 
@@ -474,9 +475,18 @@ function renderGrid(){
   table.innerHTML = '';
 
   const headRow = document.createElement('tr');
-  ['Work package', 'Optimistic (hrs)', 'Most Likely (hrs)', 'Pessimistic (hrs)', 'Complexity multiplier', 'Notes', 'Score'].forEach(label=>{
+  [
+    { label:'Work package', cls:'wp-name-cell' },
+    { label:'Optimistic (hrs)', cls:'wp-num-cell' },
+    { label:'Most Likely (hrs)', cls:'wp-num-cell-wide' },
+    { label:'Pessimistic (hrs)', cls:'wp-num-cell' },
+    { label:'Complexity multiplier', cls:'wp-mult-cell' },
+    { label:'Notes', cls:'wp-notes-cell' },
+    { label:'Score', cls:'wp-score-cell' }
+  ].forEach(col=>{
     const th = document.createElement('th');
-    th.textContent = label;
+    th.textContent = col.label;
+    th.className = col.cls;
     headRow.appendChild(th);
   });
   table.appendChild(headRow);
@@ -489,8 +499,8 @@ function renderGrid(){
     nameTd.className = 'wp-name-cell';
     const nameInner = document.createElement('div');
     nameInner.className = 'step-header-inner';
-    const nameInput = document.createElement('input');
-    nameInput.type = 'text'; nameInput.className = 'step-name-input'; nameInput.value = step.name;
+    const nameInput = document.createElement('textarea');
+    nameInput.className = 'step-name-input'; nameInput.rows = 2; nameInput.value = step.name;
     nameInput.addEventListener('input', e=>{ step.name = e.target.value; renderSummary(); });
     const removeBtn = document.createElement('button');
     removeBtn.className = 'remove-step-btn'; removeBtn.textContent = '×';
@@ -506,7 +516,7 @@ function renderGrid(){
 
     ['optimistic', 'mostLikely', 'pessimistic'].forEach(key=>{
       const td = document.createElement('td');
-      td.className = 'wp-num-cell';
+      td.className = key === 'mostLikely' ? 'wp-num-cell-wide' : 'wp-num-cell';
       const input = document.createElement('input');
       input.type = 'number'; input.min = '0'; input.className = 'mini-example';
       input.placeholder = 'hrs'; input.value = step[key];
