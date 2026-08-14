@@ -25,16 +25,15 @@
   header.top h1{ font-size:30px; }
   header.top p.sub{ color:#3d4d57; font-size:14px; margin-top:8px; max-width:700px; }
   .setup-row{ display:flex; gap:16px; flex-wrap:wrap; margin-top:20px; align-items:flex-end; }
+  .required-hint{ font-size:11px; color:#7a4a12; margin-top:8px; }
   .field{ display:flex; flex-direction:column; gap:6px; }
   .field label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dusk); }
   .field input[type=text]{ font-family:inherit; font-size:14px; padding:9px 11px; border:1.5px solid var(--muted); border-radius:8px; background:#fff; color:var(--text); min-width:220px; }
   .config-status{ font-size:11px; color:#5c6b76; font-weight:700; }
   .config-status.live{ color:#1e6b47; }
 
-  .steps-toolbar{ display:flex; justify-content:space-between; align-items:center; margin-top:26px; }
-  .steps-toolbar h2{ font-size:19px; }
-  .add-step-btn{ font-family:inherit; font-size:13px; padding:9px 16px; border-radius:8px; border:none; background:var(--dusk); color:#fff; cursor:pointer; }
-  .steps-hint{ font-size:12.5px; color:#3d4d57; margin-top:4px; margin-bottom:12px; max-width:700px; }
+  .phase-toggle{ margin-top:26px; }
+  .phase-toggle-label{ font-family:'Castoro', Georgia, serif; font-size:19px; font-weight:400; color:var(--dusk); }
 
   .grid-card{ background:var(--card); border:1.5px solid var(--muted); border-radius:14px; padding:16px; margin-top:12px; }
   .steps-scroll{ overflow-x:auto; }
@@ -53,6 +52,7 @@
   .mini-options{ display:flex; gap:5px; }
   .mini-opt{ position:relative; flex:1; font-family:inherit; font-size:12px; font-weight:700; padding:7px 0; border-radius:6px; border:1.75px solid var(--muted); background:#fff; cursor:pointer; }
   .mini-opt:hover{ border-color:var(--dusk); }
+  .mini-options.stacked .mini-opt{ text-align:center; padding:8px 4px; font-size:10px; white-space:normal; line-height:1.25; }
   .mini-opt.sel-1{ border-color:var(--dusk); background:rgba(138,206,216,0.32); }
   .mini-opt.sel-2{ border-color:var(--dusk); background:rgba(101,135,166,0.32); }
   .mini-opt.sel-3{ border-color:var(--dusk); background:rgba(217,107,103,0.26); }
@@ -62,9 +62,9 @@
     line-height:1.4; z-index:40; box-shadow:0 6px 16px rgba(0,0,0,0.2); text-align:left; font-weight:300;
   }
   .mini-example{ width:100%; margin-top:6px; font-family:inherit; font-size:11.5px; padding:6px 7px; border:1.5px solid var(--muted); border-radius:6px; background:#fff; }
-  .step-score-row .step-cell{ background:transparent; text-align:center; padding:6px; border:none; }
-  .step-score-badge{ font-family:'Castoro', Georgia, serif; font-size:20px; }
-  .step-score-band{ font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; margin-top:2px; }
+  .mini-example::placeholder{ font-style:italic; color:#9aa3a9; }
+  .mini-number-input{ width:100%; font-family:inherit; font-size:16px; font-weight:700; padding:8px 9px; border:1.75px solid var(--muted); border-radius:6px; background:#fff; color:var(--dusk); text-align:center; }
+  .mini-number-input:focus{ outline:none; border-color:var(--dusk); }
 
   .summary{ position:sticky; top:24px; background:var(--dusk); color:#fff; border-radius:16px; padding:22px; }
   .summary h3{ font-size:15px; text-transform:uppercase; letter-spacing:.06em; }
@@ -72,10 +72,16 @@
   .step-summary-item{ background:rgba(255,255,255,0.06); border-radius:10px; padding:10px 12px; }
   .step-summary-item .name{ font-size:12.5px; font-weight:700; }
   .step-summary-item .details{ display:flex; justify-content:space-between; margin-top:4px; font-size:11.5px; color:#B7C4CE; }
-  .band-standard{ color:var(--low); } .band-elevated{ color:#e8c08a; } .band-complex{ color:#ff9d97; }
   .total-hero{ margin-top:18px; padding:18px; background:rgba(255,255,255,0.06); border-radius:12px; text-align:center; }
   .total-hero .num{ font-family:'Castoro', Georgia, serif; font-size:36px; }
   .total-hero .lbl{ margin-top:4px; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:#B7C4CE; }
+  .hours-hero{ display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:18px; }
+  .hours-tile{ background:rgba(255,255,255,0.06); border-radius:12px; padding:14px 6px; text-align:center; }
+  .hours-tile .num{ font-family:'Castoro', Georgia, serif; font-size:22px; }
+  .hours-tile .lbl{ margin-top:4px; font-size:10px; letter-spacing:.04em; text-transform:uppercase; color:#B7C4CE; }
+  .hours-total-row{ margin-top:10px; text-align:center; font-size:12.5px; color:#dfe7ec; }
+  .hours-total-row strong{ font-family:'Castoro', Georgia, serif; font-size:17px; font-weight:400; }
+  .hours-pending-note{ margin-top:8px; font-size:10.5px; color:#B7C4CE; line-height:1.4; text-align:center; }
   .meta-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; font-size:12.5px; }
   .meta-grid div{ background:rgba(255,255,255,0.06); border-radius:8px; padding:10px; }
   .meta-grid .k{ color:#B7C4CE; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px;}
@@ -84,11 +90,37 @@
   .btn-row{ display:flex; gap:8px; margin-top:10px; }
   .btn{ flex:1; font-family:inherit; font-size:13px; padding:10px; border-radius:8px; border:none; cursor:pointer; }
   .btn-send{ background:var(--low); color:var(--dusk); font-weight:700; }
+  .btn:disabled{ opacity:.35; cursor:not-allowed; }
   .btn-primary{ background:#fff; color:var(--dusk); font-weight:700; }
   .btn-ghost{ background:transparent; border:1px solid rgba(255,255,255,0.35); color:#fff; }
   .send-status{ font-size:11.5px; text-align:center; margin-top:8px; min-height:14px; }
   .send-status.ok{ color:var(--low); } .send-status.err{ color:#ffcac6; }
   .copied-toast{ font-size:11.5px; text-align:center; margin-top:8px; color:var(--low); height:14px; }
+
+  .summary-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
+  .formulas-btn{ font-family:inherit; font-size:11px; padding:6px 10px; border-radius:7px; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.08); color:#fff; cursor:pointer; white-space:nowrap; }
+  .formulas-btn:hover{ background:rgba(255,255,255,0.18); }
+
+  .modal-overlay{ display:none; position:fixed; inset:0; background:rgba(13,33,48,0.55); z-index:100; align-items:center; justify-content:center; padding:24px; }
+  .modal-overlay.open{ display:flex; }
+  .modal-box{ background:var(--card); border-radius:16px; max-width:760px; width:100%; max-height:86vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
+  .modal-header{ position:sticky; top:0; background:var(--card); display:flex; align-items:center; justify-content:space-between; gap:12px; padding:20px 24px; border-bottom:1.5px solid var(--line); z-index:2; border-radius:16px 16px 0 0; }
+  .modal-header h3{ font-size:20px; color:var(--dusk); }
+  .modal-header p{ font-size:12px; color:#5c6b76; margin-top:4px; }
+  .modal-close{ font-family:inherit; font-size:24px; line-height:1; border:none; background:transparent; cursor:pointer; color:var(--dusk); padding:0 4px; flex-shrink:0; }
+  .modal-body{ padding:20px 24px 28px; font-size:13.5px; color:var(--text); }
+  .formula-item{ margin-bottom:22px; padding-bottom:18px; border-bottom:1px solid var(--line); }
+  .formula-item:last-child{ border-bottom:none; margin-bottom:0; padding-bottom:0; }
+  .formula-item h4{ font-family:'Castoro', Georgia, serif; font-weight:400; font-size:16px; color:var(--dusk); margin-bottom:4px; }
+  .formula-item .formula-sub{ font-size:11.5px; color:#5c6b76; margin-bottom:10px; line-height:1.4; }
+  .formula-phase-row{ display:flex; gap:10px; margin-bottom:5px; font-size:12.5px; line-height:1.4; }
+  .formula-phase-row .phase-tag{ flex:0 0 90px; font-weight:700; text-transform:uppercase; font-size:10.5px; letter-spacing:.04em; color:#3d4d57; padding-top:1px; }
+  .formula-phase-row .phase-desc{ flex:1; }
+  .formula-vars{ margin-top:8px; font-size:11px; color:#5c6b76; background:var(--bg); border-radius:8px; padding:9px 11px; }
+  .formula-vars div{ margin-bottom:3px; }
+  .formula-vars div:last-child{ margin-bottom:0; }
+  .formula-vars code{ background:#fff; border:1px solid var(--muted); border-radius:4px; padding:1px 5px; font-size:10.5px; }
+  .formula-pending{ color:#a15b1f; }
 </style>
 </head>
 <body>
@@ -100,43 +132,62 @@
 
   <div class="setup-row">
     <div class="field">
-      <label for="senderName">Your name</label>
+      <label for="senderName">Your name *</label>
       <input type="text" id="senderName" placeholder="e.g. Jane Doe">
+    </div>
+    <div class="field">
+      <label for="hubspotDealId">HubSpot Deal ID *</label>
+      <input type="text" id="hubspotDealId" placeholder="e.g. 12345678901">
     </div>
     <div class="field">
       <label for="projectName">Project / package name</label>
       <input type="text" id="projectName" placeholder="e.g. Project #1">
     </div>
   </div>
+  <p class="required-hint">* Required before the score can be sent</p>
 </header>
 
 <div class="wrap">
   <div class="left">
 
-    <div class="steps-toolbar">
-      <h2>Units</h2>
-      <button class="add-step-btn" id="addStepBtn">+ Add unit</button>
+    <div class="phase-toggle">
+      <div class="phase-toggle-label">Execution scoring criteria</div>
     </div>
-    <p class="steps-hint">Add one column per unit of execution work you want to score separately.</p>
 
     <div class="grid-card">
       <div class="steps-scroll">
         <table class="steps-grid" id="stepsTable"></table>
       </div>
     </div>
+    <p class="required-hint">* All criteria are required before the score can be sent</p>
   </div>
 
   <aside class="summary" id="summaryPanel">
-    <h3>Live score</h3>
+    <div class="summary-head">
+      <h3>Live score</h3>
+      <button type="button" class="formulas-btn" id="formulasBtn">How are hours calculated?</button>
+    </div>
     <div class="step-summary-list" id="stepSummaryList"></div>
-    <div class="total-hero">
-      <div class="num" id="totalEffortNum">—</div>
-      <div class="lbl">Total effort (hours)</div>
+    <div class="hours-hero">
+      <div class="hours-tile">
+        <div class="num" id="hoursBuildNum">—</div>
+        <div class="lbl">Build phase (h)</div>
+      </div>
+      <div class="hours-tile">
+        <div class="num" id="hoursTestNum">—</div>
+        <div class="lbl">Test phase (h)</div>
+      </div>
+      <div class="hours-tile">
+        <div class="num" id="hoursDeployNum">—</div>
+        <div class="lbl">Deployment phase (h)</div>
+      </div>
     </div>
+    <div class="hours-total-row">Total: <strong id="hoursTotalNum">—</strong> h</div>
+    <div class="hours-pending-note" id="hoursPendingNote"></div>
     <div class="meta-grid">
-      <div><div class="k">Units scored</div><div class="v" id="stepsScoredDisplay">0 / 0</div></div>
+      <div><div class="k">Criteria answered</div><div class="v" id="stepsScoredDisplay">0 / 0</div></div>
     </div>
-    <div class="decision-box" id="decisionBox">Score at least one unit to see a live total.</div>
+    <div class="decision-box" id="decisionBox">Fill in every criterion to enable sending.</div>
     <div class="btn-row">
       <button class="btn btn-send" id="sendBtn">Send score</button>
     </div>
@@ -149,48 +200,228 @@
   </aside>
 </div>
 
+<div class="modal-overlay" id="formulasOverlay">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div>
+        <h3>How the hour estimates are calculated</h3>
+        <p>Per criterion, per phase. Values shown reflect the live Config tab where connected, otherwise the tool's local defaults.</p>
+      </div>
+      <button type="button" class="modal-close" id="formulasCloseBtn" aria-label="Close">&times;</button>
+    </div>
+    <div class="modal-body" id="formulasBody"></div>
+  </div>
+</div>
+
 <script>
 const PHASE_NAME = 'Execution';
 
 const DEF = {
   effortUnit: 'hours',
   elements: [
-    { key:'robots', name:'Number of robots', sub:'How many robots in this unit?',
+    { key:'robots', name:'Number of robots', sub:'Number of individual RobCo robots',
+      inputType:'number', example:'e.g. 2',
+      hourFormula:{
+        build:(step, cfg)=> (cfg.robotquantity_build ?? 3) * numOr0(step.rawInputs.robots),
+        test:(step, cfg)=> 0,
+        deploy:(step, cfg)=> 0
+      },
+      formulaDoc:{
+        build:cfg=> `${fmtH(cfg.robotquantity_build ?? 3)} × number of robots entered.`,
+        test:cfg=> `Always 0h.`,
+        deploy:cfg=> `Always 0h.`,
+        vars:[
+          { cfgKey:'robotquantity_build', sheetKey:'execution.hours_robotquantity_build', label:'Build hours per robot', fallback:3 }
+        ]
+      } },
+    { key:'usecase', name:'Number of robot configurations',
+      sub:'Number of different robot configurations. Example: Frostkrone has 8 robots, 6 of which pick and place the same items, 2 of which palletize the same items. Therefore the number of configurations is 2.',
+      inputType:'number', example:'e.g. 2',
+      hourFormula:{
+        build:(step, cfg)=> 0,
+        test:(step, cfg)=> (cfg.robotconfigurations_test ?? 100) * numOr0(step.rawInputs.usecase) * (1 + numOr0(step.rawInputs.robots)/10),
+        deploy:(step, cfg)=> (cfg.robotconfigurations_deploy ?? 50) * numOr0(step.rawInputs.usecase) * (1 + numOr0(step.rawInputs.robots)/10)
+      },
+      formulaDoc:{
+        build:cfg=> `Always 0h.`,
+        test:cfg=> `${fmtH(cfg.robotconfigurations_test ?? 100)} × number of configurations entered × (1 + number of robots entered ÷ 10).`,
+        deploy:cfg=> `${fmtH(cfg.robotconfigurations_deploy ?? 50)} × number of configurations entered × (1 + number of robots entered ÷ 10).`,
+        vars:[
+          { cfgKey:'robotconfigurations_test', sheetKey:'execution.hours_robotconfigurations_test', label:'Test hours per configuration (base)', fallback:100 },
+          { cfgKey:'robotconfigurations_deploy', sheetKey:'execution.hours_robotconfigurations_deploy', label:'Deployment hours per configuration (base)', fallback:50 }
+        ]
+      } },
+    { key:'variants', name:'Number of mtbh variants', sub:'Number of different SKUs with different processes',
+      inputType:'number', example:'e.g. 7',
+      hourFormula:{
+        build:(step, cfg)=> 0,
+        test:(step, cfg)=> (cfg.mtbhvariants_test ?? 20) * numOr0(step.rawInputs.variants),
+        deploy:(step, cfg)=> (cfg.mtbhvariants_deploy ?? 15) * numOr0(step.rawInputs.variants)
+      },
+      formulaDoc:{
+        build:cfg=> `Always 0h.`,
+        test:cfg=> `${fmtH(cfg.mtbhvariants_test ?? 20)} × number of mtbh variants entered.`,
+        deploy:cfg=> `${fmtH(cfg.mtbhvariants_deploy ?? 15)} × number of mtbh variants entered.`,
+        vars:[
+          { cfgKey:'mtbhvariants_test', sheetKey:'execution.hours_mtbhvariants_test', label:'Test hours per variant', fallback:20 },
+          { cfgKey:'mtbhvariants_deploy', sheetKey:'execution.hours_mtbhvariants_deploy', label:'Deployment hours per variant', fallback:15 }
+        ]
+      } },
+    { key:'integration', name:'Number of grippers',
+      sub:'Number of grippers (a single gripper with 3 different gripping methods counts as 3 grippers)',
+      inputType:'number', example:'e.g. 2',
+      notesPlaceholder:'describe grippers for context here',
+      hourFormula:{
+        build:(step, cfg)=> (cfg.grippers_build ?? 1.5) * numOr0(step.rawInputs.integration),
+        test:(step, cfg)=> (cfg.grippers_test ?? 3) * numOr0(step.rawInputs.integration),
+        deploy:(step, cfg)=> (cfg.grippers_deploy ?? 1) * numOr0(step.rawInputs.integration)
+      },
+      formulaDoc:{
+        build:cfg=> `${fmtH(cfg.grippers_build ?? 1.5)} × number of grippers entered.`,
+        test:cfg=> `${fmtH(cfg.grippers_test ?? 3)} × number of grippers entered.`,
+        deploy:cfg=> `${fmtH(cfg.grippers_deploy ?? 1)} × number of grippers entered.`,
+        vars:[
+          { cfgKey:'grippers_build', sheetKey:'execution.hours_grippers_build', label:'Build hours per gripper', fallback:1.5 },
+          { cfgKey:'grippers_test', sheetKey:'execution.hours_grippers_test', label:'Test hours per gripper', fallback:3 },
+          { cfgKey:'grippers_deploy', sheetKey:'execution.hours_grippers_deploy', label:'Deployment hours per gripper', fallback:1 }
+        ]
+      } },
+    { key:'cellsize', name:'Cell size', sub:'Physical size of cell to determine build effort (m²)',
+      inputType:'number', example:'e.g. 15',
+      hourFormula:{
+        build:(step, cfg)=> cellsizeBuildHours(step, cfg),
+        test:(step, cfg)=> 0,
+        deploy:(step, cfg)=> cellsizeBuildHours(step, cfg) * (cfg.cellsize_deploy ?? 0.5)
+      },
+      formulaDoc:{
+        build:cfg=> [
+          `If cell size &lt; 5 m²: ${fmtH(cfg.cellsize_build_small ?? 8)} × cell size entered.`,
+          `If cell size is 5–40 m²: ${fmtH(cfg.cellsize_build_medium ?? 7)} × cell size entered.`,
+          `If cell size &gt; 40 m²: ${fmtH(cfg.cellsize_build_large ?? 3)} × cell size entered.`
+        ],
+        test:cfg=> `Always 0h.`,
+        deploy:cfg=> `Build result × ${fmtPct(cfg.cellsize_deploy ?? 0.5)}.`,
+        vars:[
+          { cfgKey:'cellsize_build_small', sheetKey:'execution.hours_cellsize_build_small', label:'Build hours/m² (<5 m²)', fallback:8 },
+          { cfgKey:'cellsize_build_medium', sheetKey:'execution.hours_cellsize_build_medium', label:'Build hours/m² (5–40 m²)', fallback:7 },
+          { cfgKey:'cellsize_build_large', sheetKey:'execution.hours_cellsize_build_large', label:'Build hours/m² (>40 m²)', fallback:3 },
+          { cfgKey:'cellsize_deploy', sheetKey:'execution.pct_cellsize_deploy', label:'Deployment share of build hours', fallback:0.5, isPct:true }
+        ]
+      } },
+    { key:'gripper', name:'PLC complexity', sub:'Amount of PLC programming required',
+      example:'e.g. Siemens S7',
       options:[
-        {score:1, tooltip:'1 robot.'},
-        {score:2, tooltip:'2-3 robots.'},
-        {score:3, tooltip:'4+ robots.'}
-      ], example:'e.g. 2 robots' },
-    { key:'variants', name:'Number of variants', sub:'How many part/product variants?',
-      options:[
-        {score:1, tooltip:'1-5 variants.'},
-        {score:2, tooltip:'5-10 variants.'},
-        {score:3, tooltip:'10+ variants.'}
-      ], example:'e.g. 7 SKUs' },
-    { key:'usecase', name:'Use case complexity', sub:'e.g. palletizing vs. pick-and-place',
-      options:[
-        {score:1, tooltip:'Simple pick-and-place.'},
-        {score:2, tooltip:'Moderate — e.g. sorting, basic assembly.'},
-        {score:3, tooltip:'Complex — e.g. palletizing with mixed patterns.'}
-      ], example:'e.g. Mixed-pattern palletizing' },
-    { key:'integration', name:'Integration complexity', sub:'e.g. PLC / line integration present?',
-      options:[
-        {score:1, tooltip:'Standalone, no PLC/line integration.'},
-        {score:2, tooltip:'Simple PLC handshake.'},
-        {score:3, tooltip:'Deep integration into existing line/PLC.'}
-      ], example:'e.g. Full line PLC handshake' },
-    { key:'travel', name:'Travel', sub:'Travel burden for this unit',
-      options:[
-        {score:1, tooltip:'Local / no significant travel.'},
-        {score:2, tooltip:'Domestic travel required.'},
-        {score:3, tooltip:'International / extended travel required.'}
-      ], example:'e.g. 2-week on-site in Mexico' },
-    { key:'gripper', name:'Gripper complexity', sub:'(reconsider weight/inclusion if this matters less at Execution)',
-      options:[
-        {score:1, tooltip:'Standard gripper, no changes needed on-site.'},
-        {score:2, tooltip:'Gripper needs on-site tuning/adjustment.'},
-        {score:3, tooltip:'Gripper is a known problem area needing rework on-site.'}
-      ], example:'e.g. Known soft-gripper reliability issue' }
+        {score:1, label:'No PLC'},
+        {score:2, label:'Supplier provided PLC'},
+        {score:3, label:'RobCo programmed PLC'}
+      ],
+      hourFormula:{
+        build:(step, cfg)=> step.scores.gripper===3 ? (cfg.plc_build_robco ?? 4) : 0,
+        test:(step, cfg)=> {
+          const s = step.scores.gripper;
+          if(s===2) return cfg.plc_test_supplier ?? 3;
+          if(s===3) return cfg.plc_test_robco ?? 30;
+          return 0;
+        },
+        deploy:(step, cfg)=> {
+          const s = step.scores.gripper;
+          if(s===2) return cfg.plc_deploy_supplier ?? 2;
+          if(s===3) return cfg.plc_deploy_robco ?? 6;
+          return 0;
+        }
+      },
+      formulaDoc:{
+        build:cfg=> [
+          `"No PLC" or "Supplier provided PLC" selected: 0h.`,
+          `"RobCo programmed PLC" selected: ${fmtH(cfg.plc_build_robco ?? 4)}.`
+        ],
+        test:cfg=> [
+          `"No PLC" selected: 0h.`,
+          `"Supplier provided PLC" selected: ${fmtH(cfg.plc_test_supplier ?? 3)}.`,
+          `"RobCo programmed PLC" selected: ${fmtH(cfg.plc_test_robco ?? 30)}.`
+        ],
+        deploy:cfg=> [
+          `"No PLC" selected: 0h.`,
+          `"Supplier provided PLC" selected: ${fmtH(cfg.plc_deploy_supplier ?? 2)}.`,
+          `"RobCo programmed PLC" selected: ${fmtH(cfg.plc_deploy_robco ?? 6)}.`
+        ],
+        vars:[
+          { cfgKey:'plc_build_robco', sheetKey:'execution.hours_plc_build_robco', label:'Build hours — RobCo programmed PLC', fallback:4 },
+          { cfgKey:'plc_test_supplier', sheetKey:'execution.hours_plc_test_supplier', label:'Test hours — Supplier provided PLC', fallback:3 },
+          { cfgKey:'plc_test_robco', sheetKey:'execution.hours_plc_test_robco', label:'Test hours — RobCo programmed PLC', fallback:30 },
+          { cfgKey:'plc_deploy_supplier', sheetKey:'execution.hours_plc_deploy_supplier', label:'Deployment hours — Supplier provided PLC', fallback:2 },
+          { cfgKey:'plc_deploy_robco', sheetKey:'execution.hours_plc_deploy_robco', label:'Deployment hours — RobCo programmed PLC', fallback:6 }
+        ]
+      } },
+    { key:'vision', name:'Vision system', sub:'Number of vision systems included',
+      inputType:'number', example:'e.g. 2',
+      hourFormula:{
+        build:(step, cfg)=> (cfg.vision_build ?? 1) * numOr0(step.rawInputs.vision),
+        test:(step, cfg)=> (cfg.vision_test ?? 4) * numOr0(step.rawInputs.vision) * numOr0(step.rawInputs.variants),
+        deploy:(step, cfg)=> (cfg.vision_deploy ?? 1) * numOr0(step.rawInputs.vision) * numOr0(step.rawInputs.variants)
+      },
+      formulaDoc:{
+        build:cfg=> `${fmtH(cfg.vision_build ?? 1)} × number of vision systems entered.`,
+        test:cfg=> `${fmtH(cfg.vision_test ?? 4)} × number of vision systems entered × number of mtbh variants entered.`,
+        deploy:cfg=> `${fmtH(cfg.vision_deploy ?? 1)} × number of vision systems entered × number of mtbh variants entered.`,
+        vars:[
+          { cfgKey:'vision_build', sheetKey:'execution.hours_vision_build', label:'Build hours per vision system', fallback:1 },
+          { cfgKey:'vision_test', sheetKey:'execution.hours_vision_test', label:'Test hours per vision system × variant', fallback:4 },
+          { cfgKey:'vision_deploy', sheetKey:'execution.hours_vision_deploy', label:'Deployment hours per vision system × variant', fallback:1 }
+        ]
+      } },
+    { key:'periphery', name:'Periphery integrations',
+      sub:'Number of larger devices that require integrating (e.g. conveyors, flexi-bowls, feeding stations etc)',
+      inputType:'number', example:'e.g. 2',
+      hourFormula:{
+        build:(step, cfg)=> (cfg.periphery_build ?? 2) * numOr0(step.rawInputs.periphery),
+        test:(step, cfg)=> (cfg.periphery_test ?? 4) * numOr0(step.rawInputs.periphery),
+        deploy:(step, cfg)=> (cfg.periphery_deploy ?? 2) * numOr0(step.rawInputs.periphery)
+      },
+      formulaDoc:{
+        build:cfg=> `${fmtH(cfg.periphery_build ?? 2)} × number of periphery integrations entered.`,
+        test:cfg=> `${fmtH(cfg.periphery_test ?? 4)} × number of periphery integrations entered.`,
+        deploy:cfg=> `${fmtH(cfg.periphery_deploy ?? 2)} × number of periphery integrations entered.`,
+        vars:[
+          { cfgKey:'periphery_build', sheetKey:'execution.hours_periphery_build', label:'Build hours per integration', fallback:2 },
+          { cfgKey:'periphery_test', sheetKey:'execution.hours_periphery_test', label:'Test hours per integration', fallback:4 },
+          { cfgKey:'periphery_deploy', sheetKey:'execution.hours_periphery_deploy', label:'Deployment hours per integration', fallback:2 }
+        ]
+      } },
+    { key:'custmachine', name:'Customer machine integrations',
+      sub:'Number of customer machines that require communication integration (e.g. CNCs, measuring machines etc)',
+      inputType:'number', example:'e.g. 2',
+      hourFormula:{
+        build:(step, cfg)=> (cfg.custmachine_build ?? 1) * numOr0(step.rawInputs.custmachine),
+        test:(step, cfg)=> (cfg.custmachine_test ?? 4) * numOr0(step.rawInputs.custmachine),
+        deploy:(step, cfg)=> (cfg.custmachine_deploy ?? 5) * numOr0(step.rawInputs.custmachine)
+      },
+      formulaDoc:{
+        build:cfg=> `${fmtH(cfg.custmachine_build ?? 1)} × number of customer machine integrations entered.`,
+        test:cfg=> `${fmtH(cfg.custmachine_test ?? 4)} × number of customer machine integrations entered.`,
+        deploy:cfg=> `${fmtH(cfg.custmachine_deploy ?? 5)} × number of customer machine integrations entered.`,
+        vars:[
+          { cfgKey:'custmachine_build', sheetKey:'execution.hours_custmachine_build', label:'Build hours per integration', fallback:1 },
+          { cfgKey:'custmachine_test', sheetKey:'execution.hours_custmachine_test', label:'Test hours per integration', fallback:4 },
+          { cfgKey:'custmachine_deploy', sheetKey:'execution.hours_custmachine_deploy', label:'Deployment hours per integration', fallback:5 }
+        ]
+      } },
+    { key:'travel', name:'Travel', sub:'Number of travel hours (one-way) to the customer',
+      inputType:'number', example:'e.g. 4',
+      hourFormula:{
+        build:(step, cfg)=> 0,
+        test:(step, cfg)=> numOr0(step.rawInputs.travel) * 2 * (cfg.travel_test ?? 6),
+        deploy:(step, cfg)=> numOr0(step.rawInputs.travel) * 2 * (cfg.travel_deploy ?? 5)
+      },
+      formulaDoc:{
+        build:cfg=> `Always 0h.`,
+        test:cfg=> `Number of travel hours entered × 2 × ${cfg.travel_test ?? 6} weeks (on-site weeks during test).`,
+        deploy:cfg=> `Number of travel hours entered × 2 × ${cfg.travel_deploy ?? 5} weeks (on-site weeks during deployment).`,
+        vars:[
+          { cfgKey:'travel_test', sheetKey:'execution.weeks_travel_test', label:'On-site weeks during test', fallback:6, unit:'weeks' },
+          { cfgKey:'travel_deploy', sheetKey:'execution.weeks_travel_deploy', label:'On-site weeks during deployment', fallback:5, unit:'weeks' }
+        ]
+      } }
   ]
 };
 
@@ -200,6 +431,7 @@ const FORM_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfgKJHpdF7DjQu
 const FORM_ENTRY_IDS = {
   phase: 'entry.913181026',
   senderName: 'entry.1612375149',
+  hubspotDealId: 'PASTE_ENTRY_ID_HUBSPOT_DEAL_ID',
   project: 'entry.469321192',
   estimateType: 'entry.245978400',
   projectLevelJson: 'entry.1914133355',
@@ -210,33 +442,81 @@ const FORM_ENTRY_IDS = {
   adjustmentNotes: 'entry.1781478160'
 };
 
-let CONFIG = { weights:{}, bands:{ standardMax:1.6, elevatedMax:2.3, standard:{low:2,high:5}, elevated:{low:5,high:12}, complex:{low:12,high:25} } };
-let state = { project:'', senderName:'', steps:[] };
+let CONFIG = {
+  // Local defaults for hour-formula coefficients. Overridden by rows in the Config tab named
+  // "execution.hours_<name>" (e.g. execution.hours_robotconfigurations_test, execution.hours_robotconfigurations_deploy),
+  // "execution.pct_<name>" for percentage-style coefficients (e.g. execution.pct_cellsize_deploy),
+  // or "execution.weeks_<name>" for week-count coefficients (e.g. execution.weeks_travel_test).
+  hours:{ robotconfigurations_test:100, robotconfigurations_deploy:50, robotquantity_build:3,
+    mtbhvariants_test:20, mtbhvariants_deploy:15,
+    grippers_build:1.5, grippers_test:3, grippers_deploy:1,
+    cellsize_build_small:8, cellsize_build_medium:7, cellsize_build_large:3, cellsize_deploy:0.5,
+    vision_build:1, vision_test:4, vision_deploy:1,
+    periphery_build:2, periphery_test:4, periphery_deploy:2,
+    custmachine_build:1, custmachine_test:4, custmachine_deploy:5,
+    plc_build_robco:4, plc_test_supplier:3, plc_test_robco:30, plc_deploy_supplier:2, plc_deploy_robco:6,
+    travel_test:6, travel_deploy:5 } };
+let state = { project:'', senderName:'', hubspotDealId:'', steps:[] };
 let stepCounter = 0;
 
-function evenWeights(elements){
-  const w = {}; elements.forEach(e=> w[e.key] = 1/elements.length); return w;
+function numOr0(v){ const n = parseFloat(v); return isNaN(n) ? 0 : n; }
+
+// Formatting helpers used only by the "How are hours calculated?" overview modal.
+function fmtH(n){ n = Number(n); if(isNaN(n)) return '?h'; return (Math.round(n*100)/100) + 'h'; }
+function fmtPct(n){ n = Number(n); if(isNaN(n)) return '?%'; return (Math.round(n*1000)/10) + '%'; }
+
+// Tiered build-hour calculation for Cell size, shared by its own build formula and by its
+// deployment formula (which is defined as a percentage of the build result).
+function cellsizeBuildHours(step, cfg){
+  const n = numOr0(step.rawInputs.cellsize);
+  if(n < 5) return (cfg.cellsize_build_small ?? 8) * n;
+  if(n <= 40) return (cfg.cellsize_build_medium ?? 7) * n;
+  return (cfg.cellsize_build_large ?? 3) * n;
+}
+
+// Criteria whose Build/Test/Deployment hour formulas haven't been specified yet — they contribute 0h
+// until their formulas are added, and are called out explicitly in the Live Score panel so the
+// hour totals are never mistaken for a complete estimate.
+const PENDING_HOUR_CRITERIA = DEF.elements.filter(e=> !e.hourFormula).map(e=> e.name);
+
+function computePhaseHours(step, phase){
+  let total = 0;
+  DEF.elements.forEach(e=>{
+    if(e.hourFormula && typeof e.hourFormula[phase] === 'function'){
+      const val = e.hourFormula[phase](step, CONFIG.hours);
+      if(typeof val === 'number' && !isNaN(val)) total += val;
+    }
+  });
+  return total;
+}
+
+function totalPhaseHours(phase){
+  return state.steps.reduce((sum, step)=> sum + computePhaseHours(step, phase), 0);
 }
 
 function newStep(){
   stepCounter++;
-  const scores = {}; const examples = {};
-  DEF.elements.forEach(e=>{ scores[e.key]=null; examples[e.key]=''; });
-  return { id: stepCounter, name: `Unit ${stepCounter}`, scores, examples };
+  const scores = {}; const examples = {}; const rawInputs = {};
+  DEF.elements.forEach(e=>{ scores[e.key]=null; examples[e.key]=''; rawInputs[e.key]=''; });
+  return { id: stepCounter, name: 'Execution phase', scores, examples, rawInputs };
 }
 
-function bandFromScore(w){
-  if(w<=CONFIG.bands.standardMax) return {name:'Standard', effort:[CONFIG.bands.standard.low, CONFIG.bands.standard.high], class:'band-standard'};
-  if(w<=CONFIG.bands.elevatedMax) return {name:'Elevated', effort:[CONFIG.bands.elevated.low, CONFIG.bands.elevated.high], class:'band-elevated'};
-  return {name:'Complex', effort:[CONFIG.bands.complex.low, CONFIG.bands.complex.high], class:'band-complex'};
+// Every criterion is required. Number inputs count as answered once they hold a valid number;
+// option-based criteria (e.g. PLC complexity) count as answered once an option has been clicked.
+function isElementAnswered(step, elDef){
+  if(elDef.inputType === 'number'){
+    const raw = step.rawInputs[elDef.key];
+    return raw !== '' && raw !== null && raw !== undefined && !isNaN(parseFloat(raw));
+  }
+  return step.scores[elDef.key] !== null && step.scores[elDef.key] !== undefined;
 }
 
-function stepWeightedScore(step){
-  const allAnswered = DEF.elements.every(e=> step.scores[e.key]!==null);
-  if(!allAnswered) return null;
-  let sum = 0;
-  DEF.elements.forEach(e=>{ sum += step.scores[e.key] * (CONFIG.weights[e.key] ?? evenWeights(DEF.elements)[e.key]); });
-  return sum;
+function answeredCount(step){
+  return DEF.elements.filter(e=> isElementAnswered(step, e)).length;
+}
+
+function isStepComplete(step){
+  return answeredCount(step) === DEF.elements.length;
 }
 
 async function loadRemoteConfig(){
@@ -247,16 +527,13 @@ async function loadRemoteConfig(){
     const res = await fetch(WEBAPP_URL + '?type=config&phase=' + encodeURIComponent(PHASE_NAME));
     const data = await res.json();
     if(data.error) throw new Error(data.error);
-    const weights = {};
+    const hours = {};
     Object.keys(data).forEach(k=>{
-      if(k.startsWith('weight_')) weights[k.substring('weight_'.length)] = parseFloat(data[k]);
+      if(k.startsWith('hours_')) hours[k.substring('hours_'.length)] = parseFloat(data[k]);
+      else if(k.startsWith('pct_')) hours[k.substring('pct_'.length)] = parseFloat(data[k]);
+      else if(k.startsWith('weeks_')) hours[k.substring('weeks_'.length)] = parseFloat(data[k]);
     });
-    CONFIG.weights = weights;
-    CONFIG.bands.standardMax = parseFloat(data.band_standard_max) || CONFIG.bands.standardMax;
-    CONFIG.bands.elevatedMax = parseFloat(data.band_elevated_max) || CONFIG.bands.elevatedMax;
-    CONFIG.bands.standard = { low: parseFloat(data.band_standard_effort_low), high: parseFloat(data.band_standard_effort_high) };
-    CONFIG.bands.elevated = { low: parseFloat(data.band_elevated_effort_low), high: parseFloat(data.band_elevated_effort_high) };
-    CONFIG.bands.complex  = { low: parseFloat(data.band_complex_effort_low),  high: parseFloat(data.band_complex_effort_high) };
+    CONFIG.hours = Object.assign({}, CONFIG.hours, hours);
     document.getElementById('configStatus').textContent = 'Live config connected';
     document.getElementById('configStatus').classList.add('live');
     renderSummary();
@@ -268,112 +545,172 @@ async function loadRemoteConfig(){
 function renderGrid(){
   const table = document.getElementById('stepsTable');
   table.innerHTML = '';
-  const headRow = document.createElement('tr');
-  headRow.appendChild(document.createElement('th'));
-  state.steps.forEach(step=>{
-    const th = document.createElement('th'); th.className = 'step-header';
-    const inner = document.createElement('div'); inner.className = 'step-header-inner';
-    const input = document.createElement('input'); input.type='text'; input.className='step-name-input'; input.value = step.name;
-    input.addEventListener('input', e=>{ step.name = e.target.value; renderSummary(); });
-    const removeBtn = document.createElement('button'); removeBtn.className='remove-step-btn'; removeBtn.textContent='×';
-    removeBtn.disabled = state.steps.length <= 1;
-    removeBtn.addEventListener('click', ()=>{
-      if(state.steps.length<=1) return;
-      state.steps = state.steps.filter(s=>s.id!==step.id);
-      renderGrid(); renderSummary();
-    });
-    inner.appendChild(input); inner.appendChild(removeBtn); th.appendChild(inner); headRow.appendChild(th);
-  });
-  table.appendChild(headRow);
 
   DEF.elements.forEach(elDef=>{
     const tr = document.createElement('tr');
     const labelTd = document.createElement('td'); labelTd.className='element-label';
-    labelTd.innerHTML = `<strong>${elDef.name}</strong><span>${elDef.sub}</span>`;
+    labelTd.innerHTML = `<strong>${elDef.name} *</strong><span>${elDef.sub}</span>`;
     tr.appendChild(labelTd);
     state.steps.forEach(step=>{
       const td = document.createElement('td');
       const cellDiv = document.createElement('div'); cellDiv.className='step-cell';
-      const miniOptions = document.createElement('div'); miniOptions.className='mini-options';
-      elDef.options.forEach(opt=>{
-        const btn = document.createElement('button'); btn.className='mini-opt';
-        if(step.scores[elDef.key]===opt.score) btn.classList.add(`sel-${opt.score}`);
-        btn.setAttribute('data-tooltip', opt.tooltip); btn.textContent = opt.score;
-        btn.addEventListener('click', ()=>{
-          step.scores[elDef.key] = opt.score;
-          [...miniOptions.children].forEach(c=>c.classList.remove('sel-1','sel-2','sel-3'));
-          btn.classList.add(`sel-${opt.score}`);
+
+      if(elDef.inputType === 'number'){
+        const numberInput = document.createElement('input');
+        numberInput.type = 'number'; numberInput.min = '0'; numberInput.step = '1'; numberInput.required = true;
+        numberInput.className = 'mini-number-input';
+        numberInput.placeholder = elDef.example || '';
+        numberInput.value = step.rawInputs[elDef.key] ?? '';
+        numberInput.addEventListener('input', e=>{
+          step.rawInputs[elDef.key] = e.target.value;
           renderSummary();
         });
-        miniOptions.appendChild(btn);
-      });
-      const exampleInput = document.createElement('input'); exampleInput.type='text'; exampleInput.className='mini-example';
-      exampleInput.placeholder = elDef.example; exampleInput.value = step.examples[elDef.key];
-      exampleInput.addEventListener('input', e=>{ step.examples[elDef.key] = e.target.value; });
-      cellDiv.appendChild(miniOptions); cellDiv.appendChild(exampleInput);
+        cellDiv.appendChild(numberInput);
+        if(elDef.notesPlaceholder){
+          const notesInput = document.createElement('input'); notesInput.type='text'; notesInput.className='mini-example';
+          notesInput.placeholder = elDef.notesPlaceholder; notesInput.value = step.examples[elDef.key];
+          notesInput.addEventListener('input', e=>{ step.examples[elDef.key] = e.target.value; });
+          cellDiv.appendChild(notesInput);
+        }
+      } else {
+        const hasLabels = elDef.options.some(o=>o.label);
+        const miniOptions = document.createElement('div'); miniOptions.className='mini-options';
+        if(hasLabels) miniOptions.classList.add('stacked');
+        elDef.options.forEach(opt=>{
+          const btn = document.createElement('button'); btn.className='mini-opt';
+          if(step.scores[elDef.key]===opt.score) btn.classList.add(`sel-${opt.score}`);
+          if(opt.tooltip) btn.setAttribute('data-tooltip', opt.tooltip);
+          btn.textContent = opt.label || opt.score;
+          btn.addEventListener('click', ()=>{
+            step.scores[elDef.key] = opt.score;
+            [...miniOptions.children].forEach(c=>c.classList.remove('sel-1','sel-2','sel-3'));
+            btn.classList.add(`sel-${opt.score}`);
+            renderSummary();
+          });
+          miniOptions.appendChild(btn);
+        });
+        const exampleInput = document.createElement('input'); exampleInput.type='text'; exampleInput.className='mini-example';
+        exampleInput.placeholder = elDef.example || ''; exampleInput.value = step.examples[elDef.key];
+        exampleInput.addEventListener('input', e=>{ step.examples[elDef.key] = e.target.value; });
+        cellDiv.appendChild(miniOptions); cellDiv.appendChild(exampleInput);
+      }
+
       td.appendChild(cellDiv); tr.appendChild(td);
     });
     table.appendChild(tr);
   });
-
-  const scoreTr = document.createElement('tr'); scoreTr.className = 'step-score-row';
-  const scoreLabelTd = document.createElement('td'); scoreLabelTd.className='element-label';
-  scoreLabelTd.innerHTML = `<strong>Score</strong>`;
-  scoreTr.appendChild(scoreLabelTd);
-  state.steps.forEach(step=>{
-    const td = document.createElement('td');
-    const div = document.createElement('div'); div.className='step-cell';
-    div.innerHTML = `<div class="step-score-badge" id="score-num-${step.id}">—</div><div class="step-score-band" id="score-band-${step.id}"></div>`;
-    td.appendChild(div); scoreTr.appendChild(td);
-  });
-  table.appendChild(scoreTr);
 }
 
-document.getElementById('addStepBtn').addEventListener('click', ()=>{
-  state.steps.push(newStep());
-  renderGrid(); renderSummary();
+// Builds the "How are hours calculated?" modal content directly from DEF.elements, so the
+// overview can never drift from the actual hourFormula code — and pulls live CONFIG.hours
+// values so any Config-tab overrides show up immediately.
+function renderFormulaLine(val){
+  if(Array.isArray(val)) return val.map(v=> `<div>${v}</div>`).join('');
+  return `<div>${val}</div>`;
+}
+
+function buildFormulasContent(){
+  const body = document.getElementById('formulasBody');
+  let html = '';
+  DEF.elements.forEach(el=>{
+    html += `<div class="formula-item"><h4>${el.name}</h4>`;
+    if(el.sub) html += `<div class="formula-sub">${el.sub}</div>`;
+    if(el.formulaDoc){
+      [['build','Build'],['test','Test'],['deploy','Deployment']].forEach(([phase,label])=>{
+        const text = typeof el.formulaDoc[phase] === 'function' ? el.formulaDoc[phase](CONFIG.hours) : '—';
+        html += `<div class="formula-phase-row"><div class="phase-tag">${label}</div><div class="phase-desc">${renderFormulaLine(text)}</div></div>`;
+      });
+      if(el.formulaDoc.vars && el.formulaDoc.vars.length){
+        html += `<div class="formula-vars">`;
+        el.formulaDoc.vars.forEach(v=>{
+          const raw = CONFIG.hours[v.cfgKey] ?? v.fallback;
+          const displayVal = v.isPct ? fmtPct(raw) : (v.unit ? `${Math.round(raw*100)/100} ${v.unit}` : fmtH(raw));
+          html += `<div><code>${v.sheetKey}</code> — ${v.label}: <strong>${displayVal}</strong></div>`;
+        });
+        html += `</div>`;
+      }
+    } else {
+      html += `<div class="formula-phase-row"><div class="phase-desc formula-pending">No formula defined yet — always counted as 0h in every phase, in all Build/Test/Deployment totals.</div></div>`;
+    }
+    html += `</div>`;
+  });
+  body.innerHTML = html;
+}
+
+function openFormulasModal(){ buildFormulasContent(); document.getElementById('formulasOverlay').classList.add('open'); }
+function closeFormulasModal(){ document.getElementById('formulasOverlay').classList.remove('open'); }
+
+document.getElementById('formulasBtn').addEventListener('click', openFormulasModal);
+document.getElementById('formulasCloseBtn').addEventListener('click', closeFormulasModal);
+document.getElementById('formulasOverlay').addEventListener('click', e=>{
+  if(e.target.id === 'formulasOverlay') closeFormulasModal();
 });
+document.addEventListener('keydown', e=>{
+  if(e.key === 'Escape') closeFormulasModal();
+});
+
 document.getElementById('projectName').addEventListener('input', e=>{ state.project = e.target.value; });
-document.getElementById('senderName').addEventListener('input', e=>{ state.senderName = e.target.value; });
+document.getElementById('senderName').addEventListener('input', e=>{ state.senderName = e.target.value; updateSendButtonState(); });
+document.getElementById('hubspotDealId').addEventListener('input', e=>{ state.hubspotDealId = e.target.value; updateSendButtonState(); });
 document.getElementById('resetBtn').addEventListener('click', ()=>{ location.reload(); });
 
+// "Your name" and "HubSpot Deal ID" are required before a score can be sent.
+function updateSendButtonState(){
+  const infoReady = state.senderName.trim() !== '' && state.hubspotDealId.trim() !== '';
+  const criteriaReady = state.steps.every(isStepComplete);
+  document.getElementById('sendBtn').disabled = !(infoReady && criteriaReady);
+}
+
 function renderSummary(){
-  let totalLow=0, totalHigh=0, scoredCount=0;
   const listEl = document.getElementById('stepSummaryList'); listEl.innerHTML='';
+  let totalAnswered = 0, totalPossible = 0;
   state.steps.forEach(step=>{
-    const w = stepWeightedScore(step);
-    const numEl = document.getElementById(`score-num-${step.id}`);
-    const bandEl = document.getElementById(`score-band-${step.id}`);
-    if(w!==null){
-      scoredCount++;
-      const band = bandFromScore(w);
-      totalLow += band.effort[0]; totalHigh += band.effort[1];
-      if(numEl) numEl.textContent = w.toFixed(2);
-      if(bandEl){ bandEl.textContent = band.name; bandEl.className = 'step-score-band '+band.class; }
-      const item = document.createElement('div'); item.className='step-summary-item';
-      item.innerHTML = `<div class="name">${step.name}</div><div class="details"><span>${w.toFixed(2)} — ${band.name}</span><span>${band.effort[0]}–${band.effort[1]}${DEF.effortUnit[0]}</span></div>`;
-      listEl.appendChild(item);
-    } else {
-      if(numEl) numEl.textContent = '—';
-      const item = document.createElement('div'); item.className='step-summary-item';
-      item.innerHTML = `<div class="name">${step.name}</div><div class="details"><span>Incomplete</span><span>—</span></div>`;
-      listEl.appendChild(item);
-    }
+    const answered = answeredCount(step);
+    totalAnswered += answered; totalPossible += DEF.elements.length;
+    const complete = answered === DEF.elements.length;
+    const item = document.createElement('div'); item.className='step-summary-item';
+    item.innerHTML = `<div class="name">${step.name}</div><div class="details"><span>${complete ? 'All criteria answered' : `${answered} / ${DEF.elements.length} criteria answered`}</span></div>`;
+    listEl.appendChild(item);
   });
-  document.getElementById('stepsScoredDisplay').textContent = `${scoredCount} / ${state.steps.length}`;
-  document.getElementById('totalEffortNum').textContent = scoredCount>0 ? `${totalLow}–${totalHigh}` : '—';
+  document.getElementById('stepsScoredDisplay').textContent = `${totalAnswered} / ${totalPossible}`;
+
+  const hoursBuild = totalPhaseHours('build');
+  const hoursTest = totalPhaseHours('test');
+  const hoursDeploy = totalPhaseHours('deploy');
+  document.getElementById('hoursBuildNum').textContent = hoursBuild.toFixed(1);
+  document.getElementById('hoursTestNum').textContent = hoursTest.toFixed(1);
+  document.getElementById('hoursDeployNum').textContent = hoursDeploy.toFixed(1);
+  document.getElementById('hoursTotalNum').textContent = (hoursBuild + hoursTest + hoursDeploy).toFixed(1);
+  document.getElementById('hoursPendingNote').textContent = PENDING_HOUR_CRITERIA.length
+    ? `Formulas pending for: ${PENDING_HOUR_CRITERIA.join(', ')} (counted as 0h for now).`
+    : '';
+
   const decisionBox = document.getElementById('decisionBox');
-  decisionBox.textContent = scoredCount===0
-    ? 'Score at least one unit to see a live total.'
-    : `${scoredCount} of ${state.steps.length} scored.`;
+  decisionBox.textContent = state.steps.every(isStepComplete)
+    ? 'All criteria complete — ready to send.'
+    : 'Fill in every criterion to enable sending.';
+
+  updateSendButtonState();
 }
 
 document.getElementById('copyBtn').addEventListener('click', ()=>{
-  let out = `[Execution] ${state.project || '(unnamed)'} — scored by ${state.senderName || '(not entered)'}\n\n`;
+  const hoursBuild = totalPhaseHours('build');
+  const hoursTest = totalPhaseHours('test');
+  const hoursDeploy = totalPhaseHours('deploy');
+  let out = `[Execution] ${state.project || '(unnamed)'} — scored by ${state.senderName || '(not entered)'}\n`;
+  out += `HubSpot Deal ID: ${state.hubspotDealId || '(not entered)'}\n`;
+  out += `Hours — Build: ${hoursBuild.toFixed(1)} · Test: ${hoursTest.toFixed(1)} · Deployment: ${hoursDeploy.toFixed(1)} · Total: ${(hoursBuild+hoursTest+hoursDeploy).toFixed(1)}\n`;
+  if(PENDING_HOUR_CRITERIA.length) out += `(Formulas pending for: ${PENDING_HOUR_CRITERIA.join(', ')} — counted as 0h)\n`;
+  out += `\n`;
   state.steps.forEach(step=>{
     out += `--- ${step.name} ---\n`;
     DEF.elements.forEach(e=>{
-      out += `  ${e.name} = ${step.scores[e.key] ?? '–'}`;
+      if(e.inputType === 'number'){
+        out += `  ${e.name} = ${step.rawInputs[e.key] !== '' ? step.rawInputs[e.key] : '–'}`;
+      } else {
+        const opt = (e.options || []).find(o=> o.score === step.scores[e.key]);
+        out += `  ${e.name} = ${opt ? opt.label : (step.scores[e.key] ?? '–')}`;
+      }
       if(step.examples[e.key]) out += ` — ${step.examples[e.key]}`;
       out += `\n`;
     });
@@ -386,17 +723,26 @@ document.getElementById('copyBtn').addEventListener('click', ()=>{
 
 document.getElementById('sendBtn').addEventListener('click', ()=>{
   const statusEl = document.getElementById('sendStatus');
+  if(state.senderName.trim() === '' || state.hubspotDealId.trim() === ''){
+    statusEl.className='send-status err'; statusEl.textContent='Enter your name and HubSpot Deal ID before sending.'; return;
+  }
+  if(!state.steps.every(isStepComplete)){
+    statusEl.className='send-status err'; statusEl.textContent='Fill in every criterion before sending.'; return;
+  }
   if(!FORM_ACTION_URL || FORM_ACTION_URL.indexOf('PASTE_YOUR') === 0){
     statusEl.className='send-status err'; statusEl.textContent='No form connected yet — see SETUP.md.'; return;
   }
   const rows = state.steps.map(step=>{
-    const w = stepWeightedScore(step);
-    const band = w!==null ? bandFromScore(w) : null;
-    return { name:step.name, scores:step.scores, examples:step.examples, weightedScore:w,
-      band: band?band.name:'', effortLow: band?band.effort[0]:null, effortHigh: band?band.effort[1]:null };
+    const hoursBuild = computePhaseHours(step, 'build');
+    const hoursTest = computePhaseHours(step, 'test');
+    const hoursDeploy = computePhaseHours(step, 'deploy');
+    return { name:step.name, scores:step.scores, examples:step.examples, rawInputs:step.rawInputs,
+      hoursBuild, hoursTest, hoursDeploy, hoursTotal: hoursBuild+hoursTest+hoursDeploy };
   });
-  const totalLow = rows.reduce((s,r)=> s + (r.effortLow||0), 0);
-  const totalHigh = rows.reduce((s,r)=> s + (r.effortHigh||0), 0);
+  const totalBuild = rows.reduce((s,r)=> s + r.hoursBuild, 0);
+  const totalTest = rows.reduce((s,r)=> s + r.hoursTest, 0);
+  const totalDeploy = rows.reduce((s,r)=> s + r.hoursDeploy, 0);
+  const totalAll = totalBuild + totalTest + totalDeploy;
 
   const form = document.createElement('form');
   form.action = FORM_ACTION_URL; form.method='POST'; form.target='hidden_form_target'; form.style.display='none';
@@ -407,12 +753,16 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   }
   addField(FORM_ENTRY_IDS.phase, PHASE_NAME);
   addField(FORM_ENTRY_IDS.senderName, state.senderName);
+  addField(FORM_ENTRY_IDS.hubspotDealId, state.hubspotDealId);
   addField(FORM_ENTRY_IDS.project, state.project);
   addField(FORM_ENTRY_IDS.estimateType, '');
-  addField(FORM_ENTRY_IDS.projectLevelJson, JSON.stringify({}));
+  addField(FORM_ENTRY_IDS.projectLevelJson, JSON.stringify({
+    hubspotDealId: state.hubspotDealId,
+    hours: { build: totalBuild, test: totalTest, deploy: totalDeploy, total: totalAll },
+    hoursFormulasPending: PENDING_HOUR_CRITERIA }));
   addField(FORM_ENTRY_IDS.itemsJson, JSON.stringify(rows));
-  addField(FORM_ENTRY_IDS.totalEffortLow, totalLow);
-  addField(FORM_ENTRY_IDS.totalEffortHigh, totalHigh);
+  addField(FORM_ENTRY_IDS.totalEffortLow, totalAll);
+  addField(FORM_ENTRY_IDS.totalEffortHigh, totalAll);
   addField(FORM_ENTRY_IDS.referenceEstimate, '');
   addField(FORM_ENTRY_IDS.adjustmentNotes, '');
   document.body.appendChild(form);
@@ -426,7 +776,6 @@ hiddenIframe.name = 'hidden_form_target'; hiddenIframe.style.display='none';
 document.body.appendChild(hiddenIframe);
 
 state.steps.push(newStep());
-CONFIG.weights = evenWeights(DEF.elements);
 renderGrid();
 renderSummary();
 loadRemoteConfig();
