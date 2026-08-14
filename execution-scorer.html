@@ -32,26 +32,36 @@
   .config-status{ font-size:11px; color:#5c6b76; font-weight:700; }
   .config-status.live{ color:#1e6b47; }
 
+  .learn-pointer{ max-width:1360px; margin:14px auto 0; padding:0 24px; font-size:12.5px; color:#3d4d57; }
+  .learn-pointer button{ font-family:inherit; font-size:12.5px; color:var(--dusk); background:none; border:none; padding:0; cursor:pointer; text-decoration:underline; font-weight:700; }
+
+  .page-tabs{ display:flex; gap:6px; max-width:1360px; margin:22px auto 0; padding:0 24px; border-bottom:1.5px solid var(--line); }
+  .page-tab{ font-family:inherit; font-size:14px; padding:10px 18px; border:none; background:none; cursor:pointer; color:#5c6b76; border-bottom:2px solid transparent; margin-bottom:-1.5px; }
+  .page-tab.active{ color:var(--dusk); border-bottom-color:var(--dusk); font-weight:700; }
+  .page-panel{ display:none; }
+  .page-panel.active{ display:block; }
+
   .phase-toggle{ margin-top:26px; }
   .phase-toggle-label{ font-family:'Castoro', Georgia, serif; font-size:19px; font-weight:400; color:var(--dusk); }
 
   .grid-card{ background:var(--card); border:1.5px solid var(--muted); border-radius:14px; padding:16px; margin-top:12px; }
   .steps-scroll{ overflow-x:auto; }
-  table.steps-grid{ border-collapse:separate; border-spacing:8px 8px; min-width:100%; }
-  .element-label{ position:sticky; left:0; background:var(--card); z-index:5; width:180px; min-width:180px; padding:8px !important; vertical-align:top; }
+  table.steps-grid{ border-collapse:separate; border-spacing:8px 8px; table-layout:fixed; }
+  .element-label{ position:sticky; left:0; background:var(--card); z-index:5; width:340px; min-width:340px; padding:8px !important; vertical-align:top; }
   .element-label strong{ font-size:13.5px; display:block; }
   .element-label span{ font-size:11px; color:#4a5a66; display:block; margin-top:3px; line-height:1.3; }
 
-  .step-header{ min-width:190px; }
+  .step-header{ min-width:150px; }
   .step-header-inner{ display:flex; gap:6px; align-items:center; }
   .step-name-input{ flex:1; font-family:inherit; font-size:13px; font-weight:700; padding:7px 9px; border:1.5px solid var(--muted); border-radius:7px; }
   .remove-step-btn{ font-family:inherit; font-size:14px; width:26px; height:26px; border-radius:6px; border:1.5px solid var(--muted); background:#fff; cursor:pointer; color:var(--high); }
   .remove-step-btn:disabled{ opacity:.3; cursor:not-allowed; }
 
-  .step-cell{ min-width:190px; background:var(--bg); border-radius:10px; padding:8px; border:1px solid var(--muted); }
+  .step-cell{ min-width:150px; background:var(--bg); border-radius:10px; padding:8px; border:1px solid var(--muted); }
   .mini-options{ display:flex; gap:5px; }
   .mini-opt{ position:relative; flex:1; font-family:inherit; font-size:12px; font-weight:700; padding:7px 0; border-radius:6px; border:1.75px solid var(--muted); background:#fff; cursor:pointer; }
   .mini-opt:hover{ border-color:var(--dusk); }
+  .mini-options.stacked{ flex-direction:column; }
   .mini-options.stacked .mini-opt{ text-align:center; padding:8px 4px; font-size:10px; white-space:normal; line-height:1.25; }
   .mini-opt.sel-1{ border-color:var(--dusk); background:rgba(138,206,216,0.32); }
   .mini-opt.sel-2{ border-color:var(--dusk); background:rgba(101,135,166,0.32); }
@@ -97,18 +107,8 @@
   .send-status.ok{ color:var(--low); } .send-status.err{ color:#ffcac6; }
   .copied-toast{ font-size:11.5px; text-align:center; margin-top:8px; color:var(--low); height:14px; }
 
-  .summary-head{ display:flex; align-items:center; justify-content:space-between; gap:10px; }
-  .formulas-btn{ font-family:inherit; font-size:11px; padding:6px 10px; border-radius:7px; border:1px solid rgba(255,255,255,0.4); background:rgba(255,255,255,0.08); color:#fff; cursor:pointer; white-space:nowrap; }
-  .formulas-btn:hover{ background:rgba(255,255,255,0.18); }
-
-  .modal-overlay{ display:none; position:fixed; inset:0; background:rgba(13,33,48,0.55); z-index:100; align-items:center; justify-content:center; padding:24px; }
-  .modal-overlay.open{ display:flex; }
-  .modal-box{ background:var(--card); border-radius:16px; max-width:760px; width:100%; max-height:86vh; overflow-y:auto; box-shadow:0 20px 60px rgba(0,0,0,0.3); }
-  .modal-header{ position:sticky; top:0; background:var(--card); display:flex; align-items:center; justify-content:space-between; gap:12px; padding:20px 24px; border-bottom:1.5px solid var(--line); z-index:2; border-radius:16px 16px 0 0; }
-  .modal-header h3{ font-size:20px; color:var(--dusk); }
-  .modal-header p{ font-size:12px; color:#5c6b76; margin-top:4px; }
-  .modal-close{ font-family:inherit; font-size:24px; line-height:1; border:none; background:transparent; cursor:pointer; color:var(--dusk); padding:0 4px; flex-shrink:0; }
-  .modal-body{ padding:20px 24px 28px; font-size:13.5px; color:var(--text); }
+  .learn-wrap{ max-width:860px; margin:0 auto; padding:32px 24px 100px; font-size:13.5px; color:var(--text); }
+  .learn-wrap > p{ font-size:13px; color:#5c6b76; margin-bottom:24px; }
   .formula-item{ margin-bottom:22px; padding-bottom:18px; border-bottom:1px solid var(--line); }
   .formula-item:last-child{ border-bottom:none; margin-bottom:0; padding-bottom:0; }
   .formula-item h4{ font-family:'Castoro', Georgia, serif; font-weight:400; font-size:16px; color:var(--dusk); margin-bottom:4px; }
@@ -126,18 +126,18 @@
 <body>
 
 <header class="top">
-  <div class="eyebrow"><span>Solution Development Engineering - Execution Phase</span> — <span class="config-status" id="configStatus">Using local defaults (not connected)</span></div>
+  <div class="eyebrow"><span>Solution Execution - Execution Phase</span> — <span class="config-status" id="configStatus">Using local defaults (not connected)</span></div>
   <h1>Execution phase scoring</h1>
   <p class="sub">Score each unit on deployment-time complexity drivers.</p>
 
   <div class="setup-row">
     <div class="field">
-      <label for="senderName">Your name *</label>
-      <input type="text" id="senderName" placeholder="e.g. Jane Doe">
-    </div>
-    <div class="field">
       <label for="hubspotDealId">HubSpot Deal ID *</label>
       <input type="text" id="hubspotDealId" placeholder="e.g. 12345678901">
+    </div>
+    <div class="field">
+      <label for="senderName">Your name *</label>
+      <input type="text" id="senderName" placeholder="e.g. Jane Doe">
     </div>
     <div class="field">
       <label for="projectName">Project / package name</label>
@@ -147,6 +147,14 @@
   <p class="required-hint">* Required before the score can be sent</p>
 </header>
 
+<div class="learn-pointer">Questions about how the hour estimates are calculated? See the <button id="learnPointerLink">Learn tab</button>.</div>
+
+<div class="page-tabs">
+  <button class="page-tab active" id="tabScorerBtn">Scorer</button>
+  <button class="page-tab" id="tabLearnBtn">Learn</button>
+</div>
+
+<div class="page-panel active" id="panelScorer">
 <div class="wrap">
   <div class="left">
 
@@ -163,10 +171,7 @@
   </div>
 
   <aside class="summary" id="summaryPanel">
-    <div class="summary-head">
-      <h3>Live score</h3>
-      <button type="button" class="formulas-btn" id="formulasBtn">How are hours calculated?</button>
-    </div>
+    <h3>Live score</h3>
     <div class="step-summary-list" id="stepSummaryList"></div>
     <div class="hours-hero">
       <div class="hours-tile">
@@ -199,18 +204,14 @@
     <div class="copied-toast" id="copiedToast"></div>
   </aside>
 </div>
+</div>
 
-<div class="modal-overlay" id="formulasOverlay">
-  <div class="modal-box">
-    <div class="modal-header">
-      <div>
-        <h3>How the hour estimates are calculated</h3>
-        <p>Per criterion, per phase. Values shown reflect the live Config tab where connected, otherwise the tool's local defaults.</p>
-      </div>
-      <button type="button" class="modal-close" id="formulasCloseBtn" aria-label="Close">&times;</button>
-    </div>
-    <div class="modal-body" id="formulasBody"></div>
-  </div>
+<div class="page-panel" id="panelLearn">
+<div class="learn-wrap">
+  <h2>How the hour estimates are calculated</h2>
+  <p>Per criterion, per phase. Values shown reflect the live Config tab where connected, otherwise the tool's local defaults.</p>
+  <div id="formulasBody"></div>
+</div>
 </div>
 
 <script>
@@ -537,6 +538,7 @@ async function loadRemoteConfig(){
     document.getElementById('configStatus').textContent = 'Live config connected';
     document.getElementById('configStatus').classList.add('live');
     renderSummary();
+    buildFormulasContent();
   } catch(err){
     document.getElementById('configStatus').textContent = 'Could not reach config — using local defaults';
   }
@@ -545,6 +547,17 @@ async function loadRemoteConfig(){
 function renderGrid(){
   const table = document.getElementById('stepsTable');
   table.innerHTML = '';
+
+  // table-layout:fixed needs explicit column widths — otherwise the value column would
+  // stretch to fit the widest content (e.g. the PLC option labels) instead of staying compact.
+  const colgroup = document.createElement('colgroup');
+  const labelCol = document.createElement('col'); labelCol.style.width = '340px';
+  colgroup.appendChild(labelCol);
+  state.steps.forEach(()=>{
+    const valueCol = document.createElement('col'); valueCol.style.width = '160px';
+    colgroup.appendChild(valueCol);
+  });
+  table.appendChild(colgroup);
 
   DEF.elements.forEach(elDef=>{
     const tr = document.createElement('tr');
@@ -637,17 +650,16 @@ function buildFormulasContent(){
   body.innerHTML = html;
 }
 
-function openFormulasModal(){ buildFormulasContent(); document.getElementById('formulasOverlay').classList.add('open'); }
-function closeFormulasModal(){ document.getElementById('formulasOverlay').classList.remove('open'); }
-
-document.getElementById('formulasBtn').addEventListener('click', openFormulasModal);
-document.getElementById('formulasCloseBtn').addEventListener('click', closeFormulasModal);
-document.getElementById('formulasOverlay').addEventListener('click', e=>{
-  if(e.target.id === 'formulasOverlay') closeFormulasModal();
-});
-document.addEventListener('keydown', e=>{
-  if(e.key === 'Escape') closeFormulasModal();
-});
+// ---------- Page tabs ----------
+document.getElementById('tabScorerBtn').addEventListener('click', ()=> switchPageTab('scorer'));
+document.getElementById('tabLearnBtn').addEventListener('click', ()=> switchPageTab('learn'));
+function switchPageTab(tab){
+  document.getElementById('tabScorerBtn').classList.toggle('active', tab==='scorer');
+  document.getElementById('tabLearnBtn').classList.toggle('active', tab==='learn');
+  document.getElementById('panelScorer').classList.toggle('active', tab==='scorer');
+  document.getElementById('panelLearn').classList.toggle('active', tab==='learn');
+}
+document.getElementById('learnPointerLink').addEventListener('click', ()=> switchPageTab('learn'));
 
 document.getElementById('projectName').addEventListener('input', e=>{ state.project = e.target.value; });
 document.getElementById('senderName').addEventListener('input', e=>{ state.senderName = e.target.value; updateSendButtonState(); });
@@ -778,6 +790,7 @@ document.body.appendChild(hiddenIframe);
 state.steps.push(newStep());
 renderGrid();
 renderSummary();
+buildFormulasContent();
 loadRemoteConfig();
 </script>
 </body>
