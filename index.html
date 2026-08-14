@@ -28,13 +28,16 @@
   .field{ display:flex; flex-direction:column; gap:6px; }
   .field label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dusk); }
   .field input[type=text]{ font-family:inherit; font-size:14px; padding:9px 11px; border:1.5px solid var(--muted); border-radius:8px; background:#fff; color:var(--text); min-width:240px; }
-  .mode-toggle{ display:flex; border:1.5px solid var(--muted); border-radius:8px; overflow:hidden; }
-  .mode-toggle button{ font-family:inherit; font-size:13px; padding:9px 14px; border:none; background:#fff; color:var(--text); cursor:pointer; }
-  .mode-toggle button.active{ background:var(--dusk); color:#fff; }
   .progress-bar{ height:4px; background:var(--muted); border-radius:2px; overflow:hidden; margin-top:22px; }
   .progress-fill{ height:100%; background:var(--dusk); width:0%; transition:width .25s ease; }
   .config-status{ font-size:11px; color:#5c6b76; font-weight:700; }
   .config-status.live{ color:#1e6b47; }
+
+  .page-tabs{ display:flex; gap:6px; max-width:1360px; margin:22px auto 0; padding:0 24px; border-bottom:1.5px solid var(--line); }
+  .page-tab{ font-family:inherit; font-size:14px; padding:10px 18px; border:none; background:none; cursor:pointer; color:#5c6b76; border-bottom:2px solid transparent; margin-bottom:-1.5px; }
+  .page-tab.active{ color:var(--dusk); border-bottom-color:var(--dusk); font-weight:700; }
+  .page-panel{ display:none; }
+  .page-panel.active{ display:block; }
 
   .steps-toolbar{ display:flex; justify-content:space-between; align-items:center; margin-top:26px; }
   .steps-toolbar h2{ font-size:19px; }
@@ -60,6 +63,7 @@
   .remove-step-btn:disabled{ opacity:.3; cursor:not-allowed; }
 
   .mini-example{ width:100%; font-family:inherit; font-size:11.5px; padding:6px 7px; border:1.5px solid var(--muted); border-radius:6px; background:var(--bg); }
+  textarea.mini-example{ resize:vertical; min-height:44px; line-height:1.35; white-space:pre-wrap; word-wrap:break-word; }
   .mult-slider-row{ display:flex; align-items:center; gap:6px; }
   .mult-slider-row input[type=range]{ width:90px; }
   .mult-value{ font-size:12px; font-weight:700; min-width:32px; text-align:right; }
@@ -96,12 +100,8 @@
   .decision-return{ background:rgba(217,107,103,0.25); }
   .decision-pending{ background:rgba(255,255,255,0.08); color:#dfe7ec; }
 
-  .rse-compare{ margin-top:16px; }
-  .rse-compare label{ font-size:11px; color:#B7C4CE; text-transform:uppercase; letter-spacing:.05em; }
-  .rse-compare input{ width:100%; margin-top:6px; padding:8px; border-radius:7px; border:none; font-family:inherit; font-size:13px; }
-  .adj-notes{ margin-top:12px; }
-  .adj-notes textarea{ width:100%; margin-top:6px; padding:8px; border-radius:7px; border:none; font-family:inherit; font-size:13px; min-height:60px; resize:vertical; }
-  .diff-warning{ margin-top:8px; font-size:11.5px; color:#ffcac6; }
+  .score-hint{ font-size:11.5px; color:#B7C4CE; margin-top:6px; }
+  .score-hint button{ font-family:inherit; font-size:11.5px; color:var(--low); background:none; border:none; padding:0; cursor:pointer; text-decoration:underline; }
 
   .btn-row{ display:flex; gap:8px; margin-top:10px; }
   .btn{ flex:1; font-family:inherit; font-size:13px; padding:10px; border-radius:8px; border:none; cursor:pointer; }
@@ -112,6 +112,22 @@
   .send-status.ok{ color:var(--low); }
   .send-status.err{ color:#ffcac6; }
   .copied-toast{ font-size:11.5px; text-align:center; margin-top:8px; color:var(--low); height:14px; }
+
+  .learn-wrap{ max-width:860px; margin:0 auto; padding:32px 24px 100px; }
+  .learn-nav{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:32px; }
+  .learn-nav a{ font-size:12px; padding:7px 13px; border:1.5px solid var(--muted); border-radius:20px; color:var(--dusk); text-decoration:none; background:#fff; }
+  .learn-nav a:hover{ border-color:var(--dusk); }
+  .learn-section{ margin-bottom:44px; scroll-margin-top:20px; }
+  .learn-section h2{ font-size:21px; }
+  .learn-section h3{ font-size:14.5px; margin-top:20px; margin-bottom:4px; }
+  .learn-section p{ font-size:13.5px; color:#3d4d57; margin:10px 0; max-width:760px; }
+  .learn-formula{ display:inline-block; font-family:'Castoro', Georgia, serif; font-size:16px; background:var(--card); border:1px solid var(--muted); border-radius:8px; padding:9px 16px; margin:6px 0 12px; }
+  .learn-table{ width:100%; border-collapse:collapse; margin:12px 0; font-size:12.5px; }
+  .learn-table th{ text-align:left; padding:7px 10px; border-bottom:1.5px solid var(--muted); color:#4a5a66; text-transform:uppercase; font-size:10.5px; letter-spacing:.04em; }
+  .learn-table td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  .learn-callout{ background:rgba(138,206,216,0.15); border-left:3px solid var(--dusk); padding:12px 16px; border-radius:0 10px 10px 0; font-size:13px; margin:14px 0; max-width:760px; }
+  .learn-glossary dt{ font-weight:700; font-size:13px; margin-top:10px; }
+  .learn-glossary dd{ margin:2px 0 0; font-size:12.5px; color:#3d4d57; max-width:760px; }
 </style>
 </head>
 <body>
@@ -134,17 +150,16 @@
       <label for="projectName">Project / package name</label>
       <input type="text" id="projectName" placeholder="e.g. Project #1">
     </div>
-    <div class="field">
-      <label>Who's scoring</label>
-      <div class="mode-toggle">
-        <button id="modeRse" class="active">RSE — initial estimate</button>
-        <button id="modeSde">SDE — confirming in review</button>
-      </div>
-    </div>
   </div>
   <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 </header>
 
+<div class="page-tabs">
+  <button class="page-tab active" id="tabScorerBtn">Scorer</button>
+  <button class="page-tab" id="tabLearnBtn">Learn</button>
+</div>
+
+<div class="page-panel active" id="panelScorer">
 <div class="wrap">
   <div class="left">
 
@@ -176,22 +191,13 @@
         <div class="lbl">P80 commitment (hrs)</div>
       </div>
     </div>
+    <div class="score-hint">Expected = internal planning. P80 = the number to quote externally. <button id="scoreHintLink">What "Score" means →</button></div>
 
     <div class="meta-grid">
       <div><div class="k">Packages scored</div><div class="v" id="stepsScoredDisplay">0 / 0</div></div>
     </div>
 
     <div class="decision-box decision-pending" id="decisionBox">Score at least one work package to get a decision recommendation.</div>
-
-    <div class="rse-compare" id="rseCompare" style="display:none;">
-      <label>RSE's initial estimated total effort (hrs, for comparison)</label>
-      <input type="number" step="1" min="0" id="rseScoreInput" placeholder="e.g. 110">
-      <div class="diff-warning" id="diffWarning" style="display:none;"></div>
-      <div class="adj-notes">
-        <label>Adjustment notes (why the SDE estimate differs)</label>
-        <textarea id="adjustmentNotes" placeholder="e.g. Bumped palletizing up — needs a physical trial for the mixed pallet pattern"></textarea>
-      </div>
-    </div>
 
     <div class="btn-row">
       <button class="btn btn-send" id="sendBtn">Send score</button>
@@ -204,6 +210,131 @@
     </div>
     <div class="copied-toast" id="copiedToast"></div>
   </aside>
+</div>
+</div>
+
+<div class="page-panel" id="panelLearn">
+<div class="learn-wrap">
+
+  <div class="learn-nav">
+    <a href="#lrn-start">Start here</a>
+    <a href="#lrn-logic">How the scoring works</a>
+    <a href="#lrn-score">What "Score" means</a>
+    <a href="#lrn-multiplier">Complexity multiplier</a>
+    <a href="#lrn-contingency">Contingency &amp; risk correlation</a>
+    <a href="#lrn-limits">What this tool can't do</a>
+    <a href="#lrn-glossary">Glossary</a>
+  </div>
+
+  <section class="learn-section" id="lrn-start">
+    <h2>Start here</h2>
+    <p>This tool answers one question: <strong>how much engineering time will this Concept-phase work package take, and what number is safe to put in a Statement of Work?</strong></p>
+    <p>Instead of scoring a work package against fixed 1/2/3 dimensions, you give each one an honest three-point time estimate — optimistic, most likely, pessimistic — plus a complexity multiplier. The tool combines those into an <strong>Expected</strong> hours figure (for internal planning) and a <strong>P80 commitment</strong> figure (safe to quote externally). This is the same estimating method — PERT plus a complexity multiplier plus contingency plus a percentile commitment — used in the reference estimator this scorer was adapted from.</p>
+    <h3>Your first five minutes</h3>
+    <p>1. Delete any pre-filled work package that doesn't apply to this project, rename ones that are close, add anything missing.<br>
+    2. Expand one row and fill in three hour estimates. Don't agonize — you'll refine them.<br>
+    3. Set the complexity multiplier — how unfamiliar is this specific package, not the project as a whole.<br>
+    4. Check the sidebar for the two headline figures: Expected effort and P80 commitment.</p>
+  </section>
+
+  <section class="learn-section" id="lrn-logic">
+    <h2>How the scoring works</h2>
+    <p>Each step below catches a different kind of estimating error. They stack in order.</p>
+    <h3>1. Three numbers, not one</h3>
+    <p>Asking for one number gets you the version of the task where everything goes right, because that's the version people picture. Three numbers force a wider view:</p>
+    <table class="learn-table">
+      <thead><tr><th>Estimate</th><th>Means</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Optimistic (O)</strong></td><td>Everything goes right — no rework, no waiting. Still a genuinely possible outcome, not fantasy.</td></tr>
+        <tr><td><strong>Most Likely (M)</strong></td><td>Your honest normal expectation, with the usual amount of friction.</td></tr>
+        <tr><td><strong>Pessimistic (P)</strong></td><td>A realistic bad run — rework, a wrong assumption, waiting on someone. Not a catastrophe.</td></tr>
+      </tbody>
+    </table>
+    <p>The gap between O and P is information, not padding. Squeezing it to look confident throws away the only measurement of uncertainty the tool has.</p>
+    <h3>2. Combine them (PERT)</h3>
+    <p>A plain average lets a long pessimistic tail drag the number too high, because task durations are skewed — there's a floor on how fast work can go, but no ceiling on how slow. PERT weights Most Likely four times as heavily as the two extremes:</p>
+    <div class="learn-formula">Expected hours = (O + 4 × M + P) ÷ 6</div>
+    <p>This is established method (Program Evaluation and Review Technique, US Navy, 1950s), not a heuristic invented for this tool.</p>
+    <h3>3. Measure the uncertainty (σ)</h3>
+    <div class="learn-formula">σ = (P − O) ÷ 6</div>
+    <p><strong>σ (sigma) is the typical amount reality differs from the middle estimate.</strong> Small σ means outcomes cluster tightly; large σ means they scatter widely. It's what turns "137.5 hours" into a range instead of a false-precision point figure.</p>
+    <h3>4. Correct for unfamiliar work (complexity multiplier)</h3>
+    <p>Even a pessimistic guess is anchored to problems you've already seen — you can't imagine a failure mode you've never encountered. The complexity multiplier corrects the <em>center</em> of the estimate for that blind spot. See <a href="#lrn-multiplier">Complexity multiplier</a> below.</p>
+    <h3>5. Add contingency</h3>
+    <p>Contingency buffers project-level friction that belongs to no single work package — approval delays, vendor lead times, integration surprises. It's applied on top of the multiplier, centrally managed rather than set per package. See <a href="#lrn-contingency">Contingency &amp; risk correlation</a> below.</p>
+    <h3>6. Roll up to a phase total</h3>
+    <p>Hours just add up. Uncertainty doesn't — see <a href="#lrn-contingency">Contingency &amp; risk correlation</a> for why the phase range uses a correlation factor instead of a linear sum.</p>
+    <h3>7. Pick a commitment number</h3>
+    <p>The Expected value is the middle of the range — you'd overrun it about half the time. For a figure you'll put in a customer-facing document, the tool also gives P80. See <a href="#lrn-score">What "Score" means</a>.</p>
+  </section>
+
+  <section class="learn-section" id="lrn-score">
+    <h2>What "Score" means</h2>
+    <p>This tool doesn't produce a single "score" the way the old 1/2/3 dimension grid did. Every work package — and the phase total in the sidebar — shows <strong>two numbers</strong>, and they answer two different questions:</p>
+    <table class="learn-table">
+      <thead><tr><th>Number</th><th>Formula</th><th>Use it for</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Expected (central)</strong></td><td>the PERT-derived middle, × multiplier, × (1 + contingency)</td><td>Internal planning, resourcing. You'd overrun it roughly half the time — that's fine for planning, where overs and unders average out.</td></tr>
+        <tr><td><strong>P80</strong></td><td>Expected + 0.84 × σ</td><td>Binding SOW commitments, customer-facing quotes. The figure you'd expect to come in under about 80% of the time — 1 overrun in 5 instead of 1 in 2.</td></tr>
+      </tbody>
+    </table>
+    <p>This is exactly what the reference estimator (the jsx your boss sent over) calls "Expected effort" and "P80 commitment" side by side on its Summary tab — nothing was renamed or reinterpreted here. If someone asks "what's the score for this package," the honest answer is "which one — Expected or P80?"</p>
+    <div class="learn-callout">The per-package Score column in the grid shows Expected as the large number and P80 as the smaller line underneath, colored by that package's complexity tier. The sidebar shows the phase-wide totals for both.</div>
+  </section>
+
+  <section class="learn-section" id="lrn-multiplier">
+    <h2>Complexity multiplier</h2>
+    <p>The multiplier corrects for the planning fallacy (Kahneman &amp; Tversky, 1979) — the documented tendency to underestimate novel work even when you know about the tendency, because you can't picture a problem you've never met.</p>
+    <table class="learn-table">
+      <thead><tr><th>Multiplier</th><th>When to use it</th><th>Examples</th></tr></thead>
+      <tbody>
+        <tr><td>1.0</td><td>You've built this exact type of thing before.</td><td>Off-the-shelf robot + standard gripper. A layout done 5+ times.</td></tr>
+        <tr><td>1.2 – 1.4</td><td>Familiar territory, with a new twist.</td><td>Same robot family, different payload/reach.</td></tr>
+        <tr><td>1.5 – 2.0</td><td>Meaningful customization.</td><td>Custom end-effector with new actuation. Unfamiliar PLC/vendor ecosystem.</td></tr>
+        <tr><td>2.5 – 3.0+</td><td>Genuinely novel — no internal precedent.</td><td>Custom kinematic mechanism. First-of-kind sensor fusion.</td></tr>
+      </tbody>
+    </table>
+    <p>Apply it per work package, not as one blanket project number — a layout using an off-the-shelf robot might be 1.0 while a custom end-effector on the same project is 2.0. This tool flags any package at 2.5x or higher on the Concept decision box.</p>
+    <div class="learn-callout"><strong>Avoid double-counting:</strong> if your Pessimistic hours already assume "this could be a slog because it's new to us," don't also apply a large multiplier for the same reason.</div>
+  </section>
+
+  <section class="learn-section" id="lrn-contingency">
+    <h2>Contingency % &amp; risk correlation</h2>
+    <p>These two numbers are <strong>centrally managed</strong> in the shared Config tab (<code>concept.contingency_pct</code> and <code>concept.correlation</code>) rather than sliders on this page — so every RSE and SDE scores against the same assumptions instead of picking their own.</p>
+    <h3>Contingency %</h3>
+    <p>Buffers project-level friction that isn't part of any single work package's own variance — approval delays, vendor lead times, integration surprises between subsystems. AACE International's cost estimate classification system ties it to design maturity: roughly 20–30% at Concept-level, dropping to 10–15% once detailed design is underway.</p>
+    <h3>Risk correlation</h3>
+    <p>Individual work packages' uncertainties don't simply add up. If every package's risk were independent, some would run over while others ran under and partly cancel — the combined uncertainty would be √(Σσ²), narrower than the linear sum. If everything is driven by one shared cause (a bad early requirements assumption), they'd stack linearly. Reality sits between, so the phase total uses a correlation factor (currently defaulting to 35%) instead of either extreme.</p>
+    <div class="learn-callout">Summing each package's low/high linearly would silently assume 100% correlation and produce a range that looks like "±1σ" but isn't. The correlation factor replaces that silent assumption with an explicit, adjustable one.</div>
+  </section>
+
+  <section class="learn-section" id="lrn-limits">
+    <h2>What this tool can't do</h2>
+    <p>None of these are bugs — they're boundaries worth knowing before trusting a number further than it deserves.</p>
+    <p><strong>It cannot make a bad estimate good.</strong> Every number here traces back to someone's three guesses. PERT, the multiplier, and contingency reduce specific, known biases in those guesses — none of them add information that wasn't there.</p>
+    <p><strong>It doesn't know what you forgot.</strong> The most common cause of a badly wrong estimate is a task nobody listed, not a task that ran long. Walk the work package list with someone else and ask what's missing.</p>
+    <p><strong>The multiplier scale and contingency defaults are heuristics, not standards.</strong> They're reasonable starting points, not published industry standards for robotics engineering.</p>
+    <p><strong>It only covers Concept-phase engineering hours.</strong> No cost or calendar-duration modeling, no build/commissioning effort.</p>
+    <p>The reference estimator this was adapted from also included features intentionally left out here for now: multiple independent estimators per package with a divergence check, an Actuals &amp; Calibration tab comparing estimates to real outcomes over time, concurrency/phase-overlap modeling for calendar duration, and Shared vs. Task-Specific decomposition for multi-capability solutions. All of those are portable if this tool proves out and it's worth building them.</p>
+  </section>
+
+  <section class="learn-section" id="lrn-glossary">
+    <h2>Glossary</h2>
+    <dl class="learn-glossary">
+      <div><dt>Work package</dt><dd>A discrete chunk of Concept-phase engineering work, small enough to picture doing and distinct enough not to overlap another one. One row in the grid.</dd></div>
+      <div><dt>Three-point estimate</dt><dd>Giving three time guesses instead of one, so the estimator has to consider more than the best case.</dd></div>
+      <div><dt>PERT</dt><dd>Program Evaluation and Review Technique — combines three estimates into one weighted number: (O + 4M + P) ÷ 6.</dd></div>
+      <div><dt>Standard deviation (σ)</dt><dd>The typical amount reality differs from the middle estimate. Here, σ = (P − O) ÷ 6.</dd></div>
+      <div><dt>Complexity multiplier</dt><dd>A correction that scales the estimate's center up based on how novel the work is. 1.0x = routine, 3.0x = first-of-kind.</dd></div>
+      <div><dt>Contingency</dt><dd>A percentage buffer for project-level friction belonging to no single work package. Centrally managed for this tool.</dd></div>
+      <div><dt>Expected value (central estimate)</dt><dd>The middle of the range. You'd overrun it roughly half the time. Use for internal planning.</dd></div>
+      <div><dt>P80 / P90</dt><dd>The figure you'd expect to come in under 80% (or 90%) of the time. P80 is this tool's default commitment figure.</dd></div>
+      <div><dt>Risk correlation</dt><dd>How much work packages tend to go wrong together. 0% = independent risks that partly cancel; 100% = one shared cause affects everything.</dd></div>
+      <div><dt>Planning fallacy</dt><dd>The documented tendency to underestimate how long tasks take, worse for unfamiliar work because you can't imagine a problem you've never met.</dd></div>
+    </dl>
+  </section>
+
+</div>
 </div>
 
 <script>
@@ -273,9 +404,8 @@ function tierClass(m){
 }
 
 let state = {
-  project:'', mode:'rse', senderName:'', hubspotDealId:'',
-  steps: [],
-  rseScore:null, adjustmentNotes:''
+  project:'', senderName:'', hubspotDealId:'',
+  steps: []
 };
 let stepCounter = 0;
 
@@ -285,23 +415,17 @@ function newStep(name){
 }
 
 // Starting checklist — a suggestion, not a rule. Delete what doesn't apply, rename what's
-// close, add what's missing. Matches the Concept-phase work breakdown from the reference tool.
+// close, add what's missing.
 const DEFAULT_WORK_PACKAGES = [
-  'Requirements & Feasibility Study',
-  'Use Case / Application Definition',
-  'Concept Layout – Mechanical (kinematics, envelope)',
-  'Concept Layout – Electrical/Controls Architecture',
-  'End-Effector / Tooling Concept',
-  'Safety Concept (preliminary risk assessment)',
-  'Make/Buy Analysis & Vendor Research',
-  'ROM Cost & Schedule Estimate',
-  'Concept Review & Stakeholder Sign-off (internal)',
-  'Concept Documentation',
-  'Statement of Work (SOW) Drafting & Customer Negotiation — binding',
-  'Regulatory & Standards Scoping (CE, UL, ISO 10218/15066)',
-  'Site & Integration Constraints Survey',
-  'Human Factors / Ergonomics Concept',
-  'Preliminary Risk Register (cost/schedule/technical)'
+  'Ideation Phase / Brainstorming',
+  '2D Layout',
+  '3D Layout',
+  'Periphery Research',
+  'End Effector Concept',
+  'Safety Concept',
+  'Cost & Resource Estimation',
+  'SOW Creation',
+  'Risk Assessment'
 ];
 DEFAULT_WORK_PACKAGES.forEach(name=> state.steps.push(newStep(name)));
 
@@ -413,8 +537,9 @@ function renderGrid(){
 
     const notesTd = document.createElement('td');
     notesTd.className = 'wp-notes-cell';
-    const notesInput = document.createElement('input');
-    notesInput.type = 'text'; notesInput.className = 'mini-example';
+    const notesInput = document.createElement('textarea');
+    notesInput.className = 'mini-example';
+    notesInput.rows = 2;
     notesInput.placeholder = 'e.g. Adapted from Project X gripper'; notesInput.value = step.notes;
     notesInput.addEventListener('input', e=>{ step.notes = e.target.value; });
     notesTd.appendChild(notesInput);
@@ -435,21 +560,27 @@ document.getElementById('addStepBtn').addEventListener('click', ()=>{
 });
 
 document.getElementById('projectName').addEventListener('input', e=>{ state.project = e.target.value; });
-document.getElementById('modeRse').addEventListener('click', ()=> setMode('rse'));
-document.getElementById('modeSde').addEventListener('click', ()=> setMode('sde'));
-function setMode(m){
-  state.mode = m;
-  document.getElementById('modeRse').classList.toggle('active', m==='rse');
-  document.getElementById('modeSde').classList.toggle('active', m==='sde');
-  document.getElementById('rseCompare').style.display = (m==='sde') ? 'block' : 'none';
-  renderSummary();
+
+// ---------- Page tabs ----------
+document.getElementById('tabScorerBtn').addEventListener('click', ()=> switchPageTab('scorer'));
+document.getElementById('tabLearnBtn').addEventListener('click', ()=> switchPageTab('learn'));
+function switchPageTab(tab){
+  document.getElementById('tabScorerBtn').classList.toggle('active', tab==='scorer');
+  document.getElementById('tabLearnBtn').classList.toggle('active', tab==='learn');
+  document.getElementById('panelScorer').classList.toggle('active', tab==='scorer');
+  document.getElementById('panelLearn').classList.toggle('active', tab==='learn');
 }
-document.getElementById('rseScoreInput').addEventListener('input', e=>{ state.rseScore = parseFloat(e.target.value)||null; renderSummary(); });
-document.getElementById('adjustmentNotes').addEventListener('input', e=>{ state.adjustmentNotes = e.target.value; });
+document.getElementById('scoreHintLink').addEventListener('click', ()=>{
+  switchPageTab('learn');
+  requestAnimationFrame(()=>{
+    const el = document.getElementById('lrn-score');
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
 
 function renderSummary(){
   const total = state.steps.length;
-  const { perStep, central, totalLow, totalHigh, totalP80, scoredCount, incompleteSteps, anyNovel } = computeAll();
+  const { perStep, central, totalP80, scoredCount, incompleteSteps, anyNovel } = computeAll();
 
   const listEl = document.getElementById('stepSummaryList');
   listEl.innerHTML = '';
@@ -498,17 +629,6 @@ function renderSummary(){
     decisionBox.textContent = text;
   }
 
-  if(state.mode==='sde' && state.rseScore!==null && scoredCount>0){
-    const inRange = state.rseScore >= totalLow && state.rseScore <= totalHigh;
-    const w = document.getElementById('diffWarning');
-    if(!inRange){
-      w.style.display='block';
-      w.textContent = `RSE's estimate (${state.rseScore}h) falls outside the computed ±1σ range (${totalLow.toFixed(1)}–${totalHigh.toFixed(1)}h) — fill in the adjustment notes below.`;
-    } else {
-      w.style.display='none';
-    }
-  }
-
   const progressAnswered = scoredCount;
   const progressTotal = state.steps.length;
   document.getElementById('progressFill').style.width = (progressAnswered/progressTotal*100)+'%';
@@ -520,7 +640,6 @@ function buildPayload(){
   const { perStep, totalLow, totalHigh, totalP80 } = computeAll();
   return {
     project: state.project,
-    mode: state.mode,
     senderName: state.senderName,
     hubspotDealId: state.hubspotDealId,
     steps: perStep.map(({step, calc})=>({
@@ -539,9 +658,7 @@ function buildPayload(){
     totalEffortHigh: totalHigh,
     totalP80Hours: totalP80,
     contingencyPctUsed: CONFIG.contingencyPct,
-    correlationUsed: CONFIG.correlation,
-    rseEstimate: state.rseScore,
-    adjustmentNotes: state.adjustmentNotes
+    correlationUsed: CONFIG.correlation
   };
 }
 
@@ -549,8 +666,7 @@ document.getElementById('copyBtn').addEventListener('click', ()=>{
   const payload = buildPayload();
   let out = `Concept complexity score — ${payload.project || '(unnamed project)'}\n`;
   out += `HubSpot deal ID: ${payload.hubspotDealId || '(not entered)'}\n`;
-  out += `Scored by: ${payload.senderName || '(not entered)'}\n`;
-  out += `Mode: ${payload.mode==='rse' ? 'RSE initial estimate' : 'SDE confirmed (during review)'}\n\n`;
+  out += `Scored by: ${payload.senderName || '(not entered)'}\n\n`;
   payload.steps.forEach(step=>{
     out += `--- ${step.name} ---\n`;
     out += `  O/M/P = ${step.optimistic || '–'} / ${step.mostLikely || '–'} / ${step.pessimistic || '–'} hrs, multiplier ${Number(step.multiplier).toFixed(1)}x\n`;
@@ -564,10 +680,6 @@ document.getElementById('copyBtn').addEventListener('click', ()=>{
   });
   out += `Total concept effort (±1σ) = ${payload.totalEffortLow.toFixed(1)}–${payload.totalEffortHigh.toFixed(1)} hrs\n`;
   out += `P80 commitment = ${payload.totalP80Hours.toFixed(1)} hrs\n`;
-  if(payload.mode==='sde' && payload.rseEstimate!==null){
-    out += `RSE initial estimate: ${payload.rseEstimate} hrs\n`;
-    if(payload.adjustmentNotes) out += `Adjustment notes: ${payload.adjustmentNotes}\n`;
-  }
 
   navigator.clipboard.writeText(out).then(()=>{
     const toast = document.getElementById('copiedToast');
@@ -607,7 +719,7 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   addField(FORM_ENTRY_IDS.phase, PHASE_NAME);
   addField(FORM_ENTRY_IDS.senderName, payload.senderName);
   addField(FORM_ENTRY_IDS.project, payload.project);
-  addField(FORM_ENTRY_IDS.estimateType, payload.mode);
+  addField(FORM_ENTRY_IDS.estimateType, '');
   addField(FORM_ENTRY_IDS.projectLevelJson, JSON.stringify({
     hubspotDealId: payload.hubspotDealId,
     totalP80Hours: payload.totalP80Hours,
@@ -617,8 +729,8 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   addField(FORM_ENTRY_IDS.itemsJson, JSON.stringify(payload.steps));
   addField(FORM_ENTRY_IDS.totalEffortLow, payload.totalEffortLow);
   addField(FORM_ENTRY_IDS.totalEffortHigh, payload.totalEffortHigh);
-  addField(FORM_ENTRY_IDS.referenceEstimate, payload.rseEstimate);
-  addField(FORM_ENTRY_IDS.adjustmentNotes, payload.adjustmentNotes);
+  addField(FORM_ENTRY_IDS.referenceEstimate, '');
+  addField(FORM_ENTRY_IDS.adjustmentNotes, '');
 
   document.body.appendChild(form);
   statusEl.className = 'send-status';
