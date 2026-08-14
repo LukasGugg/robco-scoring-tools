@@ -67,7 +67,7 @@
 <div class="page">
   <div class="eyebrow">Solution Development — Multi-Phase Complexity Scorer</div>
   <h1>Admin panel</h1>
-  <p class="sub">Read-only view of submitted scores across all phases, pulled from each phase's own Responses tab. Weights, bands, and effort ranges are edited directly in the <strong>Config</strong> tab of the Sheet (phase-prefixed keys, e.g. <code>concept.weight_task</code>) — no UI for that here, on purpose.</p>
+  <p class="sub">Read-only view of submitted scores across all phases, pulled from each phase's own Responses tab. Weights, bands, and effort ranges are edited directly in the <strong>Config</strong> tab of the Sheet (phase-prefixed keys, e.g. <code>concept.weight_task</code>) — no UI for that here, on purpose. Concept now scores PERT-style, so its two config keys are <code>concept.contingency_pct</code> (e.g. <code>0.25</code>) and <code>concept.correlation</code> (e.g. <code>0.35</code>) instead of dimension weights/bands.</p>
   <div class="setup-row" style="margin-top:16px; display:flex; gap:10px; align-items:flex-end;">
     <div class="config-field" style="max-width:200px;">
       <label>Phase</label>
@@ -171,6 +171,22 @@ async function loadSubmissions(){
       let itemsHtml = '';
       if(!Array.isArray(sub.itemsParsed)){
         itemsHtml += `<p>Couldn't read item data for this submission — "Items JSON" contained: <code>${JSON.stringify(sub['Items JSON'])}</code>. Usually means a Form entry ID mapping is off.</p>`;
+      } else if(itemsArr.length && itemsArr[0].expectedHours !== undefined){
+        // PERT-style items (work package + optimistic/most likely/pessimistic + complexity multiplier).
+        itemsHtml += `<table><thead><tr><th>Work package</th><th>O</th><th>M</th><th>P</th><th>Multiplier</th><th>Expected</th><th>P80</th><th>Notes</th></tr></thead><tbody>`;
+        itemsArr.forEach(item=>{
+          itemsHtml += `<tr>
+            <td>${item.name || ''}</td>
+            <td>${item.optimistic ?? ''}</td>
+            <td>${item.mostLikely ?? ''}</td>
+            <td>${item.pessimistic ?? ''}</td>
+            <td>${item.multiplier != null ? Number(item.multiplier).toFixed(1)+'x' : ''}</td>
+            <td>${item.expectedHours != null ? Number(item.expectedHours).toFixed(1)+'h' : ''}</td>
+            <td>${item.p80Hours != null ? Number(item.p80Hours).toFixed(1)+'h' : ''}</td>
+            <td>${item.notes || ''}</td>
+          </tr>`;
+        });
+        itemsHtml += `</tbody></table>`;
       } else if(itemsArr.length){
         // Discover dimension keys dynamically from the first item, so this works for any phase.
         const dimKeys = Object.keys(itemsArr[0].scores || {});
