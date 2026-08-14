@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Design Phase Package Scorer</title>
+<title>Design Complexity Scorer</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Castoro&display=swap" rel="stylesheet">
 <style>
@@ -14,103 +14,142 @@
   }
   *{box-sizing:border-box;}
   body{ margin:0; background:var(--bg); color:var(--text); font-family:'Helvetica Neue', Arial, sans-serif; font-weight:300; line-height:1.5; }
-  h1,h2,h3{ font-family:'Castoro', Georgia, serif; font-weight:400; margin:0; }
+  h1,h2,h3,.display{ font-family:'Castoro', Georgia, serif; font-weight:400; margin:0; }
   .wrap{ display:grid; grid-template-columns: 1fr 380px; gap:28px; max-width:1360px; margin:0 auto; padding:32px 24px 120px; align-items:start; }
   @media (max-width: 1000px){
-    .wrap{ grid-template-columns: 1fr; padding-bottom:280px; }
-    .summary{ position:fixed; left:0; right:0; bottom:0; top:auto; max-height:58vh; overflow-y:auto; border-radius:16px 16px 0 0; box-shadow:0 -8px 24px rgba(13,33,48,0.15); }
+    .wrap{ grid-template-columns: 1fr; padding-bottom:300px; }
+    .summary{ position:fixed; left:0; right:0; bottom:0; top:auto; max-height:60vh; overflow-y:auto; border-radius:16px 16px 0 0; box-shadow:0 -8px 24px rgba(13,33,48,0.15); }
   }
   header.top{ max-width:1360px; margin:0 auto; padding:32px 24px 0; }
-  .eyebrow{ text-transform:uppercase; letter-spacing:0.12em; font-size:11px; color:var(--dusk); margin-bottom:6px; }
-  header.top h1{ font-size:30px; }
+  .eyebrow{ text-transform:uppercase; letter-spacing:0.12em; font-size:11px; color:var(--dusk); margin-bottom:6px; display:flex; justify-content:space-between; align-items:center; }
+  header.top h1{ font-size:30px; color:var(--text); }
   header.top p.sub{ color:#3d4d57; font-size:14px; margin-top:8px; max-width:700px; }
   .setup-row{ display:flex; gap:16px; flex-wrap:wrap; margin-top:20px; align-items:flex-end; }
   .field{ display:flex; flex-direction:column; gap:6px; }
   .field label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dusk); }
-  .field input[type=text]{ font-family:inherit; font-size:14px; padding:9px 11px; border:1.5px solid var(--muted); border-radius:8px; background:#fff; color:var(--text); min-width:220px; }
+  .field input[type=text]{ font-family:inherit; font-size:14px; padding:9px 11px; border:1.5px solid var(--muted); border-radius:8px; background:#fff; color:var(--text); min-width:240px; }
+  .progress-bar{ height:4px; background:var(--muted); border-radius:2px; overflow:hidden; margin-top:22px; }
+  .progress-fill{ height:100%; background:var(--dusk); width:0%; transition:width .25s ease; }
   .config-status{ font-size:11px; color:#5c6b76; font-weight:700; }
   .config-status.live{ color:#1e6b47; }
 
-  .readiness-card{ background:#fff; border:1.5px solid var(--dusk); border-radius:14px; padding:22px; margin-top:24px; }
-  .readiness-card h2{ font-size:18px; }
-  .readiness-card .desc{ font-size:13px; color:#3d4d57; margin-top:4px; margin-bottom:14px; }
-  .readiness-options{ display:flex; flex-direction:column; gap:10px; }
-  .readiness-option{ display:flex; gap:12px; align-items:flex-start; border:1.75px solid var(--muted); border-radius:10px; padding:13px 16px; cursor:pointer; }
-  .readiness-option:hover{ border-color:var(--dusk); }
-  .readiness-option.sel-1{ border-color:var(--dusk); background:rgba(138,206,216,0.28); }
-  .readiness-option.sel-2{ border-color:var(--dusk); background:rgba(101,135,166,0.28); }
-  .readiness-option.sel-3{ border-color:var(--dusk); background:rgba(217,107,103,0.22); }
-  .readiness-option .r-label{ font-weight:700; font-size:14px; display:block; }
-  .readiness-option .r-desc{ font-size:12.5px; color:#3d4d57; margin-top:3px; }
+  .page-tabs{ display:flex; gap:6px; max-width:1360px; margin:22px auto 0; padding:0 24px; border-bottom:1.5px solid var(--line); }
+  .page-tab{ font-family:inherit; font-size:14px; padding:10px 18px; border:none; background:none; cursor:pointer; color:#5c6b76; border-bottom:2px solid transparent; margin-bottom:-1.5px; }
+  .page-tab.active{ color:var(--dusk); border-bottom-color:var(--dusk); font-weight:700; }
+  .page-panel{ display:none; }
+  .page-panel.active{ display:block; }
+
+  .learn-pointer{ max-width:1360px; margin:14px auto 0; padding:0 24px; font-size:12.5px; color:#3d4d57; }
+  .learn-pointer button{ font-family:inherit; font-size:12.5px; color:var(--dusk); background:none; border:none; padding:0; cursor:pointer; text-decoration:underline; font-weight:700; }
 
   .steps-toolbar{ display:flex; justify-content:space-between; align-items:center; margin-top:26px; }
   .steps-toolbar h2{ font-size:19px; }
   .add-step-btn{ font-family:inherit; font-size:13px; padding:9px 16px; border-radius:8px; border:none; background:var(--dusk); color:#fff; cursor:pointer; }
-  .steps-hint{ font-size:12.5px; color:#3d4d57; margin-top:4px; margin-bottom:12px; max-width:700px; }
+  ul.steps-hint{ font-size:12.5px; color:#3d4d57; margin:4px 0 12px; padding-left:18px; max-width:700px; }
+  ul.steps-hint li{ margin-bottom:2px; }
 
   .grid-card{ background:var(--card); border:1.5px solid var(--muted); border-radius:14px; padding:16px; margin-top:12px; }
   .steps-scroll{ overflow-x:auto; }
-  table.steps-grid{ border-collapse:separate; border-spacing:8px 8px; min-width:100%; }
-  .element-label{ position:sticky; left:0; background:var(--card); z-index:5; width:180px; min-width:180px; padding:8px !important; vertical-align:top; }
-  .element-label strong{ font-size:13.5px; display:block; }
-  .element-label span{ font-size:11px; color:#4a5a66; display:block; margin-top:3px; line-height:1.3; }
+  table.steps-grid{ border-collapse:collapse; width:100%; min-width:820px; }
+  table.steps-grid th{ text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.04em; color:#4a5a66; font-weight:700; padding:0 8px 8px; }
+  table.steps-grid td{ padding:6px 8px; vertical-align:top; border-top:1px solid var(--line); }
+  table.steps-grid tr.wp-row:first-child td{ border-top:none; }
 
-  .step-header{ min-width:190px; }
+  .wp-name-cell{ min-width:220px; }
+  .wp-num-cell{ min-width:80px; }
+  .wp-num-cell-wide{ min-width:118px; }
+  .wp-mult-cell{ min-width:160px; }
+  .wp-score-cell{ min-width:100px; text-align:center; }
+
   .step-header-inner{ display:flex; gap:6px; align-items:center; }
-  .step-name-input{ flex:1; font-family:inherit; font-size:13px; font-weight:700; padding:7px 9px; border:1.5px solid var(--muted); border-radius:7px; }
-  .remove-step-btn{ font-family:inherit; font-size:14px; width:26px; height:26px; border-radius:6px; border:1.5px solid var(--muted); background:#fff; cursor:pointer; color:var(--high); }
+  .step-name-input{ flex:1; font-family:inherit; font-size:13px; font-weight:700; padding:7px 9px; border:1.5px solid var(--muted); border-radius:7px; color:var(--text); }
+  .remove-step-btn{ font-family:inherit; font-size:14px; width:26px; height:26px; border-radius:6px; border:1.5px solid var(--muted); background:#fff; cursor:pointer; color:var(--high); line-height:1; }
   .remove-step-btn:disabled{ opacity:.3; cursor:not-allowed; }
 
-  .step-cell{ min-width:190px; background:var(--bg); border-radius:10px; padding:8px; border:1px solid var(--muted); }
-  .mini-options{ display:flex; gap:5px; }
-  .mini-opt{ position:relative; flex:1; font-family:inherit; font-size:12px; font-weight:700; padding:7px 0; border-radius:6px; border:1.75px solid var(--muted); background:#fff; cursor:pointer; }
-  .mini-opt:hover{ border-color:var(--dusk); }
-  .mini-opt.sel-1{ border-color:var(--dusk); background:rgba(138,206,216,0.32); }
-  .mini-opt.sel-2{ border-color:var(--dusk); background:rgba(101,135,166,0.32); }
-  .mini-opt.sel-3{ border-color:var(--dusk); background:rgba(217,107,103,0.26); }
-  .mini-opt[data-tooltip]:hover::after{
-    content:attr(data-tooltip); position:absolute; bottom:120%; left:50%; transform:translateX(-50%);
-    width:190px; background:var(--dusk); color:#fff; padding:8px 10px; border-radius:8px; font-size:11px;
-    line-height:1.4; z-index:40; box-shadow:0 6px 16px rgba(0,0,0,0.2); text-align:left; font-weight:300;
-  }
-  .mini-example{ width:100%; margin-top:6px; font-family:inherit; font-size:11.5px; padding:6px 7px; border:1.5px solid var(--muted); border-radius:6px; background:#fff; }
-  .step-score-row .step-cell{ background:transparent; text-align:center; padding:6px; border:none; }
+  .mini-example{ width:100%; font-family:inherit; font-size:11.5px; padding:6px 7px; border:1.5px solid var(--muted); border-radius:6px; background:var(--bg); }
+  textarea.mini-example{ resize:vertical; min-height:44px; line-height:1.35; white-space:pre-wrap; word-wrap:break-word; }
+  .mult-slider-row{ display:flex; align-items:center; gap:6px; }
+  .mult-slider-row input[type=range]{ width:90px; }
+  .mult-value{ font-size:12px; font-weight:700; min-width:32px; text-align:right; }
+  .mult-tier{ font-size:10.5px; color:#4a5a66; margin-top:5px; line-height:1.3; }
+
   .step-score-badge{ font-family:'Castoro', Georgia, serif; font-size:20px; }
   .step-score-band{ font-size:10.5px; text-transform:uppercase; letter-spacing:.04em; margin-top:2px; }
+  .band-standard{ color:var(--low); }
+  .band-elevated{ color:#e8c08a; }
+  .band-complex{ color:#ff9d97; }
+
+  .notes-field{ margin-top:16px; }
+  .notes-field label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dusk); display:block; margin-bottom:6px; }
+  .notes-field textarea.mini-example{ min-height:70px; font-size:13px; }
 
   .summary{ position:sticky; top:24px; background:var(--dusk); color:#fff; border-radius:16px; padding:22px; }
-  .summary h3{ font-size:15px; text-transform:uppercase; letter-spacing:.06em; }
+  .summary h3{ font-size:15px; color:#fff; text-transform:uppercase; letter-spacing:.06em; }
   .step-summary-list{ margin-top:14px; display:flex; flex-direction:column; gap:10px; }
   .step-summary-item{ background:rgba(255,255,255,0.06); border-radius:10px; padding:10px 12px; }
-  .step-summary-item .name{ font-size:12.5px; font-weight:700; }
+  .step-summary-item .name{ font-size:12.5px; color:#dfe7ec; font-weight:700; }
   .step-summary-item .details{ display:flex; justify-content:space-between; margin-top:4px; font-size:11.5px; color:#B7C4CE; }
-  .band-standard{ color:var(--low); } .band-elevated{ color:#e8c08a; } .band-complex{ color:#ff9d97; }
+
   .total-hero{ margin-top:18px; padding:18px; background:rgba(255,255,255,0.06); border-radius:12px; text-align:center; }
-  .total-hero .num{ font-family:'Castoro', Georgia, serif; font-size:36px; }
+  .total-hero .num{ font-family:'Castoro', Georgia, serif; font-size:36px; line-height:1; }
   .total-hero .lbl{ margin-top:4px; font-size:11px; letter-spacing:.05em; text-transform:uppercase; color:#B7C4CE; }
-  .meta-grid{ display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:14px; font-size:12.5px; }
+  .total-hero.accent .num{ color:var(--low); }
+  .hero-row{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+
+  .meta-grid{ display:grid; grid-template-columns:1fr; gap:10px; margin-top:14px; font-size:12.5px; }
   .meta-grid div{ background:rgba(255,255,255,0.06); border-radius:8px; padding:10px; }
   .meta-grid .k{ color:#B7C4CE; font-size:10.5px; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px;}
   .meta-grid .v{ font-size:14px; }
-  .decision-box{ margin-top:16px; padding:14px; border-radius:10px; font-size:13px; background:rgba(255,255,255,0.08); color:#dfe7ec; }
+
+  .decision-box{ margin-top:16px; padding:14px; border-radius:10px; font-size:13px; }
+  .decision-ok{ background:rgba(138,206,216,0.18); }
+  .decision-flag{ background:rgba(232,192,138,0.22); }
+  .decision-accept-flag{ background:rgba(232,192,138,0.22); }
+  .decision-return{ background:rgba(217,107,103,0.25); }
+  .decision-pending{ background:rgba(255,255,255,0.08); color:#dfe7ec; }
+
+  .score-hint{ font-size:11.5px; color:#B7C4CE; margin-top:6px; }
+  .score-hint button{ font-family:inherit; font-size:11.5px; color:var(--low); background:none; border:none; padding:0; cursor:pointer; text-decoration:underline; }
+
   .btn-row{ display:flex; gap:8px; margin-top:10px; }
   .btn{ flex:1; font-family:inherit; font-size:13px; padding:10px; border-radius:8px; border:none; cursor:pointer; }
   .btn-send{ background:var(--low); color:var(--dusk); font-weight:700; }
   .btn-primary{ background:#fff; color:var(--dusk); font-weight:700; }
   .btn-ghost{ background:transparent; border:1px solid rgba(255,255,255,0.35); color:#fff; }
   .send-status{ font-size:11.5px; text-align:center; margin-top:8px; min-height:14px; }
-  .send-status.ok{ color:var(--low); } .send-status.err{ color:#ffcac6; }
+  .send-status.ok{ color:var(--low); }
+  .send-status.err{ color:#ffcac6; }
   .copied-toast{ font-size:11.5px; text-align:center; margin-top:8px; color:var(--low); height:14px; }
+
+  .learn-wrap{ max-width:860px; margin:0 auto; padding:32px 24px 100px; }
+  .learn-nav{ display:flex; flex-wrap:wrap; gap:8px; margin-bottom:32px; }
+  .learn-nav a{ font-size:12px; padding:7px 13px; border:1.5px solid var(--muted); border-radius:20px; color:var(--dusk); text-decoration:none; background:#fff; }
+  .learn-nav a:hover{ border-color:var(--dusk); }
+  .learn-section{ margin-bottom:44px; scroll-margin-top:20px; }
+  .learn-section h2{ font-size:21px; }
+  .learn-section h3{ font-size:14.5px; margin-top:20px; margin-bottom:4px; }
+  .learn-section p{ font-size:13.5px; color:#3d4d57; margin:10px 0; max-width:760px; }
+  .learn-formula{ display:inline-block; font-family:'Castoro', Georgia, serif; font-size:16px; background:var(--card); border:1px solid var(--muted); border-radius:8px; padding:9px 16px; margin:6px 0 12px; }
+  .learn-table{ width:100%; border-collapse:collapse; margin:12px 0; font-size:12.5px; }
+  .learn-table th{ text-align:left; padding:7px 10px; border-bottom:1.5px solid var(--muted); color:#4a5a66; text-transform:uppercase; font-size:10.5px; letter-spacing:.04em; }
+  .learn-table td{ text-align:left; padding:8px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  .learn-callout{ background:rgba(138,206,216,0.15); border-left:3px solid var(--dusk); padding:12px 16px; border-radius:0 10px 10px 0; font-size:13px; margin:14px 0; max-width:760px; }
+  .learn-glossary dt{ font-weight:700; font-size:13px; margin-top:10px; }
+  .learn-glossary dd{ margin:2px 0 0; font-size:12.5px; color:#3d4d57; max-width:760px; }
 </style>
 </head>
 <body>
 
 <header class="top">
-  <div class="eyebrow"><span>Solution Development Engineering - Design Phase</span> — <span class="config-status" id="configStatus">Using local defaults (not connected)</span></div>
-  <h1>Design phase package scoring</h1>
-  <p class="sub">Score each work package on design-specific dimensions. Requirements stability applies once, to the whole project.</p>
+  <div class="eyebrow"><span>Solution Development Engineering - Design Phase</span><span class="config-status" id="configStatus">Using default contingency/correlation (not connected)</span></div>
+  <h1>Design package scoring</h1>
+  <p class="sub">Break the design work into work packages and give each one a three-point time estimate (optimistic / most likely / pessimistic) plus a complexity multiplier. Contingency % and risk correlation are centrally managed — see the config status above.</p>
 
   <div class="setup-row">
+    <div class="field">
+      <label for="hubspotDealId">HubSpot deal ID</label>
+      <input type="text" id="hubspotDealId" placeholder="e.g. 24681012">
+    </div>
     <div class="field">
       <label for="senderName">Your name</label>
       <input type="text" id="senderName" placeholder="e.g. Jane Doe">
@@ -120,46 +159,70 @@
       <input type="text" id="projectName" placeholder="e.g. Project #1">
     </div>
   </div>
+  <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
 </header>
 
+<div class="learn-pointer">Questions about how to use this scoring, or how to interpret it and the math behind it? See the <button id="learnPointerLink">Learn tab</button>.</div>
+
+<div class="page-tabs">
+  <button class="page-tab active" id="tabScorerBtn">Scorer</button>
+  <button class="page-tab" id="tabLearnBtn">Learn</button>
+</div>
+
+<div class="page-panel active" id="panelScorer">
 <div class="wrap">
   <div class="left">
-
-    <section class="readiness-card" id="projectLevelCard">
-      <h2>Requirements stability</h2>
-      <div class="desc">Scored once for the whole project, not per package.</div>
-      <div class="readiness-options" id="readinessOptions"></div>
-    </section>
 
     <div class="steps-toolbar">
       <h2>Work packages</h2>
       <button class="add-step-btn" id="addStepBtn">+ Add work package</button>
     </div>
-    <p class="steps-hint">Add one column per work package — e.g. "Gripper development," "Conveyor technology."</p>
+    <ul class="steps-hint">
+      <li>Add or remove work packages to fit this design scope.</li>
+      <li>Give each one a three-point estimate — see the Learn tab if you have questions.</li>
+      <li>Add a complexity multiplier where it's warranted.</li>
+    </ul>
 
     <div class="grid-card">
       <div class="steps-scroll">
         <table class="steps-grid" id="stepsTable"></table>
       </div>
     </div>
+
+    <div class="notes-field">
+      <label for="generalNotes">Notes</label>
+      <textarea id="generalNotes" class="mini-example" rows="3" placeholder="e.g. Waiting on customer sign-off for the gripper interface before CAD can be finalized"></textarea>
+    </div>
+
   </div>
 
   <aside class="summary" id="summaryPanel">
     <h3>Live score</h3>
     <div class="step-summary-list" id="stepSummaryList"></div>
-    <div class="total-hero">
-      <div class="num" id="totalEffortNum">—</div>
-      <div class="lbl">Total effort (hours)</div>
+
+    <div class="hero-row">
+      <div class="total-hero">
+        <div class="num" id="totalEffortNum">—</div>
+        <div class="lbl">Expected effort (hrs)</div>
+      </div>
+      <div class="total-hero accent">
+        <div class="num" id="p80EffortNum">—</div>
+        <div class="lbl">P80 commitment (hrs)</div>
+      </div>
     </div>
+    <div class="score-hint">Expected = internal planning. P80 = the number to quote externally. <button id="scoreHintLink">What "Score" means →</button></div>
+
     <div class="meta-grid">
       <div><div class="k">Packages scored</div><div class="v" id="stepsScoredDisplay">0 / 0</div></div>
-      <div><div class="k">Requirements stability</div><div class="v" id="readinessDisplay">—</div></div>
     </div>
-    <div class="decision-box" id="decisionBox">Score at least one work package to see a live total.</div>
+
+    <div class="decision-box decision-pending" id="decisionBox">Score at least one work package to get a decision recommendation.</div>
+
     <div class="btn-row">
       <button class="btn btn-send" id="sendBtn">Send score</button>
     </div>
     <div class="send-status" id="sendStatus"></div>
+
     <div class="btn-row">
       <button class="btn btn-primary" id="copyBtn">Copy summary</button>
       <button class="btn btn-ghost" id="resetBtn">Reset</button>
@@ -167,50 +230,139 @@
     <div class="copied-toast" id="copiedToast"></div>
   </aside>
 </div>
+</div>
+
+<div class="page-panel" id="panelLearn">
+<div class="learn-wrap">
+
+  <div class="learn-nav">
+    <a href="#lrn-start">Start here</a>
+    <a href="#lrn-logic">How the scoring works</a>
+    <a href="#lrn-score">What "Score" means</a>
+    <a href="#lrn-multiplier">Complexity multiplier</a>
+    <a href="#lrn-contingency">Contingency &amp; risk correlation</a>
+    <a href="#lrn-limits">What this tool can't do</a>
+    <a href="#lrn-glossary">Glossary</a>
+  </div>
+
+  <section class="learn-section" id="lrn-start">
+    <h2>Start here</h2>
+    <p>This tool answers one question: <strong>how much engineering time will this Design-phase work package take, and what figure is safe to commit to?</strong></p>
+    <p>Instead of scoring a work package against fixed 1/2/3 dimensions, you give each one an honest three-point time estimate — optimistic, most likely, pessimistic — plus a complexity multiplier. The tool combines those into an <strong>Expected</strong> hours figure (for internal planning) and a <strong>P80 commitment</strong> figure (safe to quote externally). This is the same estimating method — PERT plus a complexity multiplier plus contingency plus a percentile commitment — used in the reference estimator this scorer was adapted from.</p>
+    <h3>Your first five minutes</h3>
+    <p>1. Delete any pre-filled work package that doesn't apply to this project, rename ones that are close, add anything missing.<br>
+    2. Expand one row and fill in three hour estimates. Don't agonize — you'll refine them.<br>
+    3. Set the complexity multiplier — how unfamiliar is this specific package, not the project as a whole.<br>
+    4. Check the sidebar for the two headline figures: Expected effort and P80 commitment.</p>
+  </section>
+
+  <section class="learn-section" id="lrn-logic">
+    <h2>How the scoring works</h2>
+    <p>Each step below catches a different kind of estimating error. They stack in order.</p>
+    <h3>1. Three numbers, not one</h3>
+    <p>Asking for one number gets you the version of the task where everything goes right, because that's the version people picture. Three numbers force a wider view:</p>
+    <table class="learn-table">
+      <thead><tr><th>Estimate</th><th>Means</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Optimistic (O)</strong></td><td>Everything goes right — no rework, no waiting. Still a genuinely possible outcome, not fantasy.</td></tr>
+        <tr><td><strong>Most Likely (M)</strong></td><td>Your honest normal expectation, with the usual amount of friction.</td></tr>
+        <tr><td><strong>Pessimistic (P)</strong></td><td>A realistic bad run — rework, a wrong assumption, waiting on someone. Not a catastrophe.</td></tr>
+      </tbody>
+    </table>
+    <p>The gap between O and P is information, not padding. Squeezing it to look confident throws away the only measurement of uncertainty the tool has.</p>
+    <h3>2. Combine them (PERT)</h3>
+    <p>A plain average lets a long pessimistic tail drag the number too high, because task durations are skewed — there's a floor on how fast work can go, but no ceiling on how slow. PERT weights Most Likely four times as heavily as the two extremes:</p>
+    <div class="learn-formula">Expected hours = (O + 4 × M + P) ÷ 6</div>
+    <p>This is established method (Program Evaluation and Review Technique, US Navy, 1950s), not a heuristic invented for this tool.</p>
+    <h3>3. Measure the uncertainty (σ)</h3>
+    <div class="learn-formula">σ = (P − O) ÷ 6</div>
+    <p><strong>σ (sigma) is the typical amount reality differs from the middle estimate.</strong> Small σ means outcomes cluster tightly; large σ means they scatter widely. It's what turns "137.5 hours" into a range instead of a false-precision point figure.</p>
+    <h3>4. Correct for unfamiliar work (complexity multiplier)</h3>
+    <p>Even a pessimistic guess is anchored to problems you've already seen — you can't imagine a failure mode you've never encountered. The complexity multiplier corrects the <em>center</em> of the estimate for that blind spot. See <a href="#lrn-multiplier">Complexity multiplier</a> below.</p>
+    <h3>5. Add contingency</h3>
+    <p>Contingency buffers project-level friction that belongs to no single work package — approval delays, vendor lead times, integration surprises. It's applied on top of the multiplier, centrally managed rather than set per package. See <a href="#lrn-contingency">Contingency &amp; risk correlation</a> below.</p>
+    <h3>6. Roll up to a phase total</h3>
+    <p>Hours just add up. Uncertainty doesn't — see <a href="#lrn-contingency">Contingency &amp; risk correlation</a> for why the phase range uses a correlation factor instead of a linear sum.</p>
+    <h3>7. Pick a commitment number</h3>
+    <p>The Expected value is the middle of the range — you'd overrun it about half the time. For a figure you'll put in a customer-facing document, the tool also gives P80. See <a href="#lrn-score">What "Score" means</a>.</p>
+  </section>
+
+  <section class="learn-section" id="lrn-score">
+    <h2>What "Score" means</h2>
+    <p>This tool doesn't produce a single "score" the way the old 1/2/3 dimension grid did. Every work package — and the phase total in the sidebar — shows <strong>two numbers</strong>, and they answer two different questions:</p>
+    <table class="learn-table">
+      <thead><tr><th>Number</th><th>Formula</th><th>Use it for</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Expected (central)</strong></td><td>the PERT-derived middle, × multiplier, × (1 + contingency)</td><td>Internal planning, resourcing. You'd overrun it roughly half the time — that's fine for planning, where overs and unders average out.</td></tr>
+        <tr><td><strong>P80</strong></td><td>Expected + 0.84 × σ</td><td>Binding commitments, customer-facing quotes. The figure you'd expect to come in under about 80% of the time — 1 overrun in 5 instead of 1 in 2.</td></tr>
+      </tbody>
+    </table>
+    <p>This is exactly what the reference estimator (the jsx your boss sent over) calls "Expected effort" and "P80 commitment" side by side on its Summary tab — nothing was renamed or reinterpreted here. If someone asks "what's the score for this package," the honest answer is "which one — Expected or P80?"</p>
+    <div class="learn-callout">The per-package Score column in the grid shows Expected as the large number and P80 as the smaller line underneath, colored by that package's complexity tier. The sidebar shows the phase-wide totals for both.</div>
+  </section>
+
+  <section class="learn-section" id="lrn-multiplier">
+    <h2>Complexity multiplier</h2>
+    <p>The multiplier corrects for the planning fallacy (Kahneman &amp; Tversky, 1979) — the documented tendency to underestimate novel work even when you know about the tendency, because you can't picture a problem you've never met.</p>
+    <table class="learn-table">
+      <thead><tr><th>Multiplier</th><th>When to use it</th><th>Examples</th></tr></thead>
+      <tbody>
+        <tr><td>1.0</td><td>You've built this exact type of thing before.</td><td>A sub-system carried over from a prior design with minimal rework.</td></tr>
+        <tr><td>1.2 – 1.4</td><td>Familiar territory, with a new twist.</td><td>Same gripper family, different payload/reach.</td></tr>
+        <tr><td>1.5 – 2.0</td><td>Meaningful customization.</td><td>Custom end-effector actuation. Unfamiliar vendor ecosystem for a key part.</td></tr>
+        <tr><td>2.5 – 3.0+</td><td>Genuinely novel — no internal precedent.</td><td>A new kinematic mechanism. First-of-kind sensor fusion.</td></tr>
+      </tbody>
+    </table>
+    <p>Apply it per work package, not as one blanket project number — a carried-over sub-system might be 1.0 while a custom end-effector on the same project is 2.0. This tool flags any package at 2.5x or higher on the decision box.</p>
+    <div class="learn-callout"><strong>Avoid double-counting:</strong> if your Pessimistic hours already assume "this could be a slog because it's new to us," don't also apply a large multiplier for the same reason.</div>
+  </section>
+
+  <section class="learn-section" id="lrn-contingency">
+    <h2>Contingency % &amp; risk correlation</h2>
+    <p>These two numbers are <strong>centrally managed</strong> in the shared Config tab (<code>design.contingency_pct</code> and <code>design.correlation</code>) rather than sliders on this page — so everyone scores against the same assumptions instead of picking their own.</p>
+    <h3>Contingency %</h3>
+    <p>Buffers project-level friction that isn't part of any single work package's own variance — approval delays, vendor lead times, integration surprises between subsystems. AACE International's cost estimate classification system ties it to design maturity — roughly 20–30% at Concept-level, dropping to 10–15% once detailed design (this phase) is underway.</p>
+    <h3>Risk correlation</h3>
+    <p>Individual work packages' uncertainties don't simply add up. If every package's risk were independent, some would run over while others ran under and partly cancel — the combined uncertainty would be √(Σσ²), narrower than the linear sum. If everything is driven by one shared cause (a late-breaking requirements change), they'd stack linearly. Reality sits between, so the phase total uses a correlation factor (currently defaulting to 35%) instead of either extreme.</p>
+    <div class="learn-callout">Summing each package's low/high linearly would silently assume 100% correlation and produce a range that looks like "±1σ" but isn't. The correlation factor replaces that silent assumption with an explicit, adjustable one.</div>
+  </section>
+
+  <section class="learn-section" id="lrn-limits">
+    <h2>What this tool can't do</h2>
+    <p>None of these are bugs — they're boundaries worth knowing before trusting a number further than it deserves.</p>
+    <p><strong>It cannot make a bad estimate good.</strong> Every number here traces back to someone's three guesses. PERT, the multiplier, and contingency reduce specific, known biases in those guesses — none of them add information that wasn't there.</p>
+    <p><strong>It doesn't know what you forgot.</strong> The most common cause of a badly wrong estimate is a task nobody listed, not a task that ran long. Walk the work package list with someone else and ask what's missing.</p>
+    <p><strong>The multiplier scale and contingency defaults are heuristics, not standards.</strong> They're reasonable starting points, not published industry standards for robotics engineering.</p>
+    <p><strong>It only covers Design-phase engineering hours.</strong> No cost or calendar-duration modeling, no build/commissioning effort.</p>
+    <p>The reference estimator this was adapted from also included features intentionally left out here for now: multiple independent estimators per package with a divergence check, an Actuals &amp; Calibration tab comparing estimates to real outcomes over time, concurrency/phase-overlap modeling for calendar duration, and Shared vs. Task-Specific decomposition for multi-capability solutions. All of those are portable if this tool proves out and it's worth building them.</p>
+  </section>
+
+  <section class="learn-section" id="lrn-glossary">
+    <h2>Glossary</h2>
+    <dl class="learn-glossary">
+      <div><dt>Work package</dt><dd>A discrete chunk of Design-phase engineering work, small enough to picture doing and distinct enough not to overlap another one. One row in the grid.</dd></div>
+      <div><dt>Three-point estimate</dt><dd>Giving three time guesses instead of one, so the estimator has to consider more than the best case.</dd></div>
+      <div><dt>PERT</dt><dd>Program Evaluation and Review Technique — combines three estimates into one weighted number: (O + 4M + P) ÷ 6.</dd></div>
+      <div><dt>Standard deviation (σ)</dt><dd>The typical amount reality differs from the middle estimate. Here, σ = (P − O) ÷ 6.</dd></div>
+      <div><dt>Complexity multiplier</dt><dd>A correction that scales the estimate's center up based on how novel the work is. 1.0x = routine, 3.0x = first-of-kind.</dd></div>
+      <div><dt>Contingency</dt><dd>A percentage buffer for project-level friction belonging to no single work package. Centrally managed for this tool.</dd></div>
+      <div><dt>Expected value (central estimate)</dt><dd>The middle of the range. You'd overrun it roughly half the time. Use for internal planning.</dd></div>
+      <div><dt>P80 / P90</dt><dd>The figure you'd expect to come in under 80% (or 90%) of the time. P80 is this tool's default commitment figure.</dd></div>
+      <div><dt>Risk correlation</dt><dd>How much work packages tend to go wrong together. 0% = independent risks that partly cancel; 100% = one shared cause affects everything.</dd></div>
+      <div><dt>Planning fallacy</dt><dd>The documented tendency to underestimate how long tasks take, worse for unfamiliar work because you can't imagine a problem you've never met.</dd></div>
+    </dl>
+  </section>
+
+</div>
+</div>
 
 <script>
-const PHASE_NAME = 'Design';
-
-const DEF = {
-  effortUnit: 'hours',
-  elements: [
-    { key:'maturity', name:'Design maturity', sub:'Has this sub-system been designed before?',
-      options:[
-        {score:1, tooltip:'Reused from an existing design, minimal rework.'},
-        {score:2, tooltip:'Adapted from a reference design, meaningful changes needed.'},
-        {score:3, tooltip:'New design, no internal reference.'}
-      ], example:'e.g. Adapted from Project X gripper' },
-    { key:'testing', name:'Prototype / test need', sub:'How will this be validated?',
-      options:[
-        {score:1, tooltip:'Calculation/simulation is sufficient.'},
-        {score:2, tooltip:'Bench test of a sub-component needed.'},
-        {score:3, tooltip:'Full physical prototype needed.'}
-      ], example:'e.g. Bench test of gripper jaws' },
-    { key:'procurement', name:'Supplier & procurement risk', sub:'Sourcing risk for this package',
-      options:[
-        {score:1, tooltip:'Known supplier, standard lead time.'},
-        {score:2, tooltip:'New supplier or non-standard part.'},
-        {score:3, tooltip:'Custom part, long/uncertain lead time.'}
-      ], example:'e.g. Custom actuator, 12-week lead' },
-    { key:'interface', name:'Interface complexity', sub:'Coupling with other packages',
-      options:[
-        {score:1, tooltip:'Standalone, minimal interface.'},
-        {score:2, tooltip:'Simple interface to 1-2 packages.'},
-        {score:3, tooltip:'Complex interface across multiple systems.'}
-      ], example:'e.g. Interfaces with conveyor timing' }
-  ],
-  projectLevel: {
-    key: 'reqStability', label: 'Requirements stability',
-    options: [
-      {score:1, label:'Locked', text:'Requirements package signed off, minimal expected change.'},
-      {score:2, label:'Some open points', text:'A few requirements still being clarified.'},
-      {score:3, label:'Actively in flux', text:'Requirements still changing significantly during design.'}
-    ]
-  }
-};
-
-// Fill these in once your Forms + Apps Script are deployed (see SETUP.md).
+// ====== BACKEND CONNECTION ======
+// Config (contingency %, risk correlation) is read via the Apps Script Web App (see SETUP.md),
+// same endpoint as the other phases — just a different set of keys under the Design prefix.
 const WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbzmQIh55Ii-v9cn06ethadDeaC47HHlCpkVGcl-IkgvP4zL8uDKWV95IczYElA0ylcg/exec';
+
+// Intake goes through a Google Form — see SETUP.md for how to create the Form and get these values.
 const FORM_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSeT2YrqDYtUk4BMCC37jDqoXuTX6nmCLDnDvNviC9UT8dFoWQ/formResponse';
 const FORM_ENTRY_IDS = {
   phase: 'entry.913181026',
@@ -224,246 +376,401 @@ const FORM_ENTRY_IDS = {
   referenceEstimate: 'entry.508641907',
   adjustmentNotes: 'entry.1781478160'
 };
+const PHASE_NAME = 'Design';
 
-let CONFIG = { weights:{}, bands:{ standardMax:1.6, elevatedMax:2.3, standard:{low:2,high:5}, elevated:{low:5,high:12}, complex:{low:12,high:25} } };
-let state = { project:'', senderName:'', projectLevel:{score:null}, steps:[] };
-let stepCounter = 0;
+// Standard statistical constant for the 80th percentile of a normal distribution.
+const Z_P80 = 0.8416;
 
-function evenWeights(elements){
-  const w = {}; elements.forEach(e=> w[e.key] = 1/elements.length); return w;
-}
-
-function newStep(){
-  stepCounter++;
-  const scores = {}; const examples = {};
-  DEF.elements.forEach(e=>{ scores[e.key]=null; examples[e.key]=''; });
-  return { id: stepCounter, name: `Work package ${stepCounter}`, scores, examples };
-}
-
-function bandFromScore(w){
-  if(w<=CONFIG.bands.standardMax) return {name:'Standard', effort:[CONFIG.bands.standard.low, CONFIG.bands.standard.high], class:'band-standard'};
-  if(w<=CONFIG.bands.elevatedMax) return {name:'Elevated', effort:[CONFIG.bands.elevated.low, CONFIG.bands.elevated.high], class:'band-elevated'};
-  return {name:'Complex', effort:[CONFIG.bands.complex.low, CONFIG.bands.complex.high], class:'band-complex'};
-}
-
-function stepWeightedScore(step){
-  const allAnswered = DEF.elements.every(e=> step.scores[e.key]!==null) && state.projectLevel.score!==null;
-  if(!allAnswered) return null;
-  let sum = 0;
-  DEF.elements.forEach(e=>{ sum += step.scores[e.key] * (CONFIG.weights[e.key] ?? evenWeights(DEF.elements)[e.key]); });
-  sum += state.projectLevel.score * (CONFIG.weights[DEF.projectLevel.key] ?? 0);
-  return sum;
-}
+// ====== DEFAULT CONFIG (used until/unless the Web App responds) ======
+// contingencyPct and correlation are admin-managed — edited directly in the Config tab of the
+// Sheet as `design.contingency_pct` and `design.correlation`, same convention as the other phases.
+// Default contingency is lower than Concept's (0.25) since detailed design carries less unknown
+// than concept-level work, per AACE's maturity-based guidance — see the Learn tab.
+let CONFIG = { contingencyPct: 0.125, correlation: 0.35 };
 
 async function loadRemoteConfig(){
-  document.getElementById('configStatus').textContent = 'Using local defaults (not connected)';
-  document.getElementById('configStatus').classList.remove('live');
-  if(!WEBAPP_URL || WEBAPP_URL.indexOf('PASTE_YOUR') === 0) return;
+  if(!WEBAPP_URL || WEBAPP_URL.indexOf('PASTE_YOUR') === 0){
+    document.getElementById('configStatus').textContent = 'Using default contingency/correlation (not connected)';
+    return;
+  }
   try{
-    const res = await fetch(WEBAPP_URL + '?type=config&phase=' + encodeURIComponent(PHASE_NAME));
+    const res = await fetch(WEBAPP_URL + '?type=config&phase=' + PHASE_NAME);
     const data = await res.json();
-    if(data.error) throw new Error(data.error);
-    const weights = {};
-    Object.keys(data).forEach(k=>{
-      if(k.startsWith('weight_')) weights[k.substring('weight_'.length)] = parseFloat(data[k]);
-    });
-    CONFIG.weights = weights;
-    CONFIG.bands.standardMax = parseFloat(data.band_standard_max) || CONFIG.bands.standardMax;
-    CONFIG.bands.elevatedMax = parseFloat(data.band_elevated_max) || CONFIG.bands.elevatedMax;
-    CONFIG.bands.standard = { low: parseFloat(data.band_standard_effort_low), high: parseFloat(data.band_standard_effort_high) };
-    CONFIG.bands.elevated = { low: parseFloat(data.band_elevated_effort_low), high: parseFloat(data.band_elevated_effort_high) };
-    CONFIG.bands.complex  = { low: parseFloat(data.band_complex_effort_low),  high: parseFloat(data.band_complex_effort_high) };
+    if(data.error){ throw new Error(data.error); }
+    const c = parseFloat(data.contingency_pct);
+    if(Number.isFinite(c)) CONFIG.contingencyPct = c;
+    const r = parseFloat(data.correlation);
+    if(Number.isFinite(r)) CONFIG.correlation = r;
     document.getElementById('configStatus').textContent = 'Live config connected';
     document.getElementById('configStatus').classList.add('live');
     renderSummary();
   } catch(err){
-    document.getElementById('configStatus').textContent = 'Could not reach config — using local defaults';
+    document.getElementById('configStatus').textContent = 'Could not reach config — using defaults';
   }
 }
 
-function initReadiness(){
-  CONFIG.weights = evenWeights(DEF.elements);
-  const optEl = document.getElementById('readinessOptions');
-  optEl.innerHTML = '';
-  DEF.projectLevel.options.forEach(opt=>{
-    const div = document.createElement('div');
-    div.className = 'readiness-option';
-    div.innerHTML = `<div><span class="r-label">${opt.label}</span><span class="r-desc">${opt.text}</span></div>`;
-    div.addEventListener('click', ()=>{
-      state.projectLevel.score = opt.score;
-      [...optEl.children].forEach(c=>c.classList.remove('sel-1','sel-2','sel-3'));
-      div.classList.add(`sel-${opt.score}`);
-      renderSummary();
-    });
-    optEl.appendChild(div);
-  });
+const num = v => (v===''||v===null||v===undefined) ? 0 : (Number(v)||0);
+const hasVal = v => v!==''&&v!==null&&v!==undefined&&!Number.isNaN(Number(v));
+
+function multiplierTier(m){
+  if(m < 1.2) return '1.0x — Done this exact kind of thing before.';
+  if(m < 1.5) return '1.2–1.4x — Familiar work with a new wrinkle.';
+  if(m < 2.5) return '1.5–2.0x — Meaningful customization, or an unfamiliar vendor ecosystem.';
+  return '2.5x+ — Genuinely novel. No internal precedent to estimate from.';
+}
+function tierClass(m){
+  if(m < 1.5) return 'band-standard';
+  if(m < 2.5) return 'band-elevated';
+  return 'band-complex';
 }
 
+let state = {
+  project:'', senderName:'', hubspotDealId:'', generalNotes:'',
+  steps: []
+};
+let stepCounter = 0;
+
+function newStep(name){
+  stepCounter++;
+  return { id: stepCounter, name: name || `Work package ${stepCounter}`, optimistic:'', mostLikely:'', pessimistic:'', multiplier:1.0 };
+}
+
+// Starting checklist — a suggestion, not a rule. Delete what doesn't apply, rename what's
+// close, add what's missing.
+const DEFAULT_WORK_PACKAGES = [
+  'Mechanical Detailed Design',
+  'Electrical Detailed Design',
+  'Controls Software Design',
+  'End Effector Detailed Design',
+  'Safety Design & Risk Assessment',
+  'BOM & Procurement',
+  'Design Verification & Testing',
+  'Documentation Package'
+];
+DEFAULT_WORK_PACKAGES.forEach(name=> state.steps.push(newStep(name)));
+
+function computeStep(step){
+  const hasAny = hasVal(step.optimistic) || hasVal(step.mostLikely) || hasVal(step.pessimistic);
+  if(!hasAny) return null;
+  const O = num(step.optimistic), M = num(step.mostLikely), P = num(step.pessimistic);
+  const pertHrs = (O + 4*M + P) / 6;
+  const sigma = (P - O) / 6;
+  const mult = Number(step.multiplier) || 1;
+  const adjusted = pertHrs * mult;
+  const central = adjusted * (1 + CONFIG.contingencyPct);
+  const sigmaEff = sigma * mult * (1 + CONFIG.contingencyPct);
+  const p80 = central + Z_P80 * sigmaEff;
+  return { pertHrs, sigma, adjusted, central, sigmaEff, p80 };
+}
+
+function computeAll(){
+  let central = 0, sumSigma = 0, sumSigmaSq = 0, scoredCount = 0, incompleteSteps = 0, anyNovel = false;
+  const perStep = state.steps.map(step=>{
+    const calc = computeStep(step);
+    if(calc){
+      scoredCount++;
+      central += calc.central; sumSigma += calc.sigmaEff; sumSigmaSq += calc.sigmaEff*calc.sigmaEff;
+      if((Number(step.multiplier)||1) >= 2.5) anyNovel = true;
+      return { step, calc };
+    } else {
+      incompleteSteps++;
+      return { step, calc:null };
+    }
+  });
+  const rho = Math.min(Math.max(CONFIG.correlation, 0), 1);
+  const sigmaTotal = Math.sqrt(Math.max(sumSigmaSq + rho*(sumSigma*sumSigma - sumSigmaSq), 0));
+  const totalLow = central - sigmaTotal;
+  const totalHigh = central + sigmaTotal;
+  const totalP80 = central + Z_P80 * sigmaTotal;
+  return { perStep, central, sigmaTotal, totalLow, totalHigh, totalP80, scoredCount, incompleteSteps, anyNovel };
+}
+
+document.getElementById('senderName').addEventListener('input', e=>{ state.senderName = e.target.value; });
+document.getElementById('hubspotDealId').addEventListener('input', e=>{ state.hubspotDealId = e.target.value; });
+document.getElementById('generalNotes').addEventListener('input', e=>{ state.generalNotes = e.target.value; });
+document.getElementById('learnPointerLink').addEventListener('click', ()=>{
+  switchPageTab('learn');
+  requestAnimationFrame(()=>{
+    const el = document.getElementById('lrn-start');
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
+
+// ---------- Work package grid (one row per work package) ----------
 function renderGrid(){
   const table = document.getElementById('stepsTable');
   table.innerHTML = '';
+
   const headRow = document.createElement('tr');
-  headRow.appendChild(document.createElement('th'));
-  state.steps.forEach(step=>{
-    const th = document.createElement('th'); th.className = 'step-header';
-    const inner = document.createElement('div'); inner.className = 'step-header-inner';
-    const input = document.createElement('input'); input.type='text'; input.className='step-name-input'; input.value = step.name;
-    input.addEventListener('input', e=>{ step.name = e.target.value; renderSummary(); });
-    const removeBtn = document.createElement('button'); removeBtn.className='remove-step-btn'; removeBtn.textContent='×';
-    removeBtn.disabled = state.steps.length <= 1;
-    removeBtn.addEventListener('click', ()=>{
-      if(state.steps.length<=1) return;
-      state.steps = state.steps.filter(s=>s.id!==step.id);
-      renderGrid(); renderSummary();
-    });
-    inner.appendChild(input); inner.appendChild(removeBtn); th.appendChild(inner); headRow.appendChild(th);
+  [
+    { label:'Work package', cls:'wp-name-cell' },
+    { label:'Optimistic (hrs)', cls:'wp-num-cell' },
+    { label:'Most Likely (hrs)', cls:'wp-num-cell-wide' },
+    { label:'Pessimistic (hrs)', cls:'wp-num-cell' },
+    { label:'Complexity multiplier', cls:'wp-mult-cell' },
+    { label:'Score', cls:'wp-score-cell' }
+  ].forEach(col=>{
+    const th = document.createElement('th');
+    th.textContent = col.label;
+    th.className = col.cls;
+    headRow.appendChild(th);
   });
   table.appendChild(headRow);
 
-  DEF.elements.forEach(elDef=>{
+  state.steps.forEach(step=>{
     const tr = document.createElement('tr');
-    const labelTd = document.createElement('td'); labelTd.className='element-label';
-    labelTd.innerHTML = `<strong>${elDef.name}</strong><span>${elDef.sub}</span>`;
-    tr.appendChild(labelTd);
-    state.steps.forEach(step=>{
-      const td = document.createElement('td');
-      const cellDiv = document.createElement('div'); cellDiv.className='step-cell';
-      const miniOptions = document.createElement('div'); miniOptions.className='mini-options';
-      elDef.options.forEach(opt=>{
-        const btn = document.createElement('button'); btn.className='mini-opt';
-        if(step.scores[elDef.key]===opt.score) btn.classList.add(`sel-${opt.score}`);
-        btn.setAttribute('data-tooltip', opt.tooltip); btn.textContent = opt.score;
-        btn.addEventListener('click', ()=>{
-          step.scores[elDef.key] = opt.score;
-          [...miniOptions.children].forEach(c=>c.classList.remove('sel-1','sel-2','sel-3'));
-          btn.classList.add(`sel-${opt.score}`);
-          renderSummary();
-        });
-        miniOptions.appendChild(btn);
-      });
-      const exampleInput = document.createElement('input'); exampleInput.type='text'; exampleInput.className='mini-example';
-      exampleInput.placeholder = elDef.example; exampleInput.value = step.examples[elDef.key];
-      exampleInput.addEventListener('input', e=>{ step.examples[elDef.key] = e.target.value; });
-      cellDiv.appendChild(miniOptions); cellDiv.appendChild(exampleInput);
-      td.appendChild(cellDiv); tr.appendChild(td);
+    tr.className = 'wp-row';
+
+    const nameTd = document.createElement('td');
+    nameTd.className = 'wp-name-cell';
+    const nameInner = document.createElement('div');
+    nameInner.className = 'step-header-inner';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text'; nameInput.className = 'step-name-input'; nameInput.value = step.name;
+    nameInput.addEventListener('input', e=>{ step.name = e.target.value; renderSummary(); });
+    const removeBtn = document.createElement('button');
+    removeBtn.className = 'remove-step-btn'; removeBtn.textContent = '×';
+    removeBtn.disabled = state.steps.length <= 1;
+    removeBtn.addEventListener('click', ()=>{
+      if(state.steps.length <= 1) return;
+      state.steps = state.steps.filter(s=>s.id !== step.id);
+      renderGrid(); renderSummary();
     });
+    nameInner.appendChild(nameInput); nameInner.appendChild(removeBtn);
+    nameTd.appendChild(nameInner);
+    tr.appendChild(nameTd);
+
+    ['optimistic', 'mostLikely', 'pessimistic'].forEach(key=>{
+      const td = document.createElement('td');
+      td.className = key === 'mostLikely' ? 'wp-num-cell-wide' : 'wp-num-cell';
+      const input = document.createElement('input');
+      input.type = 'number'; input.min = '0'; input.className = 'mini-example';
+      input.placeholder = 'hrs'; input.value = step[key];
+      input.addEventListener('input', e=>{ step[key] = e.target.value; renderSummary(); });
+      td.appendChild(input);
+      tr.appendChild(td);
+    });
+
+    const multTd = document.createElement('td');
+    multTd.className = 'wp-mult-cell';
+    const multRow = document.createElement('div');
+    multRow.className = 'mult-slider-row';
+    const range = document.createElement('input');
+    range.type = 'range'; range.min = '1'; range.max = '3'; range.step = '0.1'; range.value = step.multiplier;
+    const valueSpan = document.createElement('span');
+    valueSpan.className = 'mult-value'; valueSpan.textContent = Number(step.multiplier).toFixed(1) + 'x';
+    const tierLabel = document.createElement('div');
+    tierLabel.className = 'mult-tier'; tierLabel.textContent = multiplierTier(Number(step.multiplier));
+    range.addEventListener('input', e=>{
+      step.multiplier = Number(e.target.value);
+      valueSpan.textContent = step.multiplier.toFixed(1) + 'x';
+      tierLabel.textContent = multiplierTier(step.multiplier);
+      renderSummary();
+    });
+    multRow.appendChild(range); multRow.appendChild(valueSpan);
+    multTd.appendChild(multRow); multTd.appendChild(tierLabel);
+    tr.appendChild(multTd);
+
+    const scoreTd = document.createElement('td');
+    scoreTd.className = 'wp-score-cell';
+    scoreTd.innerHTML = `<div class="step-score-badge" id="score-num-${step.id}">—</div><div class="step-score-band" id="score-band-${step.id}"></div>`;
+    tr.appendChild(scoreTd);
+
     table.appendChild(tr);
   });
-
-  const scoreTr = document.createElement('tr'); scoreTr.className = 'step-score-row';
-  const scoreLabelTd = document.createElement('td'); scoreLabelTd.className='element-label';
-  scoreLabelTd.innerHTML = `<strong>Score</strong>`;
-  scoreTr.appendChild(scoreLabelTd);
-  state.steps.forEach(step=>{
-    const td = document.createElement('td');
-    const div = document.createElement('div'); div.className='step-cell';
-    div.innerHTML = `<div class="step-score-badge" id="score-num-${step.id}">—</div><div class="step-score-band" id="score-band-${step.id}"></div>`;
-    td.appendChild(div); scoreTr.appendChild(td);
-  });
-  table.appendChild(scoreTr);
 }
 
 document.getElementById('addStepBtn').addEventListener('click', ()=>{
   state.steps.push(newStep());
   renderGrid(); renderSummary();
 });
+
 document.getElementById('projectName').addEventListener('input', e=>{ state.project = e.target.value; });
-document.getElementById('senderName').addEventListener('input', e=>{ state.senderName = e.target.value; });
-document.getElementById('resetBtn').addEventListener('click', ()=>{ location.reload(); });
+
+// ---------- Page tabs ----------
+document.getElementById('tabScorerBtn').addEventListener('click', ()=> switchPageTab('scorer'));
+document.getElementById('tabLearnBtn').addEventListener('click', ()=> switchPageTab('learn'));
+function switchPageTab(tab){
+  document.getElementById('tabScorerBtn').classList.toggle('active', tab==='scorer');
+  document.getElementById('tabLearnBtn').classList.toggle('active', tab==='learn');
+  document.getElementById('panelScorer').classList.toggle('active', tab==='scorer');
+  document.getElementById('panelLearn').classList.toggle('active', tab==='learn');
+}
+document.getElementById('scoreHintLink').addEventListener('click', ()=>{
+  switchPageTab('learn');
+  requestAnimationFrame(()=>{
+    const el = document.getElementById('lrn-score');
+    if(el) el.scrollIntoView({behavior:'smooth', block:'start'});
+  });
+});
 
 function renderSummary(){
-  let totalLow=0, totalHigh=0, scoredCount=0;
-  const listEl = document.getElementById('stepSummaryList'); listEl.innerHTML='';
-  state.steps.forEach(step=>{
-    const w = stepWeightedScore(step);
-    const numEl = document.getElementById(`score-num-${step.id}`);
-    const bandEl = document.getElementById(`score-band-${step.id}`);
-    if(w!==null){
-      scoredCount++;
-      const band = bandFromScore(w);
-      totalLow += band.effort[0]; totalHigh += band.effort[1];
-      if(numEl) numEl.textContent = w.toFixed(2);
-      if(bandEl){ bandEl.textContent = band.name; bandEl.className = 'step-score-band '+band.class; }
-      const item = document.createElement('div'); item.className='step-summary-item';
-      item.innerHTML = `<div class="name">${step.name}</div><div class="details"><span>${w.toFixed(2)} — ${band.name}</span><span>${band.effort[0]}–${band.effort[1]}${DEF.effortUnit[0]}</span></div>`;
+  const total = state.steps.length;
+  const { perStep, central, totalP80, scoredCount, incompleteSteps, anyNovel } = computeAll();
+
+  const listEl = document.getElementById('stepSummaryList');
+  listEl.innerHTML = '';
+  perStep.forEach(({step, calc})=>{
+    const scoreNumEl = document.getElementById(`score-num-${step.id}`);
+    const scoreBandEl = document.getElementById(`score-band-${step.id}`);
+    if(calc){
+      if(scoreNumEl) scoreNumEl.textContent = calc.central.toFixed(1)+'h';
+      if(scoreBandEl){ scoreBandEl.textContent = 'P80 '+calc.p80.toFixed(1)+'h'; scoreBandEl.className = 'step-score-band '+tierClass(Number(step.multiplier)||1); }
+      const item = document.createElement('div');
+      item.className = 'step-summary-item';
+      item.innerHTML = `<div class="name">${step.name}</div><div class="details"><span>${calc.central.toFixed(1)}h expected</span><span>P80 ${calc.p80.toFixed(1)}h</span></div>`;
       listEl.appendChild(item);
     } else {
-      if(numEl) numEl.textContent = '—';
-      const item = document.createElement('div'); item.className='step-summary-item';
+      if(scoreNumEl) scoreNumEl.textContent = '—';
+      if(scoreBandEl){ scoreBandEl.textContent = ''; }
+      const item = document.createElement('div');
+      item.className = 'step-summary-item';
       item.innerHTML = `<div class="name">${step.name}</div><div class="details"><span>Incomplete</span><span>—</span></div>`;
       listEl.appendChild(item);
     }
   });
-  document.getElementById('stepsScoredDisplay').textContent = `${scoredCount} / ${state.steps.length}`;
-  document.getElementById('readinessDisplay').textContent = state.projectLevel.score
-    ? DEF.projectLevel.options.find(o=>o.score===state.projectLevel.score).label : '—';
-  document.getElementById('totalEffortNum').textContent = scoredCount>0 ? `${totalLow}–${totalHigh}` : '—';
+
+  document.getElementById('stepsScoredDisplay').textContent = `${scoredCount} / ${total}`;
+  document.getElementById('totalEffortNum').textContent = (scoredCount>0) ? central.toFixed(1) : '—';
+  document.getElementById('p80EffortNum').textContent = (scoredCount>0) ? totalP80.toFixed(1) : '—';
+
   const decisionBox = document.getElementById('decisionBox');
-  decisionBox.textContent = scoredCount===0
-    ? 'Score at least one work package to see a live total.'
-    : `${scoredCount} of ${state.steps.length} scored.`;
+  if(scoredCount === 0){
+    decisionBox.className = 'decision-box decision-pending';
+    decisionBox.textContent = 'Score at least one work package to get a decision recommendation.';
+  } else {
+    let text = '';
+    let cls = 'decision-ok';
+    if(anyNovel){
+      cls = 'decision-flag';
+      text = 'One or more work packages carries a 2.5x+ complexity multiplier (genuinely novel work, no internal precedent). Double-check that package\'s scope before committing to the P80 figure.';
+    } else {
+      cls = 'decision-ok';
+      text = 'No work package flagged as genuinely novel. Proceed with the Expected/P80 figures above.';
+    }
+    if(incompleteSteps > 0){
+      text += ` (${incompleteSteps} work package${incompleteSteps>1?'s':''} still incomplete.)`;
+    }
+    decisionBox.className = 'decision-box '+cls;
+    decisionBox.textContent = text;
+  }
+
+  const progressAnswered = scoredCount;
+  const progressTotal = state.steps.length;
+  document.getElementById('progressFill').style.width = (progressAnswered/progressTotal*100)+'%';
+}
+
+document.getElementById('resetBtn').addEventListener('click', ()=>{ location.reload(); });
+
+function buildPayload(){
+  const { perStep, totalLow, totalHigh, totalP80 } = computeAll();
+  return {
+    project: state.project,
+    senderName: state.senderName,
+    hubspotDealId: state.hubspotDealId,
+    generalNotes: state.generalNotes,
+    steps: perStep.map(({step, calc})=>({
+      name: step.name,
+      optimistic: step.optimistic,
+      mostLikely: step.mostLikely,
+      pessimistic: step.pessimistic,
+      multiplier: step.multiplier,
+      pertHrs: calc ? calc.pertHrs : null,
+      sigma: calc ? calc.sigma : null,
+      expectedHours: calc ? calc.central : null,
+      p80Hours: calc ? calc.p80 : null
+    })),
+    totalEffortLow: totalLow,
+    totalEffortHigh: totalHigh,
+    totalP80Hours: totalP80,
+    contingencyPctUsed: CONFIG.contingencyPct,
+    correlationUsed: CONFIG.correlation
+  };
 }
 
 document.getElementById('copyBtn').addEventListener('click', ()=>{
-  let out = `[Design] ${state.project || '(unnamed)'} — scored by ${state.senderName || '(not entered)'}\n\n`;
-  state.steps.forEach(step=>{
+  const payload = buildPayload();
+  let out = `Design complexity score — ${payload.project || '(unnamed project)'}\n`;
+  out += `HubSpot deal ID: ${payload.hubspotDealId || '(not entered)'}\n`;
+  out += `Scored by: ${payload.senderName || '(not entered)'}\n\n`;
+  payload.steps.forEach(step=>{
     out += `--- ${step.name} ---\n`;
-    DEF.elements.forEach(e=>{
-      out += `  ${e.name} = ${step.scores[e.key] ?? '–'}`;
-      if(step.examples[e.key]) out += ` — ${step.examples[e.key]}`;
-      out += `\n`;
-    });
+    out += `  O/M/P = ${step.optimistic || '–'} / ${step.mostLikely || '–'} / ${step.pessimistic || '–'} hrs, multiplier ${Number(step.multiplier).toFixed(1)}x\n`;
+    if(step.expectedHours!==null){
+      out += `  Expected = ${step.expectedHours.toFixed(1)}h, P80 = ${step.p80Hours.toFixed(1)}h\n`;
+    } else {
+      out += `  Incomplete\n`;
+    }
     out += `\n`;
   });
+  out += `Total design effort (±1σ) = ${payload.totalEffortLow.toFixed(1)}–${payload.totalEffortHigh.toFixed(1)} hrs\n`;
+  out += `P80 commitment = ${payload.totalP80Hours.toFixed(1)} hrs\n`;
+  if(payload.generalNotes) out += `\nNotes: ${payload.generalNotes}\n`;
+
   navigator.clipboard.writeText(out).then(()=>{
-    const t = document.getElementById('copiedToast'); t.textContent='Copied.'; setTimeout(()=>t.textContent='',3000);
+    const toast = document.getElementById('copiedToast');
+    toast.textContent = 'Copied — paste into ClickUp or the requirements package doc.';
+    setTimeout(()=>{ toast.textContent=''; }, 3500);
   });
 });
+
+// Hidden iframe target so the Form submission doesn't navigate the page away.
+const hiddenIframe = document.createElement('iframe');
+hiddenIframe.name = 'hidden_form_target';
+hiddenIframe.style.display = 'none';
+document.body.appendChild(hiddenIframe);
 
 document.getElementById('sendBtn').addEventListener('click', ()=>{
   const statusEl = document.getElementById('sendStatus');
   if(!FORM_ACTION_URL || FORM_ACTION_URL.indexOf('PASTE_YOUR') === 0){
-    statusEl.className='send-status err'; statusEl.textContent='No form connected yet — see SETUP.md.'; return;
+    statusEl.className = 'send-status err';
+    statusEl.textContent = 'No form connected yet — see SETUP.md.';
+    return;
   }
-  const rows = state.steps.map(step=>{
-    const w = stepWeightedScore(step);
-    const band = w!==null ? bandFromScore(w) : null;
-    return { name:step.name, scores:step.scores, examples:step.examples, weightedScore:w,
-      band: band?band.name:'', effortLow: band?band.effort[0]:null, effortHigh: band?band.effort[1]:null };
-  });
-  const totalLow = rows.reduce((s,r)=> s + (r.effortLow||0), 0);
-  const totalHigh = rows.reduce((s,r)=> s + (r.effortHigh||0), 0);
-  const projectLevelObj = { [DEF.projectLevel.key]: state.projectLevel.score };
-
+  const payload = buildPayload();
   const form = document.createElement('form');
-  form.action = FORM_ACTION_URL; form.method='POST'; form.target='hidden_form_target'; form.style.display='none';
+  form.action = FORM_ACTION_URL;
+  form.method = 'POST';
+  form.target = 'hidden_form_target';
+  form.style.display = 'none';
+
   function addField(entryId, value){
-    if(!entryId || entryId.indexOf('PASTE_ENTRY_ID')===0) return;
-    const input = document.createElement('input'); input.name = entryId; input.value = value==null?'':String(value);
+    if(!entryId || entryId.indexOf('PASTE_ENTRY_ID') === 0) return;
+    const input = document.createElement('input');
+    input.name = entryId;
+    input.value = (value === null || value === undefined) ? '' : String(value);
     form.appendChild(input);
   }
+
   addField(FORM_ENTRY_IDS.phase, PHASE_NAME);
-  addField(FORM_ENTRY_IDS.senderName, state.senderName);
-  addField(FORM_ENTRY_IDS.project, state.project);
+  addField(FORM_ENTRY_IDS.senderName, payload.senderName);
+  addField(FORM_ENTRY_IDS.project, payload.project);
   addField(FORM_ENTRY_IDS.estimateType, '');
-  addField(FORM_ENTRY_IDS.projectLevelJson, JSON.stringify(projectLevelObj));
-  addField(FORM_ENTRY_IDS.itemsJson, JSON.stringify(rows));
-  addField(FORM_ENTRY_IDS.totalEffortLow, totalLow);
-  addField(FORM_ENTRY_IDS.totalEffortHigh, totalHigh);
+  addField(FORM_ENTRY_IDS.projectLevelJson, JSON.stringify({
+    hubspotDealId: payload.hubspotDealId,
+    generalNotes: payload.generalNotes,
+    totalP80Hours: payload.totalP80Hours,
+    contingencyPctUsed: payload.contingencyPctUsed,
+    correlationUsed: payload.correlationUsed
+  }));
+  addField(FORM_ENTRY_IDS.itemsJson, JSON.stringify(payload.steps));
+  addField(FORM_ENTRY_IDS.totalEffortLow, payload.totalEffortLow);
+  addField(FORM_ENTRY_IDS.totalEffortHigh, payload.totalEffortHigh);
   addField(FORM_ENTRY_IDS.referenceEstimate, '');
   addField(FORM_ENTRY_IDS.adjustmentNotes, '');
+
   document.body.appendChild(form);
-  statusEl.className='send-status'; statusEl.textContent='Sending…';
+  statusEl.className = 'send-status';
+  statusEl.textContent = 'Sending…';
   form.submit();
-  setTimeout(()=>{ form.remove(); statusEl.className='send-status ok'; statusEl.textContent='Sent — check the Responses tab.'; }, 900);
+
+  setTimeout(()=>{
+    form.remove();
+    statusEl.className = 'send-status ok';
+    statusEl.textContent = 'Sent — check the Responses tab in the Sheet.';
+  }, 900);
 });
 
-const hiddenIframe = document.createElement('iframe');
-hiddenIframe.name = 'hidden_form_target'; hiddenIframe.style.display='none';
-document.body.appendChild(hiddenIframe);
-
-state.steps.push(newStep());
-initReadiness();
 renderGrid();
 renderSummary();
 loadRemoteConfig();
