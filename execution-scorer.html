@@ -24,8 +24,9 @@
   .eyebrow{ text-transform:uppercase; letter-spacing:0.12em; font-size:11px; color:var(--dusk); margin-bottom:6px; }
   header.top h1{ font-size:30px; }
   header.top p.sub{ color:#3d4d57; font-size:14px; margin-top:8px; max-width:700px; }
-  .setup-row{ display:flex; gap:16px; flex-wrap:wrap; margin-top:20px; align-items:flex-end; }
+  .setup-row{ display:flex; gap:16px; flex-wrap:wrap; margin-top:20px; align-items:flex-start; }
   .required-hint{ font-size:11px; color:#7a4a12; margin-top:8px; }
+  .field-note{ font-size:10.5px; color:#5c6b76; margin-top:2px; max-width:230px; line-height:1.3; }
   .field{ display:flex; flex-direction:column; gap:6px; }
   .field label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dusk); }
   .field input[type=text]{ font-family:inherit; font-size:14px; padding:9px 11px; border:1.5px solid var(--muted); border-radius:8px; background:#fff; color:var(--text); min-width:220px; }
@@ -65,6 +66,10 @@
   .mini-example::placeholder{ font-style:italic; color:#9aa3a9; }
   .mini-number-input{ width:100%; font-family:inherit; font-size:16px; font-weight:700; padding:8px 9px; border:1.75px solid var(--muted); border-radius:6px; background:#fff; color:var(--dusk); text-align:center; }
   .mini-number-input:focus{ outline:none; border-color:var(--dusk); }
+  .mini-triple{ display:flex; gap:5px; }
+  .mini-triple-item{ flex:1; display:flex; flex-direction:column; gap:3px; }
+  .mini-triple-label{ font-size:9.5px; text-transform:uppercase; letter-spacing:.03em; color:#6b7b86; text-align:center; }
+  .mini-reason-warning{ font-size:10.5px; color:#a15b1f; margin-top:6px; line-height:1.35; }
 
   .summary{ position:sticky; top:24px; background:var(--dusk); color:#fff; border-radius:16px; padding:22px; }
   .summary h3{ font-size:15px; text-transform:uppercase; letter-spacing:.06em; }
@@ -107,6 +112,8 @@
   .modal-header{ position:sticky; top:0; background:var(--card); display:flex; align-items:center; justify-content:space-between; gap:12px; padding:20px 24px; border-bottom:1.5px solid var(--line); z-index:2; border-radius:16px 16px 0 0; }
   .modal-header h3{ font-size:20px; color:var(--dusk); }
   .modal-header p{ font-size:12px; color:#5c6b76; margin-top:4px; }
+  .formulas-refresh-note{ font-style:italic; }
+  .formulas-refresh-note.err{ color:#a15b1f; }
   .modal-close{ font-family:inherit; font-size:24px; line-height:1; border:none; background:transparent; cursor:pointer; color:var(--dusk); padding:0 4px; flex-shrink:0; }
   .modal-body{ padding:20px 24px 28px; font-size:13.5px; color:var(--text); }
   .formula-item{ margin-bottom:22px; padding-bottom:18px; border-bottom:1px solid var(--line); }
@@ -140,8 +147,9 @@
       <input type="text" id="hubspotDealId" placeholder="e.g. 12345678901">
     </div>
     <div class="field">
-      <label for="projectName">Project / package name</label>
+      <label for="projectName">Project description</label>
       <input type="text" id="projectName" placeholder="e.g. Project #1">
+      <div class="field-note">For reference only — has no impact on downstream data.</div>
     </div>
   </div>
   <p class="required-hint">* Required before the score can be sent</p>
@@ -159,7 +167,7 @@
         <table class="steps-grid" id="stepsTable"></table>
       </div>
     </div>
-    <p class="required-hint">* All criteria are required before the score can be sent</p>
+    <p class="required-hint">* All criteria are required before the score can be sent, except "Project specific resource" which is optional (a reason is only required if hours are entered for it)</p>
   </div>
 
   <aside class="summary" id="summaryPanel">
@@ -185,9 +193,9 @@
     <div class="hours-total-row">Total: <strong id="hoursTotalNum">—</strong> h</div>
     <div class="hours-pending-note" id="hoursPendingNote"></div>
     <div class="meta-grid">
-      <div><div class="k">Criteria answered</div><div class="v" id="stepsScoredDisplay">0 / 0</div></div>
+      <div><div class="k">Required criteria answered</div><div class="v" id="stepsScoredDisplay">0 / 0</div></div>
     </div>
-    <div class="decision-box" id="decisionBox">Fill in every criterion to enable sending.</div>
+    <div class="decision-box" id="decisionBox">Fill in every required criterion to enable sending.</div>
     <div class="btn-row">
       <button class="btn btn-send" id="sendBtn">Send score</button>
     </div>
@@ -206,6 +214,7 @@
       <div>
         <h3>How the hour estimates are calculated</h3>
         <p>Per criterion, per phase. Values shown reflect the live Config tab where connected, otherwise the tool's local defaults.</p>
+        <p class="formulas-refresh-note" id="formulasRefreshNote"></p>
       </div>
       <button type="button" class="modal-close" id="formulasCloseBtn" aria-label="Close">&times;</button>
     </div>
@@ -234,21 +243,21 @@ const DEF = {
           { cfgKey:'robotquantity_build', sheetKey:'execution.hours_robotquantity_build', label:'Build hours per robot', fallback:3 }
         ]
       } },
-    { key:'usecase', name:'Number of robot configurations',
+    { key:'usecase', name:'Number of robot tasks',
       sub:'Number of different robot configurations. Example: Frostkrone has 8 robots, 6 of which pick and place the same items, 2 of which palletize the same items. Therefore the number of configurations is 2.',
       inputType:'number', example:'e.g. 2',
       hourFormula:{
         build:(step, cfg)=> 0,
-        test:(step, cfg)=> (cfg.robotconfigurations_test ?? 100) * numOr0(step.rawInputs.usecase) * (1 + numOr0(step.rawInputs.robots)/10),
-        deploy:(step, cfg)=> (cfg.robotconfigurations_deploy ?? 50) * numOr0(step.rawInputs.usecase) * (1 + numOr0(step.rawInputs.robots)/10)
+        test:(step, cfg)=> (cfg.robottasks_test ?? 100) * numOr0(step.rawInputs.usecase) * (1 + numOr0(step.rawInputs.robots)/10),
+        deploy:(step, cfg)=> (cfg.robottasks_deploy ?? 50) * numOr0(step.rawInputs.usecase) * (1 + numOr0(step.rawInputs.robots)/10)
       },
       formulaDoc:{
         build:cfg=> `Always 0h.`,
-        test:cfg=> `${fmtH(cfg.robotconfigurations_test ?? 100)} × number of configurations entered × (1 + number of robots entered ÷ 10).`,
-        deploy:cfg=> `${fmtH(cfg.robotconfigurations_deploy ?? 50)} × number of configurations entered × (1 + number of robots entered ÷ 10).`,
+        test:cfg=> `${fmtH(cfg.robottasks_test ?? 100)} × number of robot tasks entered × (1 + number of robots entered ÷ 10).`,
+        deploy:cfg=> `${fmtH(cfg.robottasks_deploy ?? 50)} × number of robot tasks entered × (1 + number of robots entered ÷ 10).`,
         vars:[
-          { cfgKey:'robotconfigurations_test', sheetKey:'execution.hours_robotconfigurations_test', label:'Test hours per configuration (base)', fallback:100 },
-          { cfgKey:'robotconfigurations_deploy', sheetKey:'execution.hours_robotconfigurations_deploy', label:'Deployment hours per configuration (base)', fallback:50 }
+          { cfgKey:'robottasks_test', sheetKey:'execution.hours_robottasks_test', label:'Test hours per robot task (base)', fallback:100 },
+          { cfgKey:'robottasks_deploy', sheetKey:'execution.hours_robottasks_deploy', label:'Deployment hours per robot task (base)', fallback:50 }
         ]
       } },
     { key:'variants', name:'Number of mtbh variants', sub:'Number of different SKUs with different processes',
@@ -286,7 +295,7 @@ const DEF = {
           { cfgKey:'grippers_deploy', sheetKey:'execution.hours_grippers_deploy', label:'Deployment hours per gripper', fallback:1 }
         ]
       } },
-    { key:'cellsize', name:'Cell size', sub:'Physical size of cell to determine build effort (m²)',
+    { key:'cellsize', name:'Cell size', sub:'Physical size of cell system to determine build effort (m²). If the scope is multiple cells, ensure full footprint is covered.',
       inputType:'number', example:'e.g. 15',
       hourFormula:{
         build:(step, cfg)=> cellsizeBuildHours(step, cfg),
@@ -421,6 +430,21 @@ const DEF = {
           { cfgKey:'travel_test', sheetKey:'execution.weeks_travel_test', label:'On-site weeks during test', fallback:6, unit:'weeks' },
           { cfgKey:'travel_deploy', sheetKey:'execution.weeks_travel_deploy', label:'On-site weeks during deployment', fallback:5, unit:'weeks' }
         ]
+      } },
+    { key:'projectresource', name:'Project specific resource',
+      sub:'Additional resource hours for project specific requirements. If resources are added then reason description must be given.',
+      inputType:'phasehours', optional:true,
+      reasonPlaceholder:'e.g. reason for the additional resource hours',
+      hourFormula:{
+        build:(step, cfg)=> numOr0((step.rawInputs.projectresource || {}).build),
+        test:(step, cfg)=> numOr0((step.rawInputs.projectresource || {}).test),
+        deploy:(step, cfg)=> numOr0((step.rawInputs.projectresource || {}).deploy)
+      },
+      formulaDoc:{
+        build:cfg=> `Entered directly — the Build-phase hours typed in for this criterion are added as-is (no multiplier).`,
+        test:cfg=> `Entered directly — the Test-phase hours typed in for this criterion are added as-is (no multiplier).`,
+        deploy:cfg=> `Entered directly — the Deployment-phase hours typed in for this criterion are added as-is (no multiplier).`,
+        vars:[]
       } }
   ]
 };
@@ -444,10 +468,10 @@ const FORM_ENTRY_IDS = {
 
 let CONFIG = {
   // Local defaults for hour-formula coefficients. Overridden by rows in the Config tab named
-  // "execution.hours_<name>" (e.g. execution.hours_robotconfigurations_test, execution.hours_robotconfigurations_deploy),
+  // "execution.hours_<name>" (e.g. execution.hours_robottasks_test, execution.hours_robottasks_deploy),
   // "execution.pct_<name>" for percentage-style coefficients (e.g. execution.pct_cellsize_deploy),
   // or "execution.weeks_<name>" for week-count coefficients (e.g. execution.weeks_travel_test).
-  hours:{ robotconfigurations_test:100, robotconfigurations_deploy:50, robotquantity_build:3,
+  hours:{ robottasks_test:100, robottasks_deploy:50, robotquantity_build:3,
     mtbhvariants_test:20, mtbhvariants_deploy:15,
     grippers_build:1.5, grippers_test:3, grippers_deploy:1,
     cellsize_build_small:8, cellsize_build_medium:7, cellsize_build_large:3, cellsize_deploy:0.5,
@@ -479,6 +503,10 @@ function cellsizeBuildHours(step, cfg){
 // hour totals are never mistaken for a complete estimate.
 const PENDING_HOUR_CRITERIA = DEF.elements.filter(e=> !e.hourFormula).map(e=> e.name);
 
+// Mandatory criteria only — excludes criteria explicitly marked optional (e.g. Project specific
+// resource), used for the "Required criteria answered" counter in the Live Score panel.
+const REQUIRED_ELEMENTS = DEF.elements.filter(e=> !e.optional);
+
 function computePhaseHours(step, phase){
   let total = 0;
   DEF.elements.forEach(e=>{
@@ -497,16 +525,27 @@ function totalPhaseHours(phase){
 function newStep(){
   stepCounter++;
   const scores = {}; const examples = {}; const rawInputs = {};
-  DEF.elements.forEach(e=>{ scores[e.key]=null; examples[e.key]=''; rawInputs[e.key]=''; });
+  DEF.elements.forEach(e=>{
+    scores[e.key]=null; examples[e.key]='';
+    rawInputs[e.key] = e.inputType === 'phasehours' ? {build:'', test:'', deploy:'', reason:''} : '';
+  });
   return { id: stepCounter, name: 'Execution phase', scores, examples, rawInputs };
 }
 
-// Every criterion is required. Number inputs count as answered once they hold a valid number;
-// option-based criteria (e.g. PLC complexity) count as answered once an option has been clicked.
+// Every criterion is required, except ones explicitly marked optional (e.g. Project specific
+// resource). Number inputs count as answered once they hold a valid number; option-based
+// criteria (e.g. PLC complexity) count as answered once an option has been clicked; "phasehours"
+// criteria are optional when left blank, but once any hours are entered a reason becomes required.
 function isElementAnswered(step, elDef){
   if(elDef.inputType === 'number'){
     const raw = step.rawInputs[elDef.key];
     return raw !== '' && raw !== null && raw !== undefined && !isNaN(parseFloat(raw));
+  }
+  if(elDef.inputType === 'phasehours'){
+    const vals = step.rawInputs[elDef.key] || {};
+    const anyEntered = ['build','test','deploy'].some(p=> numOr0(vals[p]) > 0);
+    if(!anyEntered) return true;
+    return !!(vals.reason && vals.reason.trim() !== '');
   }
   return step.scores[elDef.key] !== null && step.scores[elDef.key] !== undefined;
 }
@@ -515,25 +554,37 @@ function answeredCount(step){
   return DEF.elements.filter(e=> isElementAnswered(step, e)).length;
 }
 
+function requiredAnsweredCount(step){
+  return REQUIRED_ELEMENTS.filter(e=> isElementAnswered(step, e)).length;
+}
+
 function isStepComplete(step){
   return answeredCount(step) === DEF.elements.length;
+}
+
+// Fetches the Config tab (via the Apps Script web app) and merges any hours_/pct_/weeks_
+// coefficients straight into CONFIG.hours. Shared by the page-load fetch and by the
+// "How are hours calculated?" modal, which re-runs this every time it opens so its numbers
+// can never go stale relative to the Google Sheet.
+async function fetchAndApplyHoursConfig(){
+  if(!WEBAPP_URL || WEBAPP_URL.indexOf('PASTE_YOUR') === 0) throw new Error('Config webapp not configured');
+  const res = await fetch(WEBAPP_URL + '?type=config&phase=' + encodeURIComponent(PHASE_NAME));
+  const data = await res.json();
+  if(data.error) throw new Error(data.error);
+  const hours = {};
+  Object.keys(data).forEach(k=>{
+    if(k.startsWith('hours_')) hours[k.substring('hours_'.length)] = parseFloat(data[k]);
+    else if(k.startsWith('pct_')) hours[k.substring('pct_'.length)] = parseFloat(data[k]);
+    else if(k.startsWith('weeks_')) hours[k.substring('weeks_'.length)] = parseFloat(data[k]);
+  });
+  CONFIG.hours = Object.assign({}, CONFIG.hours, hours);
 }
 
 async function loadRemoteConfig(){
   document.getElementById('configStatus').textContent = 'Using local defaults (not connected)';
   document.getElementById('configStatus').classList.remove('live');
-  if(!WEBAPP_URL || WEBAPP_URL.indexOf('PASTE_YOUR') === 0) return;
   try{
-    const res = await fetch(WEBAPP_URL + '?type=config&phase=' + encodeURIComponent(PHASE_NAME));
-    const data = await res.json();
-    if(data.error) throw new Error(data.error);
-    const hours = {};
-    Object.keys(data).forEach(k=>{
-      if(k.startsWith('hours_')) hours[k.substring('hours_'.length)] = parseFloat(data[k]);
-      else if(k.startsWith('pct_')) hours[k.substring('pct_'.length)] = parseFloat(data[k]);
-      else if(k.startsWith('weeks_')) hours[k.substring('weeks_'.length)] = parseFloat(data[k]);
-    });
-    CONFIG.hours = Object.assign({}, CONFIG.hours, hours);
+    await fetchAndApplyHoursConfig();
     document.getElementById('configStatus').textContent = 'Live config connected';
     document.getElementById('configStatus').classList.add('live');
     renderSummary();
@@ -549,7 +600,8 @@ function renderGrid(){
   DEF.elements.forEach(elDef=>{
     const tr = document.createElement('tr');
     const labelTd = document.createElement('td'); labelTd.className='element-label';
-    labelTd.innerHTML = `<strong>${elDef.name} *</strong><span>${elDef.sub}</span>`;
+    const marker = elDef.optional ? ' (optional)' : ' *';
+    labelTd.innerHTML = `<strong>${elDef.name}${marker}</strong><span>${elDef.sub}</span>`;
     tr.appendChild(labelTd);
     state.steps.forEach(step=>{
       const td = document.createElement('td');
@@ -572,6 +624,40 @@ function renderGrid(){
           notesInput.addEventListener('input', e=>{ step.examples[elDef.key] = e.target.value; });
           cellDiv.appendChild(notesInput);
         }
+      } else if(elDef.inputType === 'phasehours'){
+        const vals = step.rawInputs[elDef.key] || (step.rawInputs[elDef.key] = {build:'', test:'', deploy:'', reason:''});
+        const tripleDiv = document.createElement('div'); tripleDiv.className = 'mini-triple';
+        const phaseLabels = { build:'Build phase', test:'Test phase', deploy:'Deploy phase' };
+        ['build','test','deploy'].forEach(phase=>{
+          const item = document.createElement('div'); item.className = 'mini-triple-item';
+          const lbl = document.createElement('div'); lbl.className = 'mini-triple-label';
+          lbl.textContent = phaseLabels[phase];
+          const phaseInput = document.createElement('input');
+          phaseInput.type = 'number'; phaseInput.min = '0'; phaseInput.step = '1';
+          phaseInput.className = 'mini-number-input';
+          phaseInput.placeholder = '0';
+          phaseInput.value = vals[phase] ?? '';
+          phaseInput.addEventListener('input', e=>{
+            vals[phase] = e.target.value;
+            renderSummary();
+          });
+          item.appendChild(lbl); item.appendChild(phaseInput);
+          tripleDiv.appendChild(item);
+        });
+        cellDiv.appendChild(tripleDiv);
+
+        const reasonInput = document.createElement('input'); reasonInput.type='text'; reasonInput.className='mini-example';
+        reasonInput.placeholder = elDef.reasonPlaceholder || 'Reason for the additional resource hours';
+        reasonInput.value = vals.reason ?? '';
+        reasonInput.addEventListener('input', e=>{
+          vals.reason = e.target.value;
+          renderSummary();
+        });
+        cellDiv.appendChild(reasonInput);
+
+        const warnDiv = document.createElement('div'); warnDiv.className = 'mini-reason-warning';
+        warnDiv.id = `reason-warning-${elDef.key}-${step.id}`;
+        cellDiv.appendChild(warnDiv);
       } else {
         const hasLabels = elDef.options.some(o=>o.label);
         const miniOptions = document.createElement('div'); miniOptions.className='mini-options';
@@ -637,7 +723,28 @@ function buildFormulasContent(){
   body.innerHTML = html;
 }
 
-function openFormulasModal(){ buildFormulasContent(); document.getElementById('formulasOverlay').classList.add('open'); }
+// Opens instantly with whatever values are already in memory (so there's no blank/slow modal),
+// then re-fetches the Config tab in the background and re-renders in place if it's still open —
+// so numbers shown here always catch up to the latest Google Sheet values, not just whatever
+// was live when the page first loaded.
+async function openFormulasModal(){
+  buildFormulasContent();
+  document.getElementById('formulasOverlay').classList.add('open');
+  const noteEl = document.getElementById('formulasRefreshNote');
+  noteEl.className = 'formulas-refresh-note';
+  noteEl.textContent = 'Refreshing from the Config sheet…';
+  try{
+    await fetchAndApplyHoursConfig();
+    if(document.getElementById('formulasOverlay').classList.contains('open')){
+      buildFormulasContent();
+      renderSummary();
+    }
+    noteEl.textContent = 'Showing live values from the Config sheet.';
+  } catch(err){
+    noteEl.className = 'formulas-refresh-note err';
+    noteEl.textContent = 'Could not reach the Config sheet just now — showing the last known values.';
+  }
+}
 function closeFormulasModal(){ document.getElementById('formulasOverlay').classList.remove('open'); }
 
 document.getElementById('formulasBtn').addEventListener('click', openFormulasModal);
@@ -663,16 +770,32 @@ function updateSendButtonState(){
 
 function renderSummary(){
   const listEl = document.getElementById('stepSummaryList'); listEl.innerHTML='';
-  let totalAnswered = 0, totalPossible = 0;
+  let totalRequiredAnswered = 0, totalRequiredPossible = 0;
   state.steps.forEach(step=>{
     const answered = answeredCount(step);
-    totalAnswered += answered; totalPossible += DEF.elements.length;
+    const reqAnswered = requiredAnsweredCount(step);
+    totalRequiredAnswered += reqAnswered; totalRequiredPossible += REQUIRED_ELEMENTS.length;
     const complete = answered === DEF.elements.length;
     const item = document.createElement('div'); item.className='step-summary-item';
-    item.innerHTML = `<div class="name">${step.name}</div><div class="details"><span>${complete ? 'All criteria answered' : `${answered} / ${DEF.elements.length} criteria answered`}</span></div>`;
+    item.innerHTML = `<div class="name">${step.name}</div><div class="details"><span>${complete ? 'All criteria answered' : `${reqAnswered} / ${REQUIRED_ELEMENTS.length} required criteria answered`}</span></div>`;
     listEl.appendChild(item);
   });
-  document.getElementById('stepsScoredDisplay').textContent = `${totalAnswered} / ${totalPossible}`;
+  document.getElementById('stepsScoredDisplay').textContent = `${totalRequiredAnswered} / ${totalRequiredPossible}`;
+
+  // Live-update the "reason required" warning under Project specific resource (and any future
+  // phasehours-type criterion) without needing a full grid re-render.
+  DEF.elements.forEach(elDef=>{
+    if(elDef.inputType !== 'phasehours') return;
+    state.steps.forEach(step=>{
+      const warnEl = document.getElementById(`reason-warning-${elDef.key}-${step.id}`);
+      if(!warnEl) return;
+      const vals = step.rawInputs[elDef.key] || {};
+      const anyEntered = ['build','test','deploy'].some(p=> numOr0(vals[p]) > 0);
+      warnEl.textContent = (anyEntered && (!vals.reason || vals.reason.trim() === ''))
+        ? 'Reason required — hours have been entered above.'
+        : '';
+    });
+  });
 
   const hoursBuild = totalPhaseHours('build');
   const hoursTest = totalPhaseHours('test');
@@ -688,7 +811,7 @@ function renderSummary(){
   const decisionBox = document.getElementById('decisionBox');
   decisionBox.textContent = state.steps.every(isStepComplete)
     ? 'All criteria complete — ready to send.'
-    : 'Fill in every criterion to enable sending.';
+    : 'Fill in every required criterion to enable sending.';
 
   updateSendButtonState();
 }
@@ -707,11 +830,16 @@ document.getElementById('copyBtn').addEventListener('click', ()=>{
     DEF.elements.forEach(e=>{
       if(e.inputType === 'number'){
         out += `  ${e.name} = ${step.rawInputs[e.key] !== '' ? step.rawInputs[e.key] : '–'}`;
+      } else if(e.inputType === 'phasehours'){
+        const v = step.rawInputs[e.key] || {};
+        const parts = ['build','test','deploy'].map(p=> `${p}: ${v[p] !== '' && v[p] != null ? v[p] : '0'}h`).join(', ');
+        out += `  ${e.name} = ${parts}`;
+        if(v.reason) out += ` — reason: ${v.reason}`;
       } else {
         const opt = (e.options || []).find(o=> o.score === step.scores[e.key]);
         out += `  ${e.name} = ${opt ? opt.label : (step.scores[e.key] ?? '–')}`;
       }
-      if(step.examples[e.key]) out += ` — ${step.examples[e.key]}`;
+      if(e.inputType !== 'phasehours' && step.examples[e.key]) out += ` — ${step.examples[e.key]}`;
       out += `\n`;
     });
     out += `\n`;
@@ -726,8 +854,16 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   if(state.senderName.trim() === '' || state.hubspotDealId.trim() === ''){
     statusEl.className='send-status err'; statusEl.textContent='Enter your name and HubSpot Deal ID before sending.'; return;
   }
+  const missingReason = state.steps.some(step=>{
+    const vals = step.rawInputs.projectresource || {};
+    const anyEntered = ['build','test','deploy'].some(p=> numOr0(vals[p]) > 0);
+    return anyEntered && (!vals.reason || vals.reason.trim() === '');
+  });
+  if(missingReason){
+    statusEl.className='send-status err'; statusEl.textContent='Give a reason for the Project specific resource hours before sending.'; return;
+  }
   if(!state.steps.every(isStepComplete)){
-    statusEl.className='send-status err'; statusEl.textContent='Fill in every criterion before sending.'; return;
+    statusEl.className='send-status err'; statusEl.textContent='Fill in every required criterion before sending.'; return;
   }
   if(!FORM_ACTION_URL || FORM_ACTION_URL.indexOf('PASTE_YOUR') === 0){
     statusEl.className='send-status err'; statusEl.textContent='No form connected yet — see SETUP.md.'; return;
