@@ -39,7 +39,7 @@
   .grid-card{ background:var(--card); border:1.5px solid var(--muted); border-radius:14px; padding:16px; margin-top:12px; }
   .steps-scroll{ overflow-x:auto; }
   table.steps-grid{ border-collapse:separate; border-spacing:8px 8px; min-width:100%; }
-  .element-label{ position:sticky; left:0; background:var(--card); z-index:5; width:180px; min-width:180px; padding:8px !important; vertical-align:top; }
+  .element-label{ position:sticky; left:0; background:var(--card); z-index:5; width:300px; min-width:300px; padding:8px !important; vertical-align:top; }
   .element-label strong{ font-size:13.5px; display:block; }
   .element-label span{ font-size:11px; color:#4a5a66; display:block; margin-top:3px; line-height:1.3; }
 
@@ -49,7 +49,7 @@
   .remove-step-btn{ font-family:inherit; font-size:14px; width:26px; height:26px; border-radius:6px; border:1.5px solid var(--muted); background:#fff; cursor:pointer; color:var(--high); }
   .remove-step-btn:disabled{ opacity:.3; cursor:not-allowed; }
 
-  .step-cell{ min-width:190px; background:var(--bg); border-radius:10px; padding:8px; border:1px solid var(--muted); }
+  .step-cell{ min-width:160px; width:100%; background:var(--bg); border-radius:10px; padding:8px; border:1px solid var(--muted); }
   .mini-options{ display:flex; gap:5px; }
   .mini-opt{ position:relative; flex:1; font-family:inherit; font-size:12px; font-weight:700; padding:7px 0; border-radius:6px; border:1.75px solid var(--muted); background:#fff; cursor:pointer; }
   .mini-opt:hover{ border-color:var(--dusk); }
@@ -84,6 +84,14 @@
   .hours-tile{ background:rgba(255,255,255,0.06); border-radius:12px; padding:14px 6px; text-align:center; }
   .hours-tile .num{ font-family:'Castoro', Georgia, serif; font-size:22px; }
   .hours-tile .lbl{ margin-top:4px; font-size:10px; letter-spacing:.04em; text-transform:uppercase; color:#B7C4CE; }
+  .phase-info-btn{ display:inline-flex; align-items:center; justify-content:center; width:13px; height:13px; border-radius:50%; border:1px solid rgba(255,255,255,0.55); background:transparent; color:#dfe7ec; font-size:9px; font-style:italic; font-family:Georgia, serif; line-height:1; padding:0; cursor:help; position:relative; vertical-align:middle; text-transform:none; letter-spacing:normal; }
+  .phase-info-btn:hover, .phase-info-btn:focus{ border-color:#fff; color:#fff; outline:none; }
+  .phase-info-btn:hover::after, .phase-info-btn:focus::after{
+    content:attr(data-tooltip); position:absolute; bottom:130%; left:50%; transform:translateX(-50%);
+    width:200px; background:#fff; color:var(--dusk); padding:8px 10px; border-radius:8px; font-size:11px;
+    line-height:1.4; z-index:50; box-shadow:0 6px 16px rgba(0,0,0,0.25); text-align:left; font-weight:300;
+    font-style:normal; text-transform:none; letter-spacing:normal;
+  }
   .hours-total-row{ margin-top:10px; text-align:center; font-size:12.5px; color:#dfe7ec; }
   .hours-total-row strong{ font-family:'Castoro', Georgia, serif; font-size:17px; font-weight:400; }
   .hours-pending-note{ margin-top:8px; font-size:10.5px; color:#B7C4CE; line-height:1.4; text-align:center; }
@@ -135,7 +143,7 @@
 <header class="top">
   <div class="eyebrow"><span>Solution Development Engineering - Execution Phase</span> — <span class="config-status" id="configStatus">Using local defaults (not connected)</span></div>
   <h1>Execution phase scoring</h1>
-  <p class="sub">Score each unit on deployment-time complexity drivers.</p>
+  <p class="sub">Score each unit on execution-time complexity drivers.</p>
 
   <div class="setup-row">
     <div class="field">
@@ -179,15 +187,15 @@
     <div class="hours-hero">
       <div class="hours-tile">
         <div class="num" id="hoursBuildNum">—</div>
-        <div class="lbl">Build phase (h)</div>
+        <div class="lbl">Cell Assembly (h) <button type="button" class="phase-info-btn" tabindex="0" aria-label="What is Cell Assembly?" data-tooltip="The mechanical build of the cell, including wiring and pneumatic testing, but no programming or testing of the cell and its process.">i</button></div>
       </div>
       <div class="hours-tile">
         <div class="num" id="hoursTestNum">—</div>
-        <div class="lbl">Test phase (h)</div>
+        <div class="lbl">Test phase (h) <button type="button" class="phase-info-btn" tabindex="0" aria-label="What is Test Phase?" data-tooltip="All programming and testing required to complete FAT.">i</button></div>
       </div>
       <div class="hours-tile">
         <div class="num" id="hoursDeployNum">—</div>
-        <div class="lbl">Deployment phase (h)</div>
+        <div class="lbl">Deployment phase (h) <button type="button" class="phase-info-btn" tabindex="0" aria-label="What is Deployment Phase?" data-tooltip="The duration between a completed FAT and the Handover to Customer gate.">i</button></div>
       </div>
     </div>
     <div class="hours-total-row">Total: <strong id="hoursTotalNum">—</strong> h</div>
@@ -249,18 +257,26 @@ const DEF = {
       hourFormula:{
         build:(step, cfg)=> 0,
         test:(step, cfg)=> (cfg.robottasks_test ?? 100) * numOr0(step.rawInputs.usecase) * (1 + numOr0(step.rawInputs.robots)/10),
-        deploy:(step, cfg)=> (cfg.robottasks_deploy ?? 50) * numOr0(step.rawInputs.usecase) * (1 + numOr0(step.rawInputs.robots)/10)
+        deploy:(step, cfg)=> {
+          const cellsize = numOr0(step.rawInputs.cellsize);
+          const rate = cellsize < 5 ? (cfg.robottasks_deploy_small ?? 4) : (cfg.robottasks_deploy ?? 50);
+          return rate * numOr0(step.rawInputs.usecase) * (1 + numOr0(step.rawInputs.robots)/10);
+        }
       },
       formulaDoc:{
         build:cfg=> `Always 0h.`,
         test:cfg=> `${fmtH(cfg.robottasks_test ?? 100)} × number of robot tasks entered × (1 + number of robots entered ÷ 10).`,
-        deploy:cfg=> `${fmtH(cfg.robottasks_deploy ?? 50)} × number of robot tasks entered × (1 + number of robots entered ÷ 10).`,
+        deploy:cfg=> [
+          `If cell size &lt; 5 m²: ${fmtH(cfg.robottasks_deploy_small ?? 4)} × number of robot tasks entered × (1 + number of robots entered ÷ 10).`,
+          `If cell size is 5 m² or greater: ${fmtH(cfg.robottasks_deploy ?? 50)} × number of robot tasks entered × (1 + number of robots entered ÷ 10).`
+        ],
         vars:[
           { cfgKey:'robottasks_test', sheetKey:'execution.hours_robottasks_test', label:'Test hours per robot task (base)', fallback:100 },
-          { cfgKey:'robottasks_deploy', sheetKey:'execution.hours_robottasks_deploy', label:'Deployment hours per robot task (base)', fallback:50 }
+          { cfgKey:'robottasks_deploy_small', sheetKey:'execution.hours_robottasks_deploy_small', label:'Deployment hours per robot task (cell size < 5 m²)', fallback:4 },
+          { cfgKey:'robottasks_deploy', sheetKey:'execution.hours_robottasks_deploy', label:'Deployment hours per robot task (cell size ≥ 5 m²)', fallback:50 }
         ]
       } },
-    { key:'variants', name:'Number of mtbh variants', sub:'Number of different SKUs with different processes',
+    { key:'variants', name:'Number of mtbh variants', sub:'Number of different SKUs with different processes (the product of different variant sizes, handling methods, packing/palletizing patterns etc)',
       inputType:'number', example:'e.g. 7',
       hourFormula:{
         build:(step, cfg)=> 0,
@@ -300,7 +316,7 @@ const DEF = {
       hourFormula:{
         build:(step, cfg)=> cellsizeBuildHours(step, cfg),
         test:(step, cfg)=> 0,
-        deploy:(step, cfg)=> cellsizeBuildHours(step, cfg) * (cfg.cellsize_deploy ?? 0.5)
+        deploy:(step, cfg)=> cellsizeBuildHours(step, cfg) * cellsizeDeployPct(step, cfg)
       },
       formulaDoc:{
         build:cfg=> [
@@ -309,15 +325,19 @@ const DEF = {
           `If cell size &gt; 40 m²: ${fmtH(cfg.cellsize_build_large ?? 3)} × cell size entered.`
         ],
         test:cfg=> `Always 0h.`,
-        deploy:cfg=> `Build result × ${fmtPct(cfg.cellsize_deploy ?? 0.5)}.`,
+        deploy:cfg=> [
+          `If cell size &lt; 5 m²: Build result × ${fmtPct(cfg.cellsize_deploy_small ?? 0.1)}.`,
+          `If cell size is 5 m² or greater: Build result × ${fmtPct(cfg.cellsize_deploy_large ?? 0.5)}.`
+        ],
         vars:[
           { cfgKey:'cellsize_build_small', sheetKey:'execution.hours_cellsize_build_small', label:'Build hours/m² (<5 m²)', fallback:8 },
           { cfgKey:'cellsize_build_medium', sheetKey:'execution.hours_cellsize_build_medium', label:'Build hours/m² (5–40 m²)', fallback:7 },
           { cfgKey:'cellsize_build_large', sheetKey:'execution.hours_cellsize_build_large', label:'Build hours/m² (>40 m²)', fallback:3 },
-          { cfgKey:'cellsize_deploy', sheetKey:'execution.pct_cellsize_deploy', label:'Deployment share of build hours', fallback:0.5, isPct:true }
+          { cfgKey:'cellsize_deploy_small', sheetKey:'execution.pct_cellsize_deploy_small', label:'Deployment share of build hours (cell size < 5 m²)', fallback:0.1, isPct:true },
+          { cfgKey:'cellsize_deploy_large', sheetKey:'execution.pct_cellsize_deploy_large', label:'Deployment share of build hours (cell size ≥ 5 m²)', fallback:0.5, isPct:true }
         ]
       } },
-    { key:'gripper', name:'PLC complexity', sub:'Amount of PLC programming required',
+    { key:'gripper', name:'PLC complexity', sub:'Amount of PLC programming required. Supplier provided PLCs are, for example, PLCs provided by Axmann.',
       example:'e.g. Siemens S7',
       options:[
         {score:1, label:'No PLC'},
@@ -325,7 +345,12 @@ const DEF = {
         {score:3, label:'RobCo programmed PLC'}
       ],
       hourFormula:{
-        build:(step, cfg)=> step.scores.gripper===3 ? (cfg.plc_build_robco ?? 4) : 0,
+        build:(step, cfg)=> {
+          const s = step.scores.gripper;
+          if(s===2) return cfg.plc_build_supplier ?? 2;
+          if(s===3) return cfg.plc_build_robco ?? 4;
+          return 0;
+        },
         test:(step, cfg)=> {
           const s = step.scores.gripper;
           if(s===2) return cfg.plc_test_supplier ?? 3;
@@ -341,7 +366,8 @@ const DEF = {
       },
       formulaDoc:{
         build:cfg=> [
-          `"No PLC" or "Supplier provided PLC" selected: 0h.`,
+          `"No PLC" selected: 0h.`,
+          `"Supplier provided PLC" selected: ${fmtH(cfg.plc_build_supplier ?? 2)}.`,
           `"RobCo programmed PLC" selected: ${fmtH(cfg.plc_build_robco ?? 4)}.`
         ],
         test:cfg=> [
@@ -355,6 +381,7 @@ const DEF = {
           `"RobCo programmed PLC" selected: ${fmtH(cfg.plc_deploy_robco ?? 6)}.`
         ],
         vars:[
+          { cfgKey:'plc_build_supplier', sheetKey:'execution.hours_plc_build_supplier', label:'Build hours — Supplier provided PLC', fallback:2 },
           { cfgKey:'plc_build_robco', sheetKey:'execution.hours_plc_build_robco', label:'Build hours — RobCo programmed PLC', fallback:4 },
           { cfgKey:'plc_test_supplier', sheetKey:'execution.hours_plc_test_supplier', label:'Test hours — Supplier provided PLC', fallback:3 },
           { cfgKey:'plc_test_robco', sheetKey:'execution.hours_plc_test_robco', label:'Test hours — RobCo programmed PLC', fallback:30 },
@@ -362,7 +389,7 @@ const DEF = {
           { cfgKey:'plc_deploy_robco', sheetKey:'execution.hours_plc_deploy_robco', label:'Deployment hours — RobCo programmed PLC', fallback:6 }
         ]
       } },
-    { key:'vision', name:'Vision system', sub:'Number of vision systems included',
+    { key:'vision', name:'Vision system', sub:'Number of vision systems included. Each camera counts as one system.',
       inputType:'number', example:'e.g. 2',
       hourFormula:{
         build:(step, cfg)=> (cfg.vision_build ?? 1) * numOr0(step.rawInputs.vision),
@@ -380,7 +407,7 @@ const DEF = {
         ]
       } },
     { key:'periphery', name:'Periphery integrations',
-      sub:'Number of larger devices that require integrating (e.g. conveyors, flexi-bowls, feeding stations etc)',
+      sub:'Number of larger devices that require integrating (e.g. conveyors, flexi-bowls, feeding stations etc). Each device counts individually i.e. 3 flexi-bowls are 3 integrations, not 1.',
       inputType:'number', example:'e.g. 2',
       hourFormula:{
         build:(step, cfg)=> (cfg.periphery_build ?? 2) * numOr0(step.rawInputs.periphery),
@@ -441,7 +468,7 @@ const DEF = {
         deploy:(step, cfg)=> numOr0((step.rawInputs.projectresource || {}).deploy)
       },
       formulaDoc:{
-        build:cfg=> `Entered directly — the Build-phase hours typed in for this criterion are added as-is (no multiplier).`,
+        build:cfg=> `Entered directly — the Cell Assembly hours typed in for this criterion are added as-is (no multiplier).`,
         test:cfg=> `Entered directly — the Test-phase hours typed in for this criterion are added as-is (no multiplier).`,
         deploy:cfg=> `Entered directly — the Deployment-phase hours typed in for this criterion are added as-is (no multiplier).`,
         vars:[]
@@ -471,14 +498,14 @@ let CONFIG = {
   // "execution.hours_<name>" (e.g. execution.hours_robottasks_test, execution.hours_robottasks_deploy),
   // "execution.pct_<name>" for percentage-style coefficients (e.g. execution.pct_cellsize_deploy),
   // or "execution.weeks_<name>" for week-count coefficients (e.g. execution.weeks_travel_test).
-  hours:{ robottasks_test:100, robottasks_deploy:50, robotquantity_build:3,
+  hours:{ robottasks_test:100, robottasks_deploy_small:4, robottasks_deploy:50, robotquantity_build:3,
     mtbhvariants_test:20, mtbhvariants_deploy:15,
     grippers_build:1.5, grippers_test:3, grippers_deploy:1,
-    cellsize_build_small:8, cellsize_build_medium:7, cellsize_build_large:3, cellsize_deploy:0.5,
+    cellsize_build_small:8, cellsize_build_medium:7, cellsize_build_large:3, cellsize_deploy_small:0.1, cellsize_deploy_large:0.5,
     vision_build:1, vision_test:4, vision_deploy:1,
     periphery_build:2, periphery_test:4, periphery_deploy:2,
     custmachine_build:1, custmachine_test:4, custmachine_deploy:5,
-    plc_build_robco:4, plc_test_supplier:3, plc_test_robco:30, plc_deploy_supplier:2, plc_deploy_robco:6,
+    plc_build_supplier:2, plc_build_robco:4, plc_test_supplier:3, plc_test_robco:30, plc_deploy_supplier:2, plc_deploy_robco:6,
     travel_test:6, travel_deploy:5 } };
 let state = { project:'', senderName:'', hubspotDealId:'', steps:[] };
 let stepCounter = 0;
@@ -496,6 +523,13 @@ function cellsizeBuildHours(step, cfg){
   if(n < 5) return (cfg.cellsize_build_small ?? 8) * n;
   if(n <= 40) return (cfg.cellsize_build_medium ?? 7) * n;
   return (cfg.cellsize_build_large ?? 3) * n;
+}
+
+// Deployment share of the Cell size build result: a lower percentage for small cells (<5 m²)
+// and a higher percentage for cells at or above 5 m².
+function cellsizeDeployPct(step, cfg){
+  const n = numOr0(step.rawInputs.cellsize);
+  return n < 5 ? (cfg.cellsize_deploy_small ?? 0.1) : (cfg.cellsize_deploy_large ?? 0.5);
 }
 
 // Criteria whose Build/Test/Deployment hour formulas haven't been specified yet — they contribute 0h
@@ -627,7 +661,7 @@ function renderGrid(){
       } else if(elDef.inputType === 'phasehours'){
         const vals = step.rawInputs[elDef.key] || (step.rawInputs[elDef.key] = {build:'', test:'', deploy:'', reason:''});
         const tripleDiv = document.createElement('div'); tripleDiv.className = 'mini-triple';
-        const phaseLabels = { build:'Build phase', test:'Test phase', deploy:'Deploy phase' };
+        const phaseLabels = { build:'Cell Assembly', test:'Test phase', deploy:'Deploy phase' };
         ['build','test','deploy'].forEach(phase=>{
           const item = document.createElement('div'); item.className = 'mini-triple-item';
           const lbl = document.createElement('div'); lbl.className = 'mini-triple-label';
@@ -702,7 +736,7 @@ function buildFormulasContent(){
     html += `<div class="formula-item"><h4>${el.name}</h4>`;
     if(el.sub) html += `<div class="formula-sub">${el.sub}</div>`;
     if(el.formulaDoc){
-      [['build','Build'],['test','Test'],['deploy','Deployment']].forEach(([phase,label])=>{
+      [['build','Cell Assembly'],['test','Test'],['deploy','Deployment']].forEach(([phase,label])=>{
         const text = typeof el.formulaDoc[phase] === 'function' ? el.formulaDoc[phase](CONFIG.hours) : '—';
         html += `<div class="formula-phase-row"><div class="phase-tag">${label}</div><div class="phase-desc">${renderFormulaLine(text)}</div></div>`;
       });
