@@ -30,6 +30,7 @@
   .field{ display:flex; flex-direction:column; gap:6px; }
   .field label{ font-size:11px; text-transform:uppercase; letter-spacing:.06em; color:var(--dusk); }
   .field input[type=text]{ font-family:inherit; font-size:14px; padding:9px 11px; border:1.5px solid var(--muted); border-radius:8px; background:#fff; color:var(--text); min-width:220px; }
+  .field select{ font-family:inherit; font-size:14px; padding:9px 11px; border:1.5px solid var(--muted); border-radius:8px; background:#fff; color:var(--text); min-width:220px; }
   .config-status{ font-size:11px; color:#5c6b76; font-weight:700; }
   .config-status.live{ color:#1e6b47; }
 
@@ -149,6 +150,19 @@
     <div class="field">
       <label for="senderName">Your name *</label>
       <input type="text" id="senderName" placeholder="e.g. Jane Doe">
+    </div>
+    <div class="field">
+      <label for="milestone">Scored at Milestone *</label>
+      <select id="milestone">
+        <option value="" disabled selected>Select a milestone</option>
+        <option value="M1 - Requirements">M1 - Requirements</option>
+        <option value="M2 - Concept">M2 - Concept</option>
+        <option value="M3 - Customer Commitment">M3 - Customer Commitment</option>
+        <option value="M4 - Detailed Design">M4 - Detailed Design</option>
+        <option value="M5 - Build &amp; Test">M5 - Build &amp; Test</option>
+        <option value="M6 - Deployment">M6 - Deployment</option>
+        <option value="M7 - Project Closure">M7 - Project Closure</option>
+      </select>
     </div>
     <div class="field">
       <label for="hubspotDealId">HubSpot Deal ID *</label>
@@ -482,6 +496,7 @@ const FORM_ACTION_URL = 'https://docs.google.com/forms/d/e/1FAIpQLSfgKJHpdF7DjQu
 const FORM_ENTRY_IDS = {
   phase: 'entry.913181026',
   senderName: 'entry.1612375149',
+  milestone: 'PASTE_ENTRY_ID_MILESTONE',
   hubspotDealId: 'PASTE_ENTRY_ID_HUBSPOT_DEAL_ID',
   project: 'entry.469321192',
   estimateType: 'entry.245978400',
@@ -507,7 +522,7 @@ let CONFIG = {
     custmachine_build:1, custmachine_test:4, custmachine_deploy:5,
     plc_build_supplier:2, plc_build_robco:4, plc_test_supplier:3, plc_test_robco:30, plc_deploy_supplier:2, plc_deploy_robco:6,
     travel_test:6, travel_deploy:5 } };
-let state = { project:'', senderName:'', hubspotDealId:'', steps:[] };
+let state = { project:'', senderName:'', milestone:'', hubspotDealId:'', steps:[] };
 let stepCounter = 0;
 
 function numOr0(v){ const n = parseFloat(v); return isNaN(n) ? 0 : n; }
@@ -792,12 +807,13 @@ document.addEventListener('keydown', e=>{
 
 document.getElementById('projectName').addEventListener('input', e=>{ state.project = e.target.value; });
 document.getElementById('senderName').addEventListener('input', e=>{ state.senderName = e.target.value; updateSendButtonState(); });
+document.getElementById('milestone').addEventListener('change', e=>{ state.milestone = e.target.value; updateSendButtonState(); });
 document.getElementById('hubspotDealId').addEventListener('input', e=>{ state.hubspotDealId = e.target.value; updateSendButtonState(); });
 document.getElementById('resetBtn').addEventListener('click', ()=>{ location.reload(); });
 
-// "Your name" and "HubSpot Deal ID" are required before a score can be sent.
+// "Your name", "Scored at Milestone" and "HubSpot Deal ID" are required before a score can be sent.
 function updateSendButtonState(){
-  const infoReady = state.senderName.trim() !== '' && state.hubspotDealId.trim() !== '';
+  const infoReady = state.senderName.trim() !== '' && state.milestone.trim() !== '' && state.hubspotDealId.trim() !== '';
   const criteriaReady = state.steps.every(isStepComplete);
   document.getElementById('sendBtn').disabled = !(infoReady && criteriaReady);
 }
@@ -855,6 +871,7 @@ document.getElementById('copyBtn').addEventListener('click', ()=>{
   const hoursTest = totalPhaseHours('test');
   const hoursDeploy = totalPhaseHours('deploy');
   let out = `[Execution] ${state.project || '(unnamed)'} — scored by ${state.senderName || '(not entered)'}\n`;
+  out += `Scored at Milestone: ${state.milestone || '(not entered)'}\n`;
   out += `HubSpot Deal ID: ${state.hubspotDealId || '(not entered)'}\n`;
   out += `Hours — Build: ${hoursBuild.toFixed(1)} · Test: ${hoursTest.toFixed(1)} · Deployment: ${hoursDeploy.toFixed(1)} · Total: ${(hoursBuild+hoursTest+hoursDeploy).toFixed(1)}\n`;
   if(PENDING_HOUR_CRITERIA.length) out += `(Formulas pending for: ${PENDING_HOUR_CRITERIA.join(', ')} — counted as 0h)\n`;
@@ -885,8 +902,8 @@ document.getElementById('copyBtn').addEventListener('click', ()=>{
 
 document.getElementById('sendBtn').addEventListener('click', ()=>{
   const statusEl = document.getElementById('sendStatus');
-  if(state.senderName.trim() === '' || state.hubspotDealId.trim() === ''){
-    statusEl.className='send-status err'; statusEl.textContent='Enter your name and HubSpot Deal ID before sending.'; return;
+  if(state.senderName.trim() === '' || state.milestone.trim() === '' || state.hubspotDealId.trim() === ''){
+    statusEl.className='send-status err'; statusEl.textContent='Enter your name, Scored at Milestone, and HubSpot Deal ID before sending.'; return;
   }
   const missingReason = state.steps.some(step=>{
     const vals = step.rawInputs.projectresource || {};
@@ -923,11 +940,13 @@ document.getElementById('sendBtn').addEventListener('click', ()=>{
   }
   addField(FORM_ENTRY_IDS.phase, PHASE_NAME);
   addField(FORM_ENTRY_IDS.senderName, state.senderName);
+  addField(FORM_ENTRY_IDS.milestone, state.milestone);
   addField(FORM_ENTRY_IDS.hubspotDealId, state.hubspotDealId);
   addField(FORM_ENTRY_IDS.project, state.project);
   addField(FORM_ENTRY_IDS.estimateType, '');
   addField(FORM_ENTRY_IDS.projectLevelJson, JSON.stringify({
     hubspotDealId: state.hubspotDealId,
+    milestone: state.milestone,
     hours: { build: totalBuild, test: totalTest, deploy: totalDeploy, total: totalAll },
     hoursFormulasPending: PENDING_HOUR_CRITERIA }));
   addField(FORM_ENTRY_IDS.itemsJson, JSON.stringify(rows));
