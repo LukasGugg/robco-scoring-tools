@@ -423,6 +423,7 @@ const DEF = {
     { key:'periphery', name:'Periphery integrations',
       sub:'Number of larger devices that require integrating (e.g. conveyors, flexi-bowls, feeding stations etc). Each device counts individually i.e. 3 flexi-bowls are 3 integrations, not 1.',
       inputType:'number', example:'e.g. 2',
+      notesPlaceholder:'list your periphery here',
       hourFormula:{
         build:(step, cfg)=> (cfg.periphery_build ?? 2) * numOr0(step.rawInputs.periphery),
         test:(step, cfg)=> (cfg.periphery_test ?? 4) * numOr0(step.rawInputs.periphery),
